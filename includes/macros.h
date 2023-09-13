@@ -18,7 +18,7 @@
 #define RESET "\033[0m"
 
 #ifndef DEBUG
-    #define DEBUG 4
+    #define DEBUG 3
 #endif
 
 // Log
