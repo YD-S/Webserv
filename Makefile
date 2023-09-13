@@ -6,7 +6,7 @@ CC=c++
 # 2 - WARNING
 # 3 - ERROR
 
-CFLAGS= -Wall -Wextra -Werror -DDEBUG=1 -MD -g -std=c++98
+CFLAGS= -Wall -Wextra -Werror -DDEBUG=0 -MD -g -std=c++98
 
 NAME= webserv
 
