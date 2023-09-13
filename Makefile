@@ -1,6 +1,12 @@
 
 CC=c++
-CFLAGS= -Wall -Wextra -Werror -g -std=c++98
+# Debug levels
+# 0 - DEBUG
+# 1 - INFO
+# 2 - WARNING
+# 3 - ERROR
+
+CFLAGS= -Wall -Wextra -Werror -DDEBUG=1 -MD -g -std=c++98
 
 NAME= webserv
 
@@ -14,6 +20,8 @@ SRC= $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 OBJ= $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.cpp=.o))
 
 all: $(NAME)
+
+-include $(OBJ:.o=.d)
 
 $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
