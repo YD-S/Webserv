@@ -10,13 +10,14 @@
 #include <string>
 #include "LocationConfig.hpp"
 
-class ServerConfig : public LocationConfig {
+class ServerConfig : private LocationConfig {
 
 private:
     std::vector<std::pair<std::string, int> > listen;
     std::string serverName;
 
     std::vector<LocationConfig> locations;
+    LocationConfig defaultLocation;
 
 public:
     ServerConfig();
@@ -28,7 +29,7 @@ public:
     void removeListen(const std::string& host, int port);
     ServerConfig setServerName(const std::string& name);
     ServerConfig addLocation(const LocationConfig& location);
-
+    ServerConfig setDefaultLocation(const LocationConfig& location);
 
     bool isListeningOn(const std::string& host, int port);
     std::string getServerName();

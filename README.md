@@ -28,6 +28,72 @@ A simple web server written in C++.
 - `LOG_INFO`: Log info messages.
 - `LOG_DEBUG`: Log debug messages.
 
+### LocationConfig builder
+
+The location config class can be built using a builder pattern.
+Here is an example:
+
+```cpp
+LocationConfig()
+        .addIndex("index.html")
+        .addIndex("index.php")
+        .setRoot("/var/www/html")
+        .setPath("/")
+        .addMethod("GET")
+        .addMethod("POST")
+        .setDirectoryListingEnabled(true)
+        .setDirectoryResponseFile("/var/www/html/.directory")
+        .setCgiEnabled(true)
+        .setCgiPath("/var/www/html/cgi-bin")
+        .setCgiExtension(".php")
+        .setUploadEnabled(true)
+        .setUploadPath("/var/www/html/uploads")
+```
+
+### ServerConfig builder
+
+The server config class can be built using a builder pattern. It has a default location config that can be set using
+the `setDefaultLocation` method. This default location config will be used for all requests that do not match any
+location config.
+Here is an example:
+
+```cpp
+ServerConfig config = ServerConfig()
+        .addListen("localhost", 8080)
+        .addListen("localhost", 8081)
+        .setServerName("localhost")
+        .setDefaultLocation(LocationConfig()
+                .addIndex("index.html")
+                .addIndex("index.php")
+                .setRoot("/var/www/html")
+                .setPath("/")
+                .addMethod("GET")
+                .addMethod("POST")
+                .setDirectoryListingEnabled(true)
+                .setDirectoryResponseFile("/var/www/html/.directory")
+                .setCgiEnabled(true)
+                .setCgiPath("/var/www/html/cgi-bin")
+                .setCgiExtension(".php")
+                .setUploadEnabled(true)
+                .setUploadPath("/var/www/html/uploads")
+                )
+        .addLocation(LocationConfig()
+                .addIndex("index.html")
+                .addIndex("index.php")
+                .setRoot("/var/www/html")
+                .setPath("/test")
+                .addMethod("GET")
+                .addMethod("POST")
+                .setDirectoryListingEnabled(true)
+                .setDirectoryResponseFile("/var/www/html/.directory")
+                .setCgiEnabled(true)
+                .setCgiPath("/var/www/html/cgi-bin")
+                .setCgiExtension(".php")
+                .setUploadEnabled(true)
+                .setUploadPath("/var/www/html/uploads")
+                );
+```
+
 ### Request builder
 
 The request class can be built using a builder pattern.
