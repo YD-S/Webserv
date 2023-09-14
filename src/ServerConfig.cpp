@@ -65,4 +65,5 @@ ServerConfig ServerConfig::addLocation(const LocationConfig &location) {
 
 ServerConfig ServerConfig::setDefaultLocation(const LocationConfig &location) {
     this->defaultLocation = location;
+    return *this;
 }
