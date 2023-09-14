@@ -4,6 +4,16 @@ A simple web server written in C++.
 
 ## Development
 
+### Diagrams
+
+#### Class diagram
+
+![Class diagram](./docs/class_diagram.png)
+
+#### Sequence diagram
+
+![Sequence diagram](./docs/sequence_diagram.png)
+
 ### Macros
 
 - `DEBUG`: Set the debug level. The higher the level, the higher the severity of the log messages. The default level is
