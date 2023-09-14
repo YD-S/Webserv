@@ -28,6 +28,35 @@ A simple web server written in C++.
 - `LOG_INFO`: Log info messages.
 - `LOG_DEBUG`: Log debug messages.
 
+### Request builder
+
+The request class can be built using a builder pattern.
+Here is an example:
+
+```cpp
+HttpRequest req = HttpRequest()
+        .setMethod("POST")
+        .setPath("/index.html")
+        .setVersion("HTTP/1.1")
+        .addHeader("Content-Type", MimeTypes::getType("html"))
+        .addHeader("Content-Length", "12")
+        .setBody("Hello World!");
+```
+
+### Response builder
+
+The response class can be built using a builder pattern.
+Here is an example:
+
+```cpp
+HttpResponse response = HttpResponse()
+        .setVersion("HTTP/1.1")
+        .setStatus(HttpStatus::OK)
+        .addHeader("Content-Type", MimeTypes::getType("html"))
+        .addHeader("Content-Length", "12")
+        .setBody("Hello World!");
+```
+
 ### Build
 
 ```bash

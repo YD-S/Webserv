@@ -5,7 +5,6 @@
 #include <cstdio>
 #include "HttpResponse.hpp"
 #include "HttpStatus.hpp"
-#include "macros.h"
 
 HttpResponse::HttpResponse() : status(HttpStatus::IM_A_TEAPOT) {
     this->version = "HTTP/1.1";
@@ -16,21 +15,25 @@ HttpResponse::~HttpResponse() {
 
 }
 
-void HttpResponse::setVersion(const std::string &version) {
+HttpResponse HttpResponse::setVersion(const std::string &version) {
     this->version = version;
+    return *this;
 }
 
-void HttpResponse::setStatus(int status) {
+HttpResponse HttpResponse::setStatus(int status) {
     this->status = status;
     this->reason = HttpStatus::getReasonString(status);
+    return *this;
 }
 
-void HttpResponse::addHeader(const std::string &key, const std::string &value) {
+HttpResponse HttpResponse::addHeader(const std::string &key, const std::string &value) {
     this->headers.push_back(std::make_pair(key, value));
+    return *this;
 }
 
-void HttpResponse::setBody(const std::string &body) {
+HttpResponse HttpResponse::setBody(const std::string &body) {
     this->body = body;
+    return *this;
 }
 
 const std::string &HttpResponse::getVersion() const {

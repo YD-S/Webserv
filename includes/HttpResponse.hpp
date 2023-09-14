@@ -24,13 +24,13 @@ public:
     HttpResponse();
     ~HttpResponse();
 
-    void setVersion(const std::string &version);
+    HttpResponse setVersion(const std::string &version);
 
-    void setStatus(int status);
+    HttpResponse setStatus(int status);
 
-    void addHeader(const std::string& key, const std::string& value);
+    HttpResponse addHeader(const std::string& key, const std::string& value);
 
-    void setBody(const std::string &body);
+    HttpResponse setBody(const std::string &body);
 
     const std::string &getVersion() const;
 
