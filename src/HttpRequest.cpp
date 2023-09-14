@@ -8,6 +8,21 @@ HttpRequest::HttpRequest() {
     this->version = "HTTP/1.1";
 }
 
+HttpRequest::HttpRequest(const HttpRequest &other) {
+    *this = other;
+}
+
+HttpRequest &HttpRequest::operator=(const HttpRequest &other) {
+    if (this != &other) {
+        this->method = other.method;
+        this->path = other.path;
+        this->version = other.version;
+        this->headers = other.headers;
+        this->body = other.body;
+    }
+    return *this;
+}
+
 HttpRequest::~HttpRequest() {
 
 }

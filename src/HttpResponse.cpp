@@ -8,7 +8,20 @@
 
 HttpResponse::HttpResponse() : status(HttpStatus::IM_A_TEAPOT) {
     this->version = "HTTP/1.1";
-    this->reason = HttpStatus::getReasonString(HttpStatus::IM_A_TEAPOT);
+}
+
+HttpResponse::HttpResponse(const HttpResponse &other) : status() {
+    *this = other;
+}
+
+HttpResponse &HttpResponse::operator=(const HttpResponse &other) {
+    if (this != &other) {
+        this->version = other.version;
+        this->status = other.status;
+        this->headers = other.headers;
+        this->body = other.body;
+    }
+    return *this;
 }
 
 HttpResponse::~HttpResponse() {
@@ -22,7 +35,6 @@ HttpResponse HttpResponse::setVersion(const std::string &version) {
 
 HttpResponse HttpResponse::setStatus(int status) {
     this->status = status;
-    this->reason = HttpStatus::getReasonString(status);
     return *this;
 }
 
@@ -44,10 +56,6 @@ int HttpResponse::getStatus() const {
     return status;
 }
 
-const std::string &HttpResponse::getReason() const {
-    return reason;
-}
-
 const std::vector<std::pair<std::string, std::string> > &HttpResponse::getHeaders() const {
     return headers;
 }
@@ -59,7 +67,7 @@ const std::string &HttpResponse::getBody() const {
 std::string HttpResponse::toRawString() {
     char statusAsString[3];
     std::sprintf(statusAsString, "%d", this->status);
-    std::string response = this->version + " " + std::string(statusAsString) + " " + this->reason + "\r\n";
+    std::string response = this->version + " " + std::string(statusAsString) + " " + HttpStatus::getReasonString(this->status) + "\r\n";
     for (std::vector<std::pair<std::string, std::string> >::iterator it = this->headers.begin(); it != this->headers.end(); ++it) {
         response += it->first + ": " + it->second + "\r\n";
     }

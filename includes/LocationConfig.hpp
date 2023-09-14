@@ -29,6 +29,8 @@ private:
 public:
 
     LocationConfig();
+    LocationConfig(const LocationConfig& other);
+    LocationConfig& operator=(const LocationConfig& other);
     ~LocationConfig();
 
     void addIndex(const std::string& index);

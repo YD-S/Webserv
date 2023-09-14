@@ -1,11 +1,36 @@
 
 #include "ServerConfig.hpp"
 
-void ServerConfig::addListen(const std::string& host, int port) {
+ServerConfig::ServerConfig() {
+
+}
+
+ServerConfig::ServerConfig(const ServerConfig &other) {
+    *this = other;
+}
+
+ServerConfig &ServerConfig::operator=(const ServerConfig &other) {
+    if (this != &other) {
+        this->listen = other.listen;
+        this->serverName = other.serverName;
+        this->locations.clear();
+        for (std::vector<LocationConfig>::const_iterator it = other.locations.begin();
+             it != other.locations.end(); ++it) {
+            this->locations.push_back(LocationConfig(*it));
+        }
+    }
+    return *this;
+}
+
+ServerConfig::~ServerConfig() {
+
+}
+
+void ServerConfig::addListen(const std::string &host, int port) {
     listen.push_back(std::make_pair(host, port));
 }
 
-void ServerConfig::setServerName(const std::string& name) {
+void ServerConfig::setServerName(const std::string &name) {
     serverName = name;
 }
 
@@ -20,14 +45,6 @@ bool ServerConfig::isListeningOn(const std::string &host, int port) {
 
 std::string ServerConfig::getServerName() {
     return serverName;
-}
-
-ServerConfig::ServerConfig() {
-
-}
-
-ServerConfig::~ServerConfig() {
-
 }
 
 void ServerConfig::removeListen(const std::string &host, int port) {

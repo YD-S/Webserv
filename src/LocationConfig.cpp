@@ -8,6 +8,27 @@ LocationConfig::LocationConfig() : directoryListingEnabled(), cgiEnabled(), uplo
 
 }
 
+LocationConfig::LocationConfig(const LocationConfig &other) : directoryListingEnabled(), cgiEnabled(), uploadEnabled() {
+    *this = other;
+}
+
+LocationConfig &LocationConfig::operator=(const LocationConfig &other) {
+    if (this != &other) {
+        this->path = other.path;
+        this->root = other.root;
+        this->indexes = other.indexes;
+        this->methods = other.methods;
+        this->directoryListingEnabled = other.directoryListingEnabled;
+        this->directoryResponseFile = other.directoryResponseFile;
+        this->cgiEnabled = other.cgiEnabled;
+        this->cgiPath = other.cgiPath;
+        this->cgiExtension = other.cgiExtension;
+        this->uploadEnabled = other.uploadEnabled;
+        this->uploadPath = other.uploadPath;
+    }
+    return *this;
+}
+
 LocationConfig::~LocationConfig() {
 
 }

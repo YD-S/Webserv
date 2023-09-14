@@ -23,7 +23,8 @@ private:
 public:
 
     HttpRequest();
-
+    HttpRequest(const HttpRequest& other);
+    HttpRequest& operator=(const HttpRequest& other);
     ~HttpRequest();
 
     HttpRequest setMethod(const std::string &method);

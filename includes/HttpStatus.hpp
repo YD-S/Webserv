@@ -10,6 +10,8 @@
 class HttpStatus {
 
 public:
+    virtual ~HttpStatus() = 0;
+
     static const int CONTINUE = 100;
     static const int SWITCHING_PROTOCOLS = 101;
     static const int PROCESSING = 102;

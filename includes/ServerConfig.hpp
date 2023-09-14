@@ -20,6 +20,8 @@ private:
 
 public:
     ServerConfig();
+    ServerConfig(const ServerConfig& other);
+    ServerConfig& operator=(const ServerConfig& other);
     ~ServerConfig();
 
     void addListen(const std::string& host, int port);

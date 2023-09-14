@@ -13,7 +13,6 @@ class HttpResponse {
 private:
     std::string version;
     int status;
-    std::string reason;
 
     std::vector<std::pair<std::string, std::string> > headers;
 
@@ -22,6 +21,8 @@ private:
 public:
 
     HttpResponse();
+    HttpResponse(const HttpResponse& other);
+    HttpResponse& operator=(const HttpResponse& other);
     ~HttpResponse();
 
     HttpResponse setVersion(const std::string &version);
