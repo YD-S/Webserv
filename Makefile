@@ -14,7 +14,7 @@ SRC_DIR= src
 OBJ_DIR= obj
 INC_DIR= includes
 
-SRC_FILES = main.cpp
+SRC_FILES = main.cpp ServerConfig.cpp LocationConfig.cpp HttpRequest.cpp HttpResponse.cpp HttpStatus.cpp MimeTypes.cpp
 
 SRC= $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 OBJ= $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.cpp=.o))
