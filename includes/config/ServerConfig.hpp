@@ -10,7 +10,7 @@
 #include <string>
 #include "LocationConfig.hpp"
 
-class ServerConfig : private LocationConfig {
+class ServerConfig {
 
 private:
     std::vector<std::pair<std::string, int> > listen;

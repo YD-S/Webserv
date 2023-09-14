@@ -1,11 +1,11 @@
 
-#include "ServerConfig.hpp"
+#include "config/ServerConfig.hpp"
 
 ServerConfig::ServerConfig() {
 
 }
 
-ServerConfig::ServerConfig(const ServerConfig &other)  : LocationConfig(other) {
+ServerConfig::ServerConfig(const ServerConfig &other) {
     *this = other;
 }
 

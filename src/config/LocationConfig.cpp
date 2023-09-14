@@ -2,7 +2,7 @@
 // Created by kolterdyx on 14/09/23.
 //
 
-#include "LocationConfig.hpp"
+#include "config/LocationConfig.hpp"
 
 LocationConfig::LocationConfig() : directoryListingEnabled(), cgiEnabled(), uploadEnabled() {
 

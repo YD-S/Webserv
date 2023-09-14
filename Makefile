@@ -14,7 +14,7 @@ SRC_DIR= src
 OBJ_DIR= obj
 INC_DIR= includes
 
-SRC_FILES = main.cpp ServerConfig.cpp LocationConfig.cpp HttpRequest.cpp HttpResponse.cpp HttpStatus.cpp MimeTypes.cpp
+SRC_FILES = main.cpp config/ServerConfig.cpp config/LocationConfig.cpp HttpRequest.cpp HttpResponse.cpp HttpStatus.cpp MimeTypes.cpp
 
 SRC= $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 OBJ= $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.cpp=.o))
@@ -28,7 +28,7 @@ $(NAME): $(OBJ)
 	@echo "\033[32m[✔] $(NAME) created successfully!\033[0m"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(shell dirname $@)
 	@$(CC) $(CFLAGS) -I $(INC_DIR) -c $< -o $@
 
 clean:

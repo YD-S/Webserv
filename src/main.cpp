@@ -1,6 +1,6 @@
 
 #include "macros.h"
-#include "ServerConfig.hpp"
+#include "config/ServerConfig.hpp"
 
 int main(int argc, char *argv[]) {
 
