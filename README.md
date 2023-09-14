@@ -8,11 +8,11 @@ A simple web server written in C++.
 
 #### Class diagram
 
-![Class diagram](./docs/class_diagram.png)
+![Class diagram](./docs/class_diagram.svg)
 
 #### Sequence diagram
 
-![Sequence diagram](./docs/sequence_diagram.png)
+![Sequence diagram](./docs/sequence_diagram.svg)
 
 ### Macros
 
