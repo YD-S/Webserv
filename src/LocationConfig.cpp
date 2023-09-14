@@ -33,48 +33,59 @@ LocationConfig::~LocationConfig() {
 
 }
 
-void LocationConfig::setPath(const std::string &path) {
+LocationConfig LocationConfig::setPath(const std::string &path) {
     this->path = path;
+    return *this;
 }
 
-void LocationConfig::setRoot(const std::string &root) {
+LocationConfig LocationConfig::setRoot(const std::string &root) {
     this->root = root;
+    return *this;
 }
 
-void LocationConfig::setDirectoryListingEnabled(bool directoryListingEnabled) {
+LocationConfig LocationConfig::setDirectoryListingEnabled(bool directoryListingEnabled) {
     this->directoryListingEnabled = directoryListingEnabled;
+    return *this;
 }
 
-void LocationConfig::setDirectoryResponseFile(const std::string &directoryResponseFile) {
+LocationConfig LocationConfig::setDirectoryResponseFile(const std::string &directoryResponseFile) {
     this->directoryResponseFile = directoryResponseFile;
+    return *this;
 }
 
-void LocationConfig::setCgiEnabled(bool cgiEnabled) {
+LocationConfig LocationConfig::setCgiEnabled(bool cgiEnabled) {
     this->cgiEnabled = cgiEnabled;
+    return *this;
 }
 
-void LocationConfig::setCgiPath(const std::string &cgiPath) {
+LocationConfig LocationConfig::setCgiPath(const std::string &cgiPath) {
     this->cgiPath = cgiPath;
+    return *this;
 }
 
-void LocationConfig::setCgiExtension(const std::string &cgiExtension) {
+LocationConfig LocationConfig::setCgiExtension(const std::string &cgiExtension) {
     this->cgiExtension = cgiExtension;
+    return *this;
 }
 
-void LocationConfig::setUploadEnabled(bool uploadEnabled) {
+LocationConfig LocationConfig::setUploadEnabled(bool uploadEnabled) {
     this->uploadEnabled = uploadEnabled;
+    return *this;
 }
 
-void LocationConfig::setUploadPath(const std::string &uploadPath) {
+LocationConfig LocationConfig::setUploadPath(const std::string &uploadPath) {
     this->uploadPath = uploadPath;
+    return *this;
 }
 
-void LocationConfig::addIndex(const std::string &index) {
+LocationConfig LocationConfig::addIndex(const std::string &index) {
     indexes.push_back(index);
+    return *this;
 }
 
-void LocationConfig::addMethod(const std::string &method) {
+LocationConfig LocationConfig::addMethod(const std::string &method) {
     methods.push_back(method);
+    return *this;
 }
 
 const std::string &LocationConfig::getPath() const {

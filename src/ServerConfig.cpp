@@ -5,7 +5,7 @@ ServerConfig::ServerConfig() {
 
 }
 
-ServerConfig::ServerConfig(const ServerConfig &other) {
+ServerConfig::ServerConfig(const ServerConfig &other)  : LocationConfig(other) {
     *this = other;
 }
 
@@ -26,12 +26,14 @@ ServerConfig::~ServerConfig() {
 
 }
 
-void ServerConfig::addListen(const std::string &host, int port) {
+ServerConfig ServerConfig::addListen(const std::string &host, int port) {
     listen.push_back(std::make_pair(host, port));
+    return *this;
 }
 
-void ServerConfig::setServerName(const std::string &name) {
+ServerConfig ServerConfig::setServerName(const std::string &name) {
     serverName = name;
+    return *this;
 }
 
 bool ServerConfig::isListeningOn(const std::string &host, int port) {
@@ -54,4 +56,9 @@ void ServerConfig::removeListen(const std::string &host, int port) {
             return;
         }
     }
+}
+
+ServerConfig ServerConfig::addLocation(const LocationConfig &location) {
+    this->locations.push_back(location);
+    return *this;
 }

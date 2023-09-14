@@ -37,8 +37,6 @@ public:
 
     int getStatus() const;
 
-    const std::string &getReason() const;
-
     const std::vector<std::pair<std::string, std::string> > &getHeaders() const;
 
     const std::string &getBody() const;

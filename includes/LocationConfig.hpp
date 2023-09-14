@@ -33,27 +33,27 @@ public:
     LocationConfig& operator=(const LocationConfig& other);
     ~LocationConfig();
 
-    void addIndex(const std::string& index);
+    LocationConfig addIndex(const std::string& index);
 
-    void addMethod(const std::string& method);
+    LocationConfig addMethod(const std::string& method);
 
-    void setPath(const std::string &path);
+    LocationConfig setPath(const std::string &path);
 
-    void setRoot(const std::string &root);
+    LocationConfig setRoot(const std::string &root);
 
-    void setDirectoryListingEnabled(bool directoryListingEnabled);
+    LocationConfig setDirectoryListingEnabled(bool directoryListingEnabled);
 
-    void setDirectoryResponseFile(const std::string &directoryResponseFile);
+    LocationConfig setDirectoryResponseFile(const std::string &directoryResponseFile);
 
-    void setCgiEnabled(bool cgiEnabled);
+    LocationConfig setCgiEnabled(bool cgiEnabled);
 
-    void setCgiPath(const std::string &cgiPath);
+    LocationConfig setCgiPath(const std::string &cgiPath);
 
-    void setCgiExtension(const std::string &cgiExtension);
+    LocationConfig setCgiExtension(const std::string &cgiExtension);
 
-    void setUploadEnabled(bool uploadEnabled);
+    LocationConfig setUploadEnabled(bool uploadEnabled);
 
-    void setUploadPath(const std::string &uploadPath);
+    LocationConfig setUploadPath(const std::string &uploadPath);
 
     const std::string &getPath() const;
 

@@ -10,7 +10,7 @@
 #include <string>
 #include "LocationConfig.hpp"
 
-class ServerConfig {
+class ServerConfig : public LocationConfig {
 
 private:
     std::vector<std::pair<std::string, int> > listen;
@@ -24,9 +24,11 @@ public:
     ServerConfig& operator=(const ServerConfig& other);
     ~ServerConfig();
 
-    void addListen(const std::string& host, int port);
+    ServerConfig addListen(const std::string& host, int port);
     void removeListen(const std::string& host, int port);
-    void setServerName(const std::string& name);
+    ServerConfig setServerName(const std::string& name);
+    ServerConfig addLocation(const LocationConfig& location);
+
 
     bool isListeningOn(const std::string& host, int port);
     std::string getServerName();
