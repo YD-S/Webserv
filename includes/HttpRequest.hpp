@@ -1,7 +1,3 @@
-//
-// Created by kolterdyx on 14/09/23.
-//
-
 #ifndef WEBSERV_HTTPREQUEST_HPP
 #define WEBSERV_HTTPREQUEST_HPP
 

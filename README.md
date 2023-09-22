@@ -132,6 +132,6 @@ make
 ### Run
 
 ```bash
-./webserv [config_file]
+./webserv [_config_file]
 ```
 

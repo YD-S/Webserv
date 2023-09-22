@@ -66,7 +66,7 @@ const std::string &HttpResponse::getBody() const {
 
 std::string HttpResponse::toRawString() {
     char statusAsString[3];
-    std::sprintf(statusAsString, "%d", this->status);
+    std::printf(statusAsString, "%d", this->status);
     std::string response = this->version + " " + std::string(statusAsString) + " " + HttpStatus::getReasonString(this->status) + "\r\n";
     for (std::vector<std::pair<std::string, std::string> >::iterator it = this->headers.begin(); it != this->headers.end(); ++it) {
         response += it->first + ": " + it->second + "\r\n";
