@@ -1,4 +1,6 @@
+#include <cstdlib>
 #include "fileValidate/fileValidate.hpp"
+#include "utils.hpp"
 
 fileValidate::fileValidate() {}
 
@@ -28,7 +30,12 @@ std::string fileValidate::getConfigFile(){
 }
 
 void fileValidate::validate_config_file(){
-	std::ifstream file(this->_config_file);
+    // check if file is a directory
+    if (is_dir(this->_config_file)) {
+        LOG_ERROR("Error: config file is a directory");
+        exit (EXIT_FAILURE);
+    }
+	std::ifstream file(this->_config_file.c_str());
 	if (!file.is_open()) {
 		LOG_ERROR("Error opening config file: " << this->_config_file);
 		file.close();
