@@ -30,9 +30,8 @@ std::string fileValidate::getConfigFile(){
 }
 
 void fileValidate::validate_config_file(){
-    // check if file is a directory
     if (is_dir(this->_config_file)) {
-        LOG_ERROR("Error: config file is a directory");
+        LOG_ERROR("config file is a directory");
         exit (EXIT_FAILURE);
     }
 	std::ifstream file(this->_config_file.c_str());
@@ -42,5 +41,18 @@ void fileValidate::validate_config_file(){
 		exit (EXIT_FAILURE);
 	}
 	LOG_INFO("Config file: " << this->_config_file << " opened successfully");
+	check_extension(this->_config_file);
 	file.close();
+}
+
+void fileValidate::check_extension(std::string config_file){
+	std::string extension;
+	size_t pos = config_file.find_last_of('.');
+	if (pos != std::string::npos) {
+		extension = config_file.substr(pos + 1);
+	}
+	if (extension != "conf"){
+		LOG_ERROR("Config file extension is not .conf");
+		exit (EXIT_FAILURE);
+	}
 }

@@ -1,0 +1,15 @@
+
+server {
+
+    server_name test_sever;
+
+    listen 80;
+
+    location / {
+        root /home/www;
+        index index.html index.htm;
+    }
+
+    location /test {
+    }
+}
