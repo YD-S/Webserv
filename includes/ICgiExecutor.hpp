@@ -1,0 +1,60 @@
+//
+// Created by kolterdyx on 5/10/23.
+//
+
+#ifndef WEBSERV_ICGIEXECUTOR_HPP
+#define WEBSERV_ICGIEXECUTOR_HPP
+
+
+#include "HttpResponse.hpp"
+#include "HttpRequest.hpp"
+
+class ICgiExecutor {
+
+private:
+    std::string _cgiPath;
+    std::string _cgiName;
+    std::string _cgiArgs;
+    std::string _cgiBody;
+    std::string _cgiEnv;
+    std::string _cgiResult;
+
+public:
+    ICgiExecutor();
+    ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, const std::string &cgiArgs, const std::string &cgiBody, const std::string &cgiEnv);
+    virtual ~ICgiExecutor() = 0;
+
+    const std::string &getCgiPath() const;
+
+    void setCgiPath(const std::string &cgiPath);
+
+    const std::string &getCgiName() const;
+
+    void setCgiName(const std::string &cgiName);
+
+    const std::string &getCgiArgs() const;
+
+    void setCgiArgs(const std::string &cgiArgs);
+
+    const std::string &getCgiBody() const;
+
+    void setCgiBody(const std::string &cgiBody);
+
+    const std::string &getCgiEnv() const;
+
+    void setCgiEnv(const std::string &cgiEnv);
+
+    const std::string &getCgiResult() const;
+
+    void setCgiResult(const std::string &cgiResult);
+
+    /**
+     * Passes a request to the CGI and returns the response via parameter
+     * @param request HttpRequest object reference to be passed to CGI
+     * @param response HttpResponse object reference to be filled with CGI response
+     */
+    virtual void executeCgi(HttpRequest &request, HttpResponse &response) = 0;
+};
+
+
+#endif //WEBSERV_ICGIEXECUTOR_HPP
