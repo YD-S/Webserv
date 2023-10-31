@@ -2,9 +2,9 @@
 // Created by kolterdyx on 14/09/23.
 //
 
-#include <cstdio>
 #include "HttpResponse.hpp"
 #include "HttpStatus.hpp"
+#include "utils.hpp"
 
 HttpResponse::HttpResponse() : status(HttpStatus::IM_A_TEAPOT) {
     this->version = "HTTP/1.1";
@@ -39,7 +39,7 @@ HttpResponse HttpResponse::setStatus(int status) {
 }
 
 HttpResponse HttpResponse::addHeader(const std::string &key, const std::string &value) {
-    this->headers.push_back(std::make_pair(key, value));
+    this->headers.insert(std::make_pair(key, value));
     return *this;
 }
 
@@ -56,7 +56,7 @@ int HttpResponse::getStatus() const {
     return status;
 }
 
-const std::vector<std::pair<std::string, std::string> > &HttpResponse::getHeaders() const {
+const std::map<std::string, std::string> &HttpResponse::getHeaders() const {
     return headers;
 }
 
@@ -65,10 +65,8 @@ const std::string &HttpResponse::getBody() const {
 }
 
 std::string HttpResponse::toRawString() {
-    char statusAsString[3];
-    std::printf(statusAsString, "%d", this->status);
-    std::string response = this->version + " " + std::string(statusAsString) + " " + HttpStatus::getReasonString(this->status) + "\r\n";
-    for (std::vector<std::pair<std::string, std::string> >::iterator it = this->headers.begin(); it != this->headers.end(); ++it) {
+    std::string response = this->version + " " + to_string(this->status) + " " + HttpStatus::getReasonString(this->status) + "\r\n";
+    for (std::map<std::string, std::string>::iterator it = this->headers.begin(); it != this->headers.end(); ++it) {
         response += it->first + ": " + it->second + "\r\n";
     }
     response += "\r\n";

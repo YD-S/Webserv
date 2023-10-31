@@ -43,7 +43,7 @@ HttpRequest HttpRequest::setVersion(const std::string &version) {
 }
 
 HttpRequest HttpRequest::addHeader(const std::string &key, const std::string &value) {
-    headers.push_back(std::make_pair(key, value));
+    headers.insert(std::make_pair(key, value));
     return *this;
 }
 
@@ -65,7 +65,7 @@ const std::string &HttpRequest::getVersion() const {
 }
 
 
-const std::vector<std::pair<std::string, std::string> > &HttpRequest::getHeaders() const {
+const std::map<std::string, std::string> &HttpRequest::getHeaders() const {
     return headers;
 }
 
@@ -74,8 +74,17 @@ const std::string &HttpRequest::getBody() const {
 }
 
 std::string HttpRequest::toRawString() {
-    std::string rawString = method + " " + path + " " + version + "\r\n";
-    for (std::vector<std::pair<std::string, std::string> >::iterator it = headers.begin(); it != headers.end(); ++it) {
+    std::string rawString = method + " " + path;
+    // Add the query parameters to the raw string
+    if (params.size() > 0) {
+        rawString += "?";
+        for (std::map<std::string, std::string>::iterator it = params.begin(); it != params.end(); ++it) {
+            rawString += it->first + "=" + it->second + (it != --params.end() ? "&" : "");
+        }
+        rawString = rawString.substr(0, rawString.size() - 1);
+    }
+    rawString += " " + version + "\r\n";
+    for (std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
         rawString += it->first + ": " + it->second + "\r\n";
     }
     rawString += "\r\n";
@@ -92,4 +101,21 @@ std::string HttpRequest::toPrintableString() {
         pos += 1;
     }
     return request;
+}
+
+const std::map<std::string, std::string> &HttpRequest::getParams() const {
+    return params;
+}
+
+HttpRequest HttpRequest::addParam(const std::string &key, const std::string &value) {
+    params.insert(std::make_pair(key, value));
+    return *this;
+}
+
+const std::string &HttpRequest::getHeader(const std::string &key) const {
+    return headers.find(key)->second;
+}
+
+const std::string &HttpRequest::getParam(const std::string &key) const {
+    return params.find(key)->second;
 }

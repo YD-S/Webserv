@@ -8,13 +8,14 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 class HttpResponse {
 private:
     std::string version;
     int status;
 
-    std::vector<std::pair<std::string, std::string> > headers;
+    std::map<std::string, std::string> headers;
 
     std::string body;
 
@@ -37,7 +38,7 @@ public:
 
     int getStatus() const;
 
-    const std::vector<std::pair<std::string, std::string> > &getHeaders() const;
+    const std::map<std::string, std::string> &getHeaders() const;
 
     const std::string &getBody() const;
 

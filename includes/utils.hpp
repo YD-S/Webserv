@@ -6,7 +6,15 @@
 #define WEBSERV_UTILS_HPP
 
 #include <string>
+#include <sstream>
 
 bool is_dir(const std::string& path);
+
+template <typename T>
+std::string to_string(T value) {
+    std::stringstream ss;
+    ss << value;
+    return ss.str();
+}
 
 #endif //WEBSERV_UTILS_HPP

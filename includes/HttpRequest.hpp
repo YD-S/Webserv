@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 class HttpRequest {
 
@@ -12,7 +13,8 @@ private:
     std::string path;
     std::string version;
 
-    std::vector<std::pair<std::string, std::string> > headers;
+    std::map<std::string, std::string> params;
+    std::map<std::string, std::string> headers;
 
     std::string body;
 
@@ -31,6 +33,8 @@ public:
 
     HttpRequest addHeader(const std::string &key, const std::string &value);
 
+    HttpRequest addParam(const std::string &key, const std::string &value);
+
     const HttpRequest &setBody(const std::string &body);
 
     const std::string &getMethod() const;
@@ -39,7 +43,13 @@ public:
 
     const std::string &getVersion() const;
 
-    const std::vector<std::pair<std::string, std::string> > &getHeaders() const;
+    const std::map<std::string, std::string> &getHeaders() const;
+
+    const std::string &getHeader(const std::string &key) const;
+
+    const std::map<std::string, std::string> &getParams() const;
+
+    const std::string &getParam(const std::string &key) const;
 
     const std::string &getBody() const;
 
