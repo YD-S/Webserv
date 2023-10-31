@@ -18,6 +18,7 @@ HttpRequest &HttpRequest::operator=(const HttpRequest &other) {
         this->path = other.path;
         this->version = other.version;
         this->headers = other.headers;
+        this->params = other.params;
         this->body = other.body;
     }
     return *this;
@@ -76,7 +77,7 @@ const std::string &HttpRequest::getBody() const {
 std::string HttpRequest::toRawString() {
     std::string rawString = method + " " + path;
     // Add the query parameters to the raw string
-    if (params.size() > 0) {
+    if (!params.empty()) {
         rawString += "?";
         for (std::map<std::string, std::string>::iterator it = params.begin(); it != params.end(); ++it) {
             rawString += it->first + "=" + it->second + (it != --params.end() ? "&" : "");

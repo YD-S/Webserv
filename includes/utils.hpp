@@ -17,4 +17,6 @@ std::string to_string(T value) {
     return ss.str();
 }
 
+std::string pathToFilename(const std::string& path);
+
 #endif //WEBSERV_UTILS_HPP

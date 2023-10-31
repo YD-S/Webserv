@@ -18,12 +18,19 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="206fcd91-9052-41c2-81d2-0e9cbf0e49ff" name="Changes" comment="remove test code">
-      <change afterPath="$PROJECT_DIR$/includes/ICgiExecutor.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/ICgiExecutor.cpp" afterDir="false" />
+    <list default="true" id="206fcd91-9052-41c2-81d2-0e9cbf0e49ff" name="Changes" comment="better HTTP classes">
+      <change afterPath="$PROJECT_DIR$/data/TestServerRoot/index.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/TestServerRoot/php.ini" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/TestServerRoot/test.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/includes/cgi/PhpCgiExecutor.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/cgi/PhpCgiExecutor.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/includes/HttpRequest.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/includes/HttpRequest.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/includes/utils.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/includes/utils.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HttpRequest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/HttpRequest.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,22 +115,18 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/includes/cgi" />
       <recent name="$PROJECT_DIR$/includes" />
       <recent name="$PROJECT_DIR$/configs" />
     </key>
   </component>
   <component name="RunManager" selected="Makefile Application.all">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Makefile" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Webserv" TARGET_NAME="Makefile" CONFIG_NAME="Makefile" version="1">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
@@ -139,7 +142,7 @@
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
     </configuration>
-    <configuration name="re" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Webserv" TARGET_NAME="re" CONFIG_NAME="re" version="1">
+    <configuration name="re" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Webserv" TARGET_NAME="re" CONFIG_NAME="re" version="1" RUN_PATH="webserv">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
       </method>
@@ -147,6 +150,11 @@
     <configuration name="webserv" type="CLionNativeAppRunConfigurationType" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="Webserv" TARGET_NAME="webserv" CONFIG_NAME="webserv" version="1">
       <method v="2">
         <option name="CLION.COMPOUND.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <list>
@@ -168,7 +176,19 @@
       <workItem from="1695387606799" duration="7237000" />
       <workItem from="1695743831594" duration="1201000" />
       <workItem from="1695980096752" duration="1052000" />
+      <workItem from="1698707778265" duration="38000" />
+      <workItem from="1698707822759" duration="4883000" />
+      <workItem from="1698715120346" duration="6569000" />
     </task>
+    <task id="LOCAL-00001" summary="better HTTP classes">
+      <option name="closed" value="true" />
+      <created>1698716472393</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1698716472393</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -176,6 +196,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="remove test code" />
-    <option name="LAST_COMMIT_MESSAGE" value="remove test code" />
+    <MESSAGE value="better HTTP classes" />
+    <option name="LAST_COMMIT_MESSAGE" value="better HTTP classes" />
   </component>
 </project>
