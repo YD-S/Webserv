@@ -106,6 +106,8 @@ HttpRequest req = HttpRequest()
         .setVersion("HTTP/1.1")
         .addHeader("Content-Type", MimeTypes::getType("html"))
         .addHeader("Content-Length", "12")
+        .addParam("param1", "value")
+        .addParam("param2", "434")
         .setBody("Hello World!");
 ```
 
@@ -132,6 +134,6 @@ make
 ### Run
 
 ```bash
-./webserv [_config_file]
+./webserv [config_file]
 ```
 

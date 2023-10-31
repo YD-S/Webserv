@@ -18,19 +18,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="206fcd91-9052-41c2-81d2-0e9cbf0e49ff" name="Changes" comment="better HTTP classes">
-      <change afterPath="$PROJECT_DIR$/data/TestServerRoot/index.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/TestServerRoot/php.ini" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/TestServerRoot/test.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/includes/cgi/PhpCgiExecutor.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/cgi/PhpCgiExecutor.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/includes/HttpRequest.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/includes/HttpRequest.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/includes/utils.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/includes/utils.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/HttpRequest.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/HttpRequest.cpp" afterDir="false" />
+    <list default="true" id="206fcd91-9052-41c2-81d2-0e9cbf0e49ff" name="Changes" comment="CGI stuff">
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,7 +167,7 @@
       <workItem from="1695980096752" duration="1052000" />
       <workItem from="1698707778265" duration="38000" />
       <workItem from="1698707822759" duration="4883000" />
-      <workItem from="1698715120346" duration="6569000" />
+      <workItem from="1698715120346" duration="7186000" />
     </task>
     <task id="LOCAL-00001" summary="better HTTP classes">
       <option name="closed" value="true" />
@@ -188,7 +177,15 @@
       <option name="project" value="LOCAL" />
       <updated>1698716472393</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="CGI stuff">
+      <option name="closed" value="true" />
+      <created>1698733724904</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1698733724905</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -197,6 +194,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="remove test code" />
     <MESSAGE value="better HTTP classes" />
-    <option name="LAST_COMMIT_MESSAGE" value="better HTTP classes" />
+    <MESSAGE value="CGI stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="CGI stuff" />
   </component>
 </project>
