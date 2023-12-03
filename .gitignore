@@ -31,6 +31,9 @@
 *.out
 *.app
 
+# Debugging files
+*.dSYM*
+
 # Specific files
 webserv
 
