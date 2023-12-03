@@ -105,9 +105,9 @@ char **PhpCgiExecutor::buildEnvp(HttpRequest &request) {
     }
 
     // Add the system environment variables to the environment pointer array
-    for (char **env = __environ; *env != NULL; ++env) {
-        envp_vector.push_back(*env);
-    }
+    //for (char **env = __environ; *env != NULL; ++env) {
+    //    envp_vector.push_back(*env);
+    //}
 
     // Add the environment variables to the environment pointer array
     char **envp = new char *[envp_vector.size() + 1];

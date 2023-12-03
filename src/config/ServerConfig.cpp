@@ -50,7 +50,7 @@ std::vector<std::pair<std::string, std::string> > ServerConfig::processFile(cons
 				// Skip consecutive whitespaces
 				continue;
 			}
-			if (line[i] == '#')
+			if (line[i] == '#' || (line[i] == '/' && line[i + 1] == '/'))
 				break ;
 
 			// Handle '{', '}', and ';'
@@ -88,6 +88,7 @@ std::vector<ServerConfig>    ServerConfig::parseConfig(std::string &path) {
 	std::string pastString;
 	std::unordered_multimap<std::string, std::string> myMap;
 	std::string position;
+	std::vector<ServerConfig> myServers;
 	bool startParsing = false;
 	for (std::vector<std::pair<std::string, std::string> >::iterator it = config.begin(); it != config.end(); it = config.erase(it)) {
 		// Accessing the string
@@ -101,27 +102,29 @@ std::vector<ServerConfig>    ServerConfig::parseConfig(std::string &path) {
 		if (startParsing)
 		{
 			for (; it != config.end(); it = config.erase(it)) {
-				// Accessing the string
-				pastString = it->first;
-				for (; it->first != "}" && it->first != "{" && it->first != ";"; it = config.erase(it))
+				if (it->first == "location")
 				{
-					if (it->first == "location")
-					{
-						it = config.erase(it);
-						getLocation(it, config);
-					}
+					it = config.erase(it);
+					getLocation(it, config);
+					continue ;
+				}
+				if (it->first == "}")
+					break ;
+				pastString = it->first;
+				it = config.erase(it);
+				for (; it != config.end() && it->first != "}" && it->first != "{" && it->first != ";"; it = config.erase(it))
+				{
 					myMap.insert(std::make_pair(pastString, it->first));
 				}
 				if (it->first == "{" || (it->first != ";" && it->first != "}"))
-					throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
+					throw std::runtime_error("Invalid config of server in " + it->second + " --> " + it->first);
 				if (it->first == "}")
 					break ;
 			}
-			throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
 		}
 		pastString = currentString;
 	}
-	for (std::unordered_map<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); ++it) {
+	for (std::unordered_multimap<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); ++it) {
 		// Accessing key and value
 		std::string key = it->first;
 		std::string value = it->second;
@@ -134,6 +137,7 @@ std::vector<ServerConfig>    ServerConfig::parseConfig(std::string &path) {
 			std::cout << "Invalid key or value type." << std::endl;
 		}
 	}
+	return myServers;
 }
 
 void ServerConfig::validate_braces(std::ifstream &file) {
@@ -164,23 +168,24 @@ void ServerConfig::validate_braces(std::ifstream &file) {
 }
 
 void    ServerConfig::mainSetter(std::unordered_multimap<std::string, std::string> &values){
-
+	for (std::unordered_multimap<std::string, std::string>::iterator it = values.begin(); it != values.end(); it++)
+	{
+		std::cout << it->first << std::endl;
+	}
 }
 
-LocationConfig &ServerConfig::getLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config){
+void ServerConfig::getLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config){
 	LocationConfig *myLocation = new LocationConfig();
 	myLocation->parseLocation(it, config);
 	addLocation(*myLocation);
 }
 
-ServerConfig ServerConfig::addListen(const std::string &host, int port) {
+void ServerConfig::addListen(const std::string &host, int port) {
     _listen.push_back(std::make_pair(host, port));
-    return *this;
 }
 
-ServerConfig ServerConfig::setServerName(const std::string &name) {
+void ServerConfig::setServerName(const std::string &name) {
 	_serverName = name;
-    return *this;
 }
 
 bool ServerConfig::isListeningOn(const std::string &host, int port) {
@@ -205,12 +210,19 @@ void ServerConfig::removeListen(const std::string &host, int port) {
     }
 }
 
-ServerConfig ServerConfig::addLocation(const LocationConfig &location) {
+void ServerConfig::addLocation(const LocationConfig &location) {
     this->_locations.push_back(location);
-    return *this;
 }
 
-ServerConfig ServerConfig::setDefaultLocation(const LocationConfig &location) {
+void ServerConfig::setDefaultLocation(const LocationConfig &location) {
     this->_defaultLocation = location;
-    return *this;
+}
+
+void ServerConfig::setClientMaxBodySize(size_t size){
+	_clientMaxBodySize = size;
+}
+void ServerConfig::setClientMaxBodySize(const std::string& size){
+	try {
+		_clientMaxBodySize = std::stol(size);
+	} catch (std::exception &e) { std::runtime_error("clientMaxBodySize too large!"); }
 }

@@ -54,10 +54,6 @@ void LocationConfig::parseLocation(std::vector<std::pair<std::string, std::strin
 		}
 		if (it->first == "{" || (it->first != ";" && it->first != "}"))
 			throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
-		if (it->first == "}"){
-			it = config.erase(it);
-			break ;
-		}
 	}
 }
 
@@ -65,12 +61,12 @@ void LocationConfig::addFunctions(std::unordered_map<std::string, LocationConfig
 	functionMap["path"] = &LocationConfig::setPath;
 	functionMap["root"] = &LocationConfig::setRoot;
 	functionMap["index"] = &LocationConfig::addIndex;
-	functionMap["method"] = &LocationConfig::addMethod;
+	functionMap["allow_methods"] = &LocationConfig::addMethod;
 	functionMap["directory_Listing_Enabled"] = &LocationConfig::setDirectoryListingEnabled;
 	functionMap["directory_Response_File"] = &LocationConfig::setDirectoryResponseFile;
 	functionMap["cgi_Enabled"] = &LocationConfig::setCgiEnabled;
-	functionMap["cgi_Path"] = &LocationConfig::setCgiPath;
-	functionMap["cgi_Extension"] = &LocationConfig::setCgiExtension;
+	functionMap["cgi_path"] = &LocationConfig::setCgiPath;
+	functionMap["cgi_ext"] = &LocationConfig::setCgiExtension;
 	functionMap["upload_Enabled"] = &LocationConfig::setUploadEnabled;
 	functionMap["upload_Path"] = &LocationConfig::setUploadPath;
 

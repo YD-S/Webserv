@@ -21,6 +21,7 @@ private:
     std::vector<std::pair<std::string, int> > _listen;
     std::string _serverName;
 	std::string _host;
+	size_t _clientMaxBodySize;
 
     std::vector<LocationConfig> _locations;
     LocationConfig _defaultLocation;
@@ -36,13 +37,15 @@ public:
 	std::vector<std::pair<std::string, std::string> > processFile(const std::string& filename);
 	std::vector<ServerConfig>    parseConfig(std::string &path);
     void    mainSetter(std::unordered_multimap<std::string, std::string> &values);
-	LocationConfig &getLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
+	void getLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
 
-    ServerConfig addListen(const std::string& host, int port);
+	void addListen(const std::string& host, int port);
     void removeListen(const std::string& host, int port);
-    ServerConfig setServerName(const std::string& name);
-    ServerConfig addLocation(const LocationConfig& location);
-    ServerConfig setDefaultLocation(const LocationConfig& location);
+	void setServerName(const std::string& name);
+	void addLocation(const LocationConfig& location);
+	void setDefaultLocation(const LocationConfig& location);
+	void setClientMaxBodySize(size_t size);
+	void setClientMaxBodySize(const std::string& size);
 
     bool isListeningOn(const std::string& host, int port);
     std::string getServerName();
