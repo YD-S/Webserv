@@ -1,4 +1,4 @@
-<?php
+<?php session_start();
 
 echo "<h3>_GET</h3><pre>";
 var_dump($_GET);
