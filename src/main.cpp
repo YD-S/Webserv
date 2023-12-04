@@ -1,16 +1,14 @@
-
 #include "macros.h"
 #include "fileValidate/fileValidate.hpp"
 #include "../includes/config/ServerConfig.hpp"
 #include "../includes/config/LocationConfig.hpp"
+#include "../includes/config/ParseConfig.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
 
 int main(int argc, char *argv[]) {
 
-	ServerConfig parse;
-	std::vector<ServerConfig> myServers;
     fileValidate config_file;
     LOG_INFO("Starting webserv...");
 	if (argc == 1){
@@ -18,14 +16,13 @@ int main(int argc, char *argv[]) {
 	}
 	else if (argc == 2){
 		std::string path = argv[1];
-		myServers = parse.parseConfig(path);
-		config_file.setConfigFile(argv[1]);
-	}
-    LOG_DEBUG("Reading config file: " << config_file.getConfigFile());
-	config_file.validate_config_file();
-	std::vector<ServerConfig>::iterator serverIter = myServers.begin();
-	for (; serverIter != myServers.end(); ++serverIter){
-		std::cout << serverIter->getServerName() << std::endl;
+		ParseConfig parse(path);
+		parse.parseConfig();
+		std::vector<ServerConfig>::iterator serverIter = parse.getServers().begin();
+		for (; serverIter != parse.getServers().end(); ++serverIter){
+			std::cout << serverIter->getHostName() << ":" << serverIter->getPort() 
+			<< " - with default location at -> " << serverIter->getDefaultLocation().getPath() << std::endl;
+		}
 	}
 	return 0;
 }

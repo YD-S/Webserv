@@ -29,7 +29,7 @@ std::string fileValidate::getConfigFile(){
 	return this->_config_file;
 }
 
-void fileValidate::validate_config_file(){
+std::ifstream fileValidate::validate_config_file(){
     if (is_dir(this->_config_file)) {
         LOG_ERROR("config file is a directory");
         exit (EXIT_FAILURE);
@@ -42,7 +42,7 @@ void fileValidate::validate_config_file(){
 	}
 	LOG_INFO("Config file: " << this->_config_file << " opened successfully");
 	check_extension(this->_config_file);
-	file.close();
+	return (file);
 }
 
 void fileValidate::check_extension(std::string config_file){

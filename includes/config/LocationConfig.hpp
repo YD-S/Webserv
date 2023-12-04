@@ -40,9 +40,8 @@ public:
     LocationConfig& operator=(const LocationConfig& other);
     ~LocationConfig();
 
+    void addFunctions(std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)> &functionMap);
 	void parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
-
-	void addFunctions(std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)> &functionMap);
 
     LocationConfig addIndex(const std::string& index);
 

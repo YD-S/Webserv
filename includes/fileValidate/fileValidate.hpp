@@ -18,7 +18,7 @@ public:
 	~fileValidate();
 	void setConfigFile(const std::string &config_file);
 	std::string getConfigFile();
-	void validate_config_file();
+	std::ifstream validate_config_file();
 	static void check_extension(std::string config_file);
 
 };

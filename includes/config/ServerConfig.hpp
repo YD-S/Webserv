@@ -22,7 +22,7 @@ private:
     int _listen;
 	std::string _host;
 	
-	//std::vector<std::string, std::string> error_pages;
+	std::string _errorPages;
 	std::string _serverName;
 	size_t _clientMaxBodySize;
     std::vector<LocationConfig> _locations;
@@ -34,13 +34,7 @@ public:
     ServerConfig& operator=(const ServerConfig& other);
     ~ServerConfig();
 
-	bool isDelimiter(char c);
-	void	validate_braces(std::ifstream &file);
-	std::vector<std::pair<std::string, std::string> > processFile(const std::string& filename);
-	std::vector<ServerConfig>    parseConfig(std::string &path);
-    void    mainSetter(std::unordered_multimap<std::string, std::string> &values);
-	void getLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
-	void addFunctions(std::unordered_map<std::string, void (ServerConfig::*)(const std::string&)> &functionMap);
+	void setLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
 
 	void addListen(int port);
 	void addListen(const std::string& port);
@@ -51,11 +45,14 @@ public:
 	void setDefaultLocation(const LocationConfig& location);
 	void setClientMaxBodySize(size_t size);
 	void setClientMaxBodySize(const std::string& size);
-	//void setErrorPage(const std::string& errorPage);
+	void setErrorPages(const std::string& errorPages);
 
     bool isListeningOn(int port);
     std::string getServerName();
-
+	std::string getHostName();
+	int getPort();
+	std::vector<LocationConfig>& getLocations();
+	LocationConfig& getDefaultLocation();
 };
 
 
