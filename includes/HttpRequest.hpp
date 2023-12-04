@@ -57,6 +57,8 @@ public:
     std::string toRawString();
 
     std::string toPrintableString();
+
+    std::string getQueryString();
 };
 
 

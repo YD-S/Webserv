@@ -77,13 +77,8 @@ const std::string &HttpRequest::getBody() const {
 std::string HttpRequest::toRawString() {
     std::string rawString = method + " " + path;
     // Add the query parameters to the raw string
-    if (!params.empty()) {
-        rawString += "?";
-        for (std::map<std::string, std::string>::iterator it = params.begin(); it != params.end(); ++it) {
-            rawString += it->first + "=" + it->second + (it != --params.end() ? "&" : "");
-        }
-        rawString = rawString.substr(0, rawString.size() - 1);
-    }
+    if (!params.empty())
+        rawString += "?" + getQueryString();
     rawString += " " + version + "\r\n";
     for (std::map<std::string, std::string>::iterator it = headers.begin(); it != headers.end(); ++it) {
         rawString += it->first + ": " + it->second + "\r\n";
@@ -119,4 +114,13 @@ const std::string &HttpRequest::getHeader(const std::string &key) const {
 
 const std::string &HttpRequest::getParam(const std::string &key) const {
     return params.find(key)->second;
+}
+
+std::string HttpRequest::getQueryString() {
+    std::string queryString = "";
+    for (std::map<std::string, std::string>::iterator it = params.begin(); it != params.end(); ++it) {
+        queryString += it->first + "=" + it->second + (it != params.end() ? "&" : "");
+    }
+    queryString = queryString.substr(0, queryString.size() - 1);
+    return queryString;
 }

@@ -18,9 +18,11 @@ private:
 protected:
     std::string _cgiResult;
 
+    char **envp;
+
 public:
     ICgiExecutor();
-    ICgiExecutor(const std::string &cgiPath, const std::string &cgiName);
+    ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp);
     virtual ~ICgiExecutor() = 0;
 
     const std::string &getCgiPath() const;

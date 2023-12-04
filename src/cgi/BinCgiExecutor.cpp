@@ -24,7 +24,7 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, std::string &response) {
     }
 
     // Build the environment variables
-    char **envp = buildEnvp(request);
+    char **envp_ = buildEnvp(request);
 
     // Build the arguments
     char **args = buildArgs(request);
@@ -47,7 +47,7 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, std::string &response) {
         }
 
         // Execute the CGI
-        execve(this->getCgiPath().c_str(), args, envp);
+        execve(this->getCgiPath().c_str(), args, envp_);
 
         // If we get here, execve failed
         throw std::runtime_error("Failed to execute php-cgi");
@@ -77,7 +77,7 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, std::string &response) {
         // Close the read end of the pipe
         close(response_pipe[0]);
 
-        destroyCstrp(envp);
+        destroyCstrp(envp_);
         destroyCstrp(args);
 
         response = postProcessCgiResult();
@@ -95,6 +95,14 @@ char **BinCgiExecutor::buildEnvp(HttpRequest &request) {
     envp_vector.push_back("REQUEST_METHOD=" + request.getMethod());
     envp_vector.push_back("SCRIPT_FILENAME=" + request.getPath());
     envp_vector.push_back("BODY=" + request.getBody());
+
+    // Other environment variables
+    if (request.getMethod() == "GET") {
+        envp_vector.push_back("QUERY_STRING=" + request.getQueryString());
+    } else if (request.getMethod() == "POST") {
+        envp_vector.push_back("CONTENT_TYPE=" + request.getHeaders().at("Content-Type"));
+    }
+
     // Add headers to the environment variables
     for (std::map<std::string, std::string>::const_iterator it = request.getHeaders().begin();
          it != request.getHeaders().end(); ++it) {
@@ -106,7 +114,7 @@ char **BinCgiExecutor::buildEnvp(HttpRequest &request) {
     }
 
     // Add the system environment variables to the environment pointer array
-    for (char **env = __environ; *env != NULL; ++env) {
+    for (char **env = envp; *env != NULL; ++env) {
         envp_vector.push_back(*env);
     }
 
@@ -155,8 +163,8 @@ char **BinCgiExecutor::buildArgs(unused HttpRequest &request) {
 BinCgiExecutor::~BinCgiExecutor() {
 }
 
-BinCgiExecutor::BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName) : ICgiExecutor(cgiPath,
-                                                                                                      cgiName) {
+BinCgiExecutor::BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp) : ICgiExecutor(cgiPath,
+                                                                                                      cgiName, envp) {
 
 }
 

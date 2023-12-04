@@ -17,11 +17,10 @@ private:
 
     static void destroyCstrp(char **cstrp);
 
-
 public:
     BinCgiExecutor();
 
-    BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName);
+    BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp);
 
     void executeCgi(HttpRequest &request, std::string &response);
 

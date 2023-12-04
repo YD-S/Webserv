@@ -4,9 +4,10 @@
 
 #include "ICgiExecutor.hpp"
 
-ICgiExecutor::ICgiExecutor(const std::string &cgiPath, const std::string &cgiName) {
+ICgiExecutor::ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp) {
     this->_cgiPath = cgiPath;
     this->_cgiName = cgiName;
+    this->envp = envp;
 }
 
 ICgiExecutor::ICgiExecutor() {
