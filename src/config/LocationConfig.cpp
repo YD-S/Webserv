@@ -55,6 +55,14 @@ void LocationConfig::parseLocation(std::vector<std::pair<std::string, std::strin
 		if (it->first == "{" || (it->first != ";" && it->first != "}"))
 			throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
 	}
+	std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)> functionMap;
+	addFunctions(functionMap);
+	std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)>::iterator funcIter;
+	for (std::unordered_multimap<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); it = myMap.erase(it)) {
+		funcIter = functionMap.find(it->first);
+		if (funcIter != functionMap.end())
+			(this->*funcIter->second)(it->second);
+	}
 }
 
 void LocationConfig::addFunctions(std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)> &functionMap) {

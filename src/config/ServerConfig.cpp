@@ -25,6 +25,16 @@ ServerConfig::~ServerConfig() {
 
 }
 
+void ServerConfig::addFunctions(std::unordered_map<std::string, void (ServerConfig::*)(const std::string&)> &functionMap) {
+	functionMap["listen"] = &ServerConfig::addListen;
+	functionMap["host"] = &ServerConfig::setHost;
+	functionMap["server_name"] = &ServerConfig::setServerName;
+	//functionMap["index"] = &ServerConfig::addIndex;
+	//functionMap["error_page"] = &ServerConfig::;
+	functionMap["client_max_body_size"] = &ServerConfig::setClientMaxBodySize;
+
+}
+
 bool ServerConfig::isDelimiter(char c) {
 	return (c == '{' || c == '}' || c == ';');
 }
@@ -124,19 +134,15 @@ std::vector<ServerConfig>    ServerConfig::parseConfig(std::string &path) {
 		}
 		pastString = currentString;
 	}
-	for (std::unordered_multimap<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); ++it) {
-		// Accessing key and value
-		std::string key = it->first;
-		std::string value = it->second;
-
-		// Checking if both key and value are strings
-		if (!key.empty() && !value.empty()) {
-			// Your code here, for example, printing the key-value pair
-			std::cout << "Key: " << key << ", Value: " << value << std::endl;
-		} else {
-			std::cout << "Invalid key or value type." << std::endl;
-		}
+	std::unordered_map<std::string, void (ServerConfig::*)(const std::string&)> functionMap;
+	addFunctions(functionMap);
+	std::unordered_map<std::string, void (ServerConfig::*)(const std::string&)>::iterator funcIter;
+	for (std::unordered_multimap<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); it = myMap.erase(it)) {
+		funcIter = functionMap.find(it->first);
+		if (funcIter != functionMap.end())
+			(this->*funcIter->second)(it->second);
 	}
+	myServers.push_back(*this);
 	return myServers;
 }
 
@@ -180,34 +186,29 @@ void ServerConfig::getLocation(std::vector<std::pair<std::string, std::string> >
 	addLocation(*myLocation);
 }
 
-void ServerConfig::addListen(const std::string &host, int port) {
-    _listen.push_back(std::make_pair(host, port));
+void ServerConfig::addListen(int port){
+	_listen = port;
+}
+void ServerConfig::addListen(const std::string& port){
+	try {
+		_listen = std::stoi(port);
+	} catch (std::exception &e) { LOG_ERROR(e.what()); }
 }
 
 void ServerConfig::setServerName(const std::string &name) {
 	_serverName = name;
 }
 
-bool ServerConfig::isListeningOn(const std::string &host, int port) {
-    for (std::vector<std::pair<std::string, int> >::iterator it = _listen.begin(); it != _listen.end(); ++it) {
-        if (it->first == host && it->second == port) {
-            return true;
-        }
-    }
-    return false;
+bool ServerConfig::isListeningOn(int port) {
+    return _listen == port;
 }
 
 std::string ServerConfig::getServerName() {
     return _serverName;
 }
 
-void ServerConfig::removeListen(const std::string &host, int port) {
-    for (std::vector<std::pair<std::string, int> >::iterator it = _listen.begin(); it != _listen.end(); ++it) {
-        if (it->first == host && it->second == port) {
-            _listen.erase(it);
-            return;
-        }
-    }
+void ServerConfig::removeListen() {
+    _listen = -1;
 }
 
 void ServerConfig::addLocation(const LocationConfig &location) {
@@ -225,4 +226,8 @@ void ServerConfig::setClientMaxBodySize(const std::string& size){
 	try {
 		_clientMaxBodySize = std::stol(size);
 	} catch (std::exception &e) { std::runtime_error("clientMaxBodySize too large!"); }
+}
+
+void ServerConfig::setHost(const std::string& host){
+	_host = host;
 }
