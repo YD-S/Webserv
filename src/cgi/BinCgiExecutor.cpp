@@ -6,11 +6,11 @@
 #include <unistd.h>
 #include <cstring>
 #include <sys/wait.h>
-#include "cgi/PhpCgiExecutor.hpp"
+#include "cgi/BinCgiExecutor.hpp"
 #include "macros.h"
 #include "utils.hpp"
 
-void PhpCgiExecutor::executeCgi(HttpRequest &request, HttpResponse &response) {
+void BinCgiExecutor::executeCgi(HttpRequest &request, HttpResponse &response) {
 
     // Create a pipe to communicate with the CGI
     // We need to write the request body to the pipe and read the response from the pipe,
@@ -26,6 +26,10 @@ void PhpCgiExecutor::executeCgi(HttpRequest &request, HttpResponse &response) {
 
     // Build the arguments
     char **args = buildArgs(request);
+
+    for (int i = 0; args[i] != NULL; ++i) {
+        LOG_DEBUG("args[" << i << "] = " << args[i]);
+    }
 
     // Fork the process
     pid_t pid = fork();
@@ -85,7 +89,7 @@ void PhpCgiExecutor::executeCgi(HttpRequest &request, HttpResponse &response) {
 
 }
 
-char **PhpCgiExecutor::buildEnvp(HttpRequest &request) {
+char **BinCgiExecutor::buildEnvp(HttpRequest &request) {
     // Build the environment variables
     std::vector<std::string> envp_vector = std::vector<std::string>();
     envp_vector.push_back("GATEWAY_INTERFACE=CGI/1.1");
@@ -105,9 +109,9 @@ char **PhpCgiExecutor::buildEnvp(HttpRequest &request) {
     }
 
     // Add the system environment variables to the environment pointer array
-    //for (char **env = __environ; *env != NULL; ++env) {
-    //    envp_vector.push_back(*env);
-    //}
+    for (char **env = __environ; *env != NULL; ++env) {
+        envp_vector.push_back(*env);
+    }
 
     // Add the environment variables to the environment pointer array
     char **envp = new char *[envp_vector.size() + 1];
@@ -119,28 +123,28 @@ char **PhpCgiExecutor::buildEnvp(HttpRequest &request) {
     return envp;
 }
 
-void PhpCgiExecutor::destroyCstrp(char **cstrp) {
+void BinCgiExecutor::destroyCstrp(char **cstrp) {
     for (char **str = cstrp; *str != NULL; ++str) {
         delete[] *str;
     }
     delete[] cstrp;
 }
 
-char **PhpCgiExecutor::buildArgs(unused HttpRequest &request) {
+char **BinCgiExecutor::buildArgs(unused HttpRequest &request) {
     // The first argument (omitting the argv[0] executable name) is the file requested
     std::vector<std::string> args_vector = std::vector<std::string>();
     args_vector.push_back(this->getCgiPath()); // argv[0]
-//    args_vector.push_back(request.getPath()); // argv[1]
-//    // Add the query parameters to the argument vector
-//    if (request.getParams().size() > 0) {
-//        args_vector.push_back("?");
-//        for (std::map<std::string, std::string>::const_iterator it = request.getParams().begin();
-//             it != request.getParams().end(); ++it) {
-//            args_vector.push_back(it->first + "=" + it->second);
-//        }
-//        args_vector[args_vector.size() - 1] = "&";
-//    }
-//
+    args_vector.push_back(request.getPath()); // argv[1]
+    // Add the query parameters to the argument vector
+    if (request.getParams().size() > 0) {
+        args_vector.push_back("?");
+        for (std::map<std::string, std::string>::const_iterator it = request.getParams().begin();
+             it != request.getParams().end(); ++it) {
+            args_vector.push_back(it->first + "=" + it->second);
+        }
+        args_vector[args_vector.size() - 1] = "&";
+    }
+
     // Add the arguments to the argument pointer array
     char **args = new char *[args_vector.size() + 1];
     for (std::vector<std::string>::size_type i = 0; i < args_vector.size(); ++i) {
@@ -151,19 +155,19 @@ char **PhpCgiExecutor::buildArgs(unused HttpRequest &request) {
     return args;
 }
 
-PhpCgiExecutor::~PhpCgiExecutor() {
+BinCgiExecutor::~BinCgiExecutor() {
 }
 
-PhpCgiExecutor::PhpCgiExecutor(const std::string &cgiPath, const std::string &cgiName) : ICgiExecutor(cgiPath,
+BinCgiExecutor::BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName) : ICgiExecutor(cgiPath,
                                                                                                       cgiName) {
 
 }
 
-PhpCgiExecutor::PhpCgiExecutor() {
+BinCgiExecutor::BinCgiExecutor() {
 
 }
 
-std::string PhpCgiExecutor::convertToEnvVar(const std::string &header) {
+std::string BinCgiExecutor::convertToEnvVar(const std::string &header) {
     // Convert from the format "Header-Name" to "HEADER_NAME"
     std::string envVar = "";
     for (std::string::size_type i = 0; i < header.size(); ++i) {

@@ -2,13 +2,13 @@
 // Created by kolterdyx on 31/10/23.
 //
 
-#ifndef WEBSERV_PHPCGIEXECUTOR_HPP
-#define WEBSERV_PHPCGIEXECUTOR_HPP
+#ifndef WEBSERV_BINCGIEXECUTOR_HPP
+#define WEBSERV_BINCGIEXECUTOR_HPP
 
 
 #include "ICgiExecutor.hpp"
 
-class PhpCgiExecutor : public ICgiExecutor {
+class BinCgiExecutor : public ICgiExecutor {
 
 private:
     char **buildEnvp(HttpRequest &request);
@@ -19,16 +19,16 @@ private:
 
 
 public:
-    PhpCgiExecutor();
+    BinCgiExecutor();
 
-    PhpCgiExecutor(const std::string &cgiPath, const std::string &cgiName);
+    BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName);
 
     void executeCgi(HttpRequest &request, HttpResponse &response);
 
-    ~PhpCgiExecutor();
+    ~BinCgiExecutor();
 
     static std::string convertToEnvVar(const std::string &header);
 };
 
 
-#endif //WEBSERV_PHPCGIEXECUTOR_HPP
+#endif //WEBSERV_BINCGIEXECUTOR_HPP
