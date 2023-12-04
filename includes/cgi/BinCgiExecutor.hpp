@@ -23,11 +23,13 @@ public:
 
     BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName);
 
-    void executeCgi(HttpRequest &request, HttpResponse &response);
+    void executeCgi(HttpRequest &request, std::string &response);
 
     ~BinCgiExecutor();
 
     static std::string convertToEnvVar(const std::string &header);
+
+    std::string postProcessCgiResult();
 };
 
 

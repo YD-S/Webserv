@@ -9,8 +9,10 @@
 #include "cgi/BinCgiExecutor.hpp"
 #include "macros.h"
 #include "utils.hpp"
+#include "../../includes/cgi/BinCgiExecutor.hpp"
 
-void BinCgiExecutor::executeCgi(HttpRequest &request, HttpResponse &response) {
+
+void BinCgiExecutor::executeCgi(HttpRequest &request, std::string &response) {
 
     // Create a pipe to communicate with the CGI
     // We need to write the request body to the pipe and read the response from the pipe,
@@ -26,10 +28,6 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, HttpResponse &response) {
 
     // Build the arguments
     char **args = buildArgs(request);
-
-    for (int i = 0; args[i] != NULL; ++i) {
-        LOG_DEBUG("args[" << i << "] = " << args[i]);
-    }
 
     // Fork the process
     pid_t pid = fork();
@@ -64,6 +62,10 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, HttpResponse &response) {
         // Close the write end of the pipe
         close(response_pipe[1]);
 
+        // Wait for the child process to finish
+        int status;
+        waitpid(pid, &status, 0);
+
         // Read the response from the CGI
         char buffer[1024];
         _cgiResult = "";
@@ -75,15 +77,10 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, HttpResponse &response) {
         // Close the read end of the pipe
         close(response_pipe[0]);
 
-        // Wait for the child process to finish
-        int status;
-        waitpid(pid, &status, 0);
-
         destroyCstrp(envp);
         destroyCstrp(args);
 
-        // Set the response body
-        response.setBody(_cgiResult);
+        response = postProcessCgiResult();
     }
 
 
@@ -178,5 +175,30 @@ std::string BinCgiExecutor::convertToEnvVar(const std::string &header) {
         }
     }
     return envVar;
+}
+
+std::string BinCgiExecutor::postProcessCgiResult() {
+    std::string result = "";
+    std::string status_line = "";
+    std::string::size_type status_line_start = _cgiResult.find("Status: ");
+    if (status_line_start != std::string::npos) {
+        status_line_start += 8;
+        // Find the end of the line
+        std::string::size_type status_line_end = _cgiResult.find("\n", status_line_start);
+        if (status_line_end != std::string::npos) {
+            status_line = _cgiResult.substr(status_line_start, status_line_end - status_line_start);
+        }
+    } else {
+        status_line = "200 OK";
+    }
+    result += "HTTP/1.1 " + status_line + "\n";
+    // Add everything except the status line to the result
+    if (_cgiResult.find("Status: ") != std::string::npos) {
+        result += _cgiResult.substr(0, _cgiResult.find("Status: "));
+        result += _cgiResult.substr(status_line_start + status_line.size() + 1);
+    } else {
+        result += _cgiResult;
+    }
+    return result;
 }
 
