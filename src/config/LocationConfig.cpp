@@ -20,8 +20,14 @@ LocationConfig &LocationConfig::operator=(const LocationConfig &other) {
         this->_directoryListingEnabled = other._directoryListingEnabled;
         this->_directoryResponseFile = other._directoryResponseFile;
         this->_cgiEnabled = other._cgiEnabled;
-        this->_cgiPath = other._cgiPath;
-        this->_cgiExtension = other._cgiExtension;
+        this->_cgiPath.clear();
+		for (std::vector<std::string>::const_iterator it = other._cgiPath.begin(); it != other._cgiPath.end(); ++it){
+			this->_cgiPath.push_back(*it);
+		}
+		this->_cgiExtension.clear();
+		for (std::vector<std::string>::const_iterator it = other._cgiExtension.begin(); it != other._cgiExtension.end(); ++it){
+			this->_cgiExtension.push_back(*it);
+		}
         this->_uploadEnabled = other._uploadEnabled;
         this->_uploadPath = other._uploadPath;
     }
@@ -55,9 +61,9 @@ void LocationConfig::parseLocation(std::vector<std::pair<std::string, std::strin
 		if (it->first == "{" || (it->first != ";" && it->first != "}"))
 			throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
 	}
-	std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)> functionMap;
+	std::unordered_map<std::string, void (LocationConfig::*)(const std::string&)> functionMap;
 	addFunctions(functionMap);
-	std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)>::iterator funcIter;
+	std::unordered_map<std::string, void (LocationConfig::*)(const std::string&)>::iterator funcIter;
 	for (std::unordered_multimap<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); it = myMap.erase(it)) {
 		funcIter = functionMap.find(it->first);
 		if (funcIter != functionMap.end())
@@ -65,104 +71,82 @@ void LocationConfig::parseLocation(std::vector<std::pair<std::string, std::strin
 	}
 }
 
-void LocationConfig::addFunctions(std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)> &functionMap) {
+void LocationConfig::addFunctions(std::unordered_map<std::string, void (LocationConfig::*)(const std::string&)> &functionMap) {
 	functionMap["path"] = &LocationConfig::setPath;
 	functionMap["root"] = &LocationConfig::setRoot;
 	functionMap["index"] = &LocationConfig::addIndex;
 	functionMap["allow_methods"] = &LocationConfig::addMethod;
 	functionMap["directory_Listing_Enabled"] = &LocationConfig::setDirectoryListingEnabled;
 	functionMap["directory_Response_File"] = &LocationConfig::setDirectoryResponseFile;
-	functionMap["cgi_Enabled"] = &LocationConfig::setCgiEnabled;
-	functionMap["cgi_path"] = &LocationConfig::setCgiPath;
-	functionMap["cgi_ext"] = &LocationConfig::setCgiExtension;
+	functionMap["cgi_enabled"] = &LocationConfig::setCgiEnabled;
+	functionMap["cgi_path"] = &LocationConfig::addCgiPath;
+	functionMap["cgi_ext"] = &LocationConfig::addCgiExtension;
 	functionMap["upload_Enabled"] = &LocationConfig::setUploadEnabled;
 	functionMap["upload_Path"] = &LocationConfig::setUploadPath;
 
 }
 
-LocationConfig LocationConfig::setDirectoryListingEnabled(const std::string &boolean){
+void LocationConfig::setDirectoryListingEnabled(const std::string &boolean){
 	if (boolean == "on")
 		this->_directoryListingEnabled = true;
 	else if (boolean == "off")
 		this->_directoryListingEnabled = false;
 	else
 		LOG_ERROR("directoryListingEnabled has unkown bool type " + boolean);
-	return *this;
 }
 
-LocationConfig LocationConfig::setCgiEnabled(const std::string &boolean){
+void LocationConfig::setCgiEnabled(const std::string &boolean){
 	if (boolean == "on")
 		this->_cgiEnabled = true;
 	else if (boolean == "off")
 		this->_cgiEnabled = false;
 	else
 		LOG_ERROR("cgiEnabled has unkown bool type " + boolean);
-	return *this;
 }
 
-LocationConfig LocationConfig::setUploadEnabled(const std::string &boolean){
+void LocationConfig::setUploadEnabled(const std::string &boolean){
 	if (boolean == "on")
 		this->_uploadEnabled = true;
 	else if (boolean == "off")
 		this->_uploadEnabled = false;
 	else
 		LOG_ERROR("uploadEnabled has unkown bool type " + boolean);
-	return *this;
 }
 
-LocationConfig LocationConfig::setPath(const std::string &path) {
+void LocationConfig::setPath(const std::string &path) {
     this->_path = path;
-    return *this;
 }
 
-LocationConfig LocationConfig::setRoot(const std::string &root) {
+void LocationConfig::setRoot(const std::string &root) {
     this->_root = root;
-    return *this;
 }
 
-LocationConfig LocationConfig::setDirectoryListingEnabled(bool directoryListingEnabled) {
+void LocationConfig::setDirectoryListingEnabled(bool directoryListingEnabled) {
     this->_directoryListingEnabled = directoryListingEnabled;
-    return *this;
 }
 
-LocationConfig LocationConfig::setDirectoryResponseFile(const std::string &directoryResponseFile) {
+void LocationConfig::setDirectoryResponseFile(const std::string &directoryResponseFile) {
     this->_directoryResponseFile = directoryResponseFile;
-    return *this;
 }
 
-LocationConfig LocationConfig::setCgiEnabled(bool cgiEnabled) {
+void LocationConfig::setCgiEnabled(bool cgiEnabled) {
     this->_cgiEnabled = cgiEnabled;
-    return *this;
 }
 
-LocationConfig LocationConfig::setCgiPath(const std::string &cgiPath) {
-    this->_cgiPath = cgiPath;
-    return *this;
-}
-
-LocationConfig LocationConfig::setCgiExtension(const std::string &cgiExtension) {
-    this->_cgiExtension = cgiExtension;
-    return *this;
-}
-
-LocationConfig LocationConfig::setUploadEnabled(bool uploadEnabled) {
+void LocationConfig::setUploadEnabled(bool uploadEnabled) {
     this->_uploadEnabled = uploadEnabled;
-    return *this;
 }
 
-LocationConfig LocationConfig::setUploadPath(const std::string &uploadPath) {
+void LocationConfig::setUploadPath(const std::string &uploadPath) {
     this->_uploadPath = uploadPath;
-    return *this;
 }
 
-LocationConfig LocationConfig::addIndex(const std::string &index) {
+void LocationConfig::addIndex(const std::string &index) {
     _indexes.push_back(index);
-    return *this;
 }
 
-LocationConfig LocationConfig::addMethod(const std::string &method) {
+void LocationConfig::addMethod(const std::string &method) {
     _methods.push_back(method);
-    return *this;
 }
 
 const std::string &LocationConfig::getPath() const {
@@ -193,18 +177,26 @@ bool LocationConfig::isCgiEnabled() const {
     return _cgiEnabled;
 }
 
-const std::string &LocationConfig::getCgiPath() const {
-    return _cgiPath;
-}
-
-const std::string &LocationConfig::getCgiExtension() const {
-    return _cgiExtension;
-}
-
 bool LocationConfig::isUploadEnabled() const {
     return _uploadEnabled;
 }
 
 const std::string &LocationConfig::getUploadPath() const {
     return _uploadPath;
+}
+
+const std::vector<std::string>& LocationConfig::getCgiPath() const {
+    return _cgiPath;
+}
+
+void LocationConfig::addCgiPath(const std::string& cgiPath) {
+	_cgiPath.push_back(cgiPath);
+}
+
+const std::vector<std::string>& LocationConfig::getCgiExtension() const {
+	return _cgiExtension;
+}
+
+void LocationConfig::addCgiExtension(const std::string& cgiExtension) {
+	_cgiPath.push_back(cgiExtension);
 }

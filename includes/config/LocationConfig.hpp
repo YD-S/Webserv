@@ -25,8 +25,8 @@ private:
     std::string _directoryResponseFile;
 
     bool _cgiEnabled;
-    std::string _cgiPath;
-    std::string _cgiExtension;
+    std::vector<std::string> _cgiPath;
+    std::vector<std::string> _cgiExtension;
 
     bool _uploadEnabled;
     std::string _uploadPath;
@@ -40,36 +40,32 @@ public:
     LocationConfig& operator=(const LocationConfig& other);
     ~LocationConfig();
 
-    void addFunctions(std::unordered_map<std::string, LocationConfig (LocationConfig::*)(const std::string&)> &functionMap);
+    void addFunctions(std::unordered_map<std::string, void (LocationConfig::*)(const std::string&)> &functionMap);
 	void parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
 
-    LocationConfig addIndex(const std::string& index);
+    void addIndex(const std::string& index);
 
-    LocationConfig addMethod(const std::string& method);
+    void addMethod(const std::string& method);
 
-	LocationConfig setPath(const std::string &path);
+	void setPath(const std::string &path);
 
-    LocationConfig setRoot(const std::string &root);
+    void setRoot(const std::string &root);
 
-    LocationConfig setDirectoryListingEnabled(bool directoryListingEnabled);
+    void setDirectoryListingEnabled(bool directoryListingEnabled);
 
-	LocationConfig setDirectoryListingEnabled(const std::string &directoryListingEnabled);
+	void setDirectoryListingEnabled(const std::string &directoryListingEnabled);
 
-    LocationConfig setDirectoryResponseFile(const std::string &directoryResponseFile);
+    void setDirectoryResponseFile(const std::string &directoryResponseFile);
 
-    LocationConfig setCgiEnabled(bool cgiEnabled);
+    void setCgiEnabled(bool cgiEnabled);
+    
+    void setCgiEnabled(const std::string &boolean);
 
-	LocationConfig setCgiEnabled(const std::string &cgiEnabled);
+    void setUploadEnabled(bool uploadEnabled);
 
-    LocationConfig setCgiPath(const std::string &cgiPath);
+	void setUploadEnabled(const std::string &uploadEnabled);
 
-    LocationConfig setCgiExtension(const std::string &cgiExtension);
-
-    LocationConfig setUploadEnabled(bool uploadEnabled);
-
-	LocationConfig setUploadEnabled(const std::string &uploadEnabled);
-
-    LocationConfig setUploadPath(const std::string &uploadPath);
+    void setUploadPath(const std::string &uploadPath);
 
     const std::string &getPath() const;
 
@@ -85,14 +81,20 @@ public:
 
     bool isCgiEnabled() const;
 
-    const std::string &getCgiPath() const;
-
-    const std::string &getCgiExtension() const;
-
     bool isUploadEnabled() const;
 
     const std::string &getUploadPath() const;
 
+    const std::vector<std::string>& getCgiPath() const;
+
+    // Setter for _cgiPath
+    void addCgiPath(const std::string& cgiPath);
+
+    // Getter for _cgiExtension
+    const std::vector<std::string>& getCgiExtension() const;
+
+    // Setter for _cgiExtension
+    void addCgiExtension(const std::string& cgiExtension);
 };
 
 

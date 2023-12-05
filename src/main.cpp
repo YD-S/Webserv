@@ -21,8 +21,13 @@ int main(int argc, char *argv[]) {
 		std::vector<ServerConfig>::iterator serverIter = parse.getServers().begin();
 		for (; serverIter != parse.getServers().end(); ++serverIter){
 			std::cout << serverIter->getHostName() << ":" << serverIter->getPort() 
-			<< " - with default location at -> " << serverIter->getDefaultLocation().getPath() << std::endl;
+			<< " - with default location at -> " << serverIter->getDefaultLocation().getPath()
+			<< "  with cgiExtensions:  " << std::endl;
+		for (std::vector<std::string>::const_iterator it = serverIter->getDefaultLocation().getCgiExtension().begin(); it != serverIter->getDefaultLocation().getCgiExtension().begin(); ++it){
+			std::cout << *it << std::endl;
 		}
+		}
+
 	}
 	return 0;
 }
