@@ -37,5 +37,6 @@
 # Specific files
 webserv
 
+.vscode
 .idea
 .DS_Store
