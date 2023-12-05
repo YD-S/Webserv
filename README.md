@@ -59,25 +59,25 @@ Here is an example:
 
 ```cpp
 ServerConfig config = ServerConfig()
-        .addListen("localhost", 8080)
-        .addListen("localhost", 8081)
-        .setServerName("localhost")
-        .setDefaultLocation(LocationConfig()
-                .addIndex("index.html")
-                .addIndex("index.php")
-                .setRoot("/var/www/html")
-                .setPath("/")
-                .addMethod("GET")
-                .addMethod("POST")
-                .setDirectoryListingEnabled(true)
-                .setDirectoryResponseFile("/var/www/html/.directory")
-                .setCgiEnabled(true)
-                .setCgiPath("/var/www/html/cgi-bin")
-                .setCgiExtension(".php")
-                .setUploadEnabled(true)
-                .setUploadPath("/var/www/html/uploads")
+        .addListen(8080) // listen <port>
+        .addListen("localhost", 8081) // listen <host>:<port>
+        .setServerName("localhost") // server_name
+        .setDefaultLocation(LocationConfig() // server level location config
+                .addIndex("index.html") // index
+                .addIndex("index.php") // index
+                .setRoot("/var/www/html") // root
+                .setPath("/") // location <path> { ... }
+                .addMethod("GET") // methods
+                .addMethod("POST") // methods
+                .setDirectoryListingEnabled(true) // autoindex
+                .setDirectoryResponseFile("/var/www/html/.directory") // autoindex_format
+                .setCgiEnabled(true) // cgi_enabled
+                .setCgiPath("/var/www/html/cgi-bin") // cgi_bin
+                .setCgiExtension(".php") // cgi_ext
+                .setUploadEnabled(true) // upload_enabled
+                .setUploadPath("/var/www/html/uploads") // upload_path
                 )
-        .addLocation(LocationConfig()
+        .addLocation(LocationConfig() // for each location <path> { ... }
                 .addIndex("index.html")
                 .addIndex("index.php")
                 .setRoot("/var/www/html")
