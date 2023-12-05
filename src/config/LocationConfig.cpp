@@ -198,5 +198,5 @@ const std::vector<std::string>& LocationConfig::getCgiExtension() const {
 }
 
 void LocationConfig::addCgiExtension(const std::string& cgiExtension) {
-	_cgiPath.push_back(cgiExtension);
+	_cgiExtension.push_back(cgiExtension);
 }
