@@ -10,8 +10,10 @@ ServerConfig::ServerConfig(const ServerConfig &other) {
 
 ServerConfig &ServerConfig::operator=(const ServerConfig &other) {
     if (this != &other) {
-        this->_listen = other._listen;
-		this->_host = other._host;
+        this->_listen.clear();
+		for (std::vector<std::pair<std::string,int> >::const_iterator it = other._listen.begin(); it != other._listen.end(); ++it) {
+            this->_listen.push_back(std::make_pair(it->first, it->second));
+        }
         this->_serverName = other._serverName;
 		this->_errorPages = other._errorPages;
 		this->_clientMaxBodySize = other._clientMaxBodySize;
@@ -29,19 +31,8 @@ ServerConfig::~ServerConfig() {
 
 }
 
-void ServerConfig::setLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config){
-	LocationConfig myLocation;
-	myLocation.parseLocation(it, config);
-	addLocation(myLocation);
-}
-
-void ServerConfig::addListen(int port){
-	_listen = port;
-}
-void ServerConfig::addListen(const std::string& port){
-	try {
-		_listen = std::stoi(port);
-	} catch (std::exception &e) { LOG_ERROR(e.what()); }
+void ServerConfig::addListen(std::string host, int port){
+	_listen.push_back(std::make_pair(host, port));
 }
 
 void ServerConfig::setServerName(const std::string &name) {
@@ -49,15 +40,28 @@ void ServerConfig::setServerName(const std::string &name) {
 }
 
 bool ServerConfig::isListeningOn(int port) {
-    return _listen == port;
+	for (std::vector<std::pair<std::string,int> >::const_iterator it = _listen.begin(); it != _listen.end(); ++it) {
+            if (it->second == port)
+				return true;
+    }
+	return false;
 }
 
 std::string ServerConfig::getServerName() {
     return _serverName;
 }
 
-void ServerConfig::removeListen() {
-    _listen = -1;
+void ServerConfig::removeListen(int port) {
+    std::vector<std::pair<std::string,int> >::const_iterator it = _listen.end();
+    for (std::vector<std::pair<std::string,int> >::const_iterator iter = _listen.begin(); iter != _listen.end(); ++iter) {
+            if (iter->second == port)
+			{
+				it = iter;
+				break ;
+			}
+        }
+	//if (it != _listen.end())
+	//	_listen.erase(it);
 }
 
 void ServerConfig::addLocation(const LocationConfig &location) {
@@ -73,23 +77,12 @@ void ServerConfig::setClientMaxBodySize(size_t size){
 }
 void ServerConfig::setClientMaxBodySize(const std::string& size){
 	try {
-		_clientMaxBodySize = std::stol(size);
+		_clientMaxBodySize = stoi(size);
 	} catch (std::exception &e) { std::runtime_error("clientMaxBodySize too large!"); }
-}
-
-void ServerConfig::setHost(const std::string& host){
-	_host = host;
 }
 
 void ServerConfig::setErrorPages(const std::string& errorPages){
 	_errorPages = errorPages;
-}
-
-std::string ServerConfig::getHostName(){
-	return _host;
-}
-int ServerConfig::getPort(){
-	return _listen;
 }
 
 std::vector<LocationConfig>& ServerConfig::getLocations(){

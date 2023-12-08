@@ -37,7 +37,8 @@ bool ParseConfig::isDelimiter(char c) {
 std::vector<std::pair<std::string, std::string> > ParseConfig::processFile() {
 	std::vector<std::pair<std::string, std::string> > result;
 	fileValidate fileValidator(_path);
-    std::ifstream _file = fileValidator.validate_config_file();
+    std::ifstream _file;
+	fileValidator.validate_config_file(_file);
     validate_braces(_file);
     _file.clear();
     _file.seekg(0);
@@ -59,7 +60,7 @@ std::vector<std::pair<std::string, std::string> > ParseConfig::processFile() {
 			// Handle '{', '}', and ';'
 			if (line[i] == '{' || line[i] == '}' || line[i] == ';') {
 				result.push_back(
-						std::make_pair(std::string(1, line[i]), std::to_string(lineNumber) + ":" + std::to_string(i)));
+						std::make_pair(std::string(1, line[i]), to_string(lineNumber) + ":" + to_string(i)));
 			} else {
 				// Handle other characters
 				size_t wordStart = i;
@@ -68,28 +69,22 @@ std::vector<std::pair<std::string, std::string> > ParseConfig::processFile() {
 					++i;
 				}
 				std::string word = line.substr(wordStart, i - wordStart);
-				result.push_back(std::make_pair(word, std::to_string(lineNumber) + ":" + std::to_string(i)));
+				result.push_back(std::make_pair(word, to_string(lineNumber) + ":" + to_string(i)));
 				if (line[i] == '{' || line[i] == '}' || line[i] == ';') {
 					result.push_back(std::make_pair(std::string(1, line[i]),
-													std::to_string(lineNumber) + ":" + std::to_string(i)));
+													to_string(lineNumber) + ":" + to_string(i)));
 				}
 			}
 		}
 
 		++lineNumber;
 	}
+	for (std::vector<std::pair<std::string, std::string> >::iterator it = result.begin(); it != result.end(); ++it) {
+        std::cout << "Key: " << it->first << "\t\tValue: " << it->second << std::endl;
+    }
 
 	_file.close();
 	return result;
-}
-
-void ParseConfig::addFunctionsServer(std::unordered_map<std::string, void (ServerConfig::*)(const std::string&)> &functionMap) {
-	functionMap["listen"] = &ServerConfig::addListen;
-	functionMap["host"] = &ServerConfig::setHost;
-	functionMap["server_name"] = &ServerConfig::setServerName;
-	//functionMap["index"] = &ServerConfig::addIndex;
-	functionMap["error_pages"] = &ServerConfig::setErrorPages;
-	functionMap["client_max_body_size"] = &ServerConfig::setClientMaxBodySize;
 }
 
 void    ParseConfig::parseConfig() {
@@ -97,8 +92,9 @@ void    ParseConfig::parseConfig() {
 	config = processFile();
 	std::string pastString;
 	std::string currentString;
-    std::unordered_multimap<std::string, std::string> myMap;
 	std::string position;
+	std::vector<std::pair<std::string, std::vector <std::string> > > variables;
+	std::string lastVar;
     for (std::vector<std::pair<std::string, std::string> >::iterator it = config.begin(); it != config.end(); it = config.erase(it)){
         ServerConfig server;
         // Accessing the string
@@ -111,37 +107,37 @@ void    ParseConfig::parseConfig() {
         it = config.erase(it);
         if (pastString == "server" && currentString == "{") {
             for (; it->first != "}"; it = config.erase(it)) {
+				std::vector <std::string> variablesVar;
                 if (it->first == "location")
                 {
                     it = config.erase(it);
-                    server.setLocation(it, config);
+                    parseLocation(it, config);
                     continue ;
                 }
                 if (it->first == "}")
                     break ;
-                pastString = it->first;
+                if (pastString == "}" && lastVar != ";" && lastVar != "{" && !lastVar.empty())
+					throw std::runtime_error("Invalid config of server in " + it->second + " --> " + it->first);
+				pastString = it->first;
                 it = config.erase(it);
                 for (; it != config.end() && it->first != "}" && it->first != "{" && it->first != ";"; it = config.erase(it))
                 {
-                    myMap.insert(std::make_pair(pastString, it->first));
+                    variablesVar.push_back(it->first);
                 }
+				variables.push_back(std::make_pair(pastString, variablesVar));
                 if (it->first == "{" || (it->first != ";" && it->first != "}"))
                     throw std::runtime_error("Invalid config of server in " + it->second + " --> " + it->first);
                 if (it->first == "}")
-                    break ;           
+                    break ;
+				lastVar = it->first;
             }
+			//mainSetter(variables);
         }
-        else
+        else {
             LOG_ERROR("AYO WTF");
-        std::unordered_map<std::string, void (ServerConfig::*)(const std::string&)> functionMap;
-        addFunctionsServer(functionMap);
-        std::unordered_map<std::string, void (ServerConfig::*)(const std::string&)>::iterator funcIter;
-        for (std::unordered_multimap<std::string, std::string>::iterator iter = myMap.begin(); iter != myMap.end(); iter = myMap.erase(iter)) {
-            funcIter = functionMap.find(iter->first);
-            if (funcIter != functionMap.end())
-                (server.*funcIter->second)(iter->second);
-        }
-        server.setDefaultLocation(server.getLocations()[0]);
+			exit(-1);
+		}
+		//printTempVariables(variables);
         _servers.push_back(server);    
     }
 }
@@ -159,7 +155,7 @@ void ParseConfig::validate_braces(std::ifstream &file) {
 				brace_stack.push(std::make_pair(line_number, i + 1));  // i + 1 is the column
 			} else if (line[i] == '}') {
 				if (brace_stack.empty()) {
-					throw std::runtime_error("Error: Unmatched closing brace at line " + std::to_string(line_number) + ", column " + std::to_string(i + 1));
+					throw std::runtime_error("Error: Unmatched closing brace at line " + to_string(line_number) + ", column " + to_string(i + 1));
 				} else {
 					brace_stack.pop();
 				}
@@ -169,18 +165,103 @@ void ParseConfig::validate_braces(std::ifstream &file) {
 
 	while (!brace_stack.empty()) {
 		const std::pair<int, int> &position = brace_stack.top();
-		throw std::runtime_error("Error: Unmatched opening brace at line " + std::to_string(position.first) + ", column " + std::to_string(position.second));
+		throw std::runtime_error("Error: Unmatched opening brace at line " + to_string(position.first) + ", column " + to_string(position.second));
 	}
 }
 
-void    ParseConfig::mainSetter(std::unordered_multimap<std::string, std::string> &values){
-	for (std::unordered_multimap<std::string, std::string>::iterator it = values.begin(); it != values.end(); it++)
-	{
-		std::cout << it->first << std::endl;
+LocationConfig ParseConfig::parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config) {
+	std::vector<std::pair<std::string, std::vector <std::string> > > variables;
+	
+	LocationConfig location;
+
+	if (it->first.at(0) != '/')
+		throw std::runtime_error("Invalid path of location in " + it->second + " --> " + it->first);
+	location.setPath(it->first);
+	it = config.erase(it);
+	if (it->first != "{")
+		throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first + " | Expected \"{\"");
+	it = config.erase(it);
+	std::string pastString;
+	for (; it->first != "}"; it = config.erase(it)) {
+		std::vector <std::string> variablesVar;
+		pastString = it->first;
+		it = config.erase(it);
+		for (; it->first != "}" && it->first != "{" && it->first != ";"; it = config.erase(it))
+		{
+			variablesVar.push_back(it->first);
+		}
+		variables.push_back(std::make_pair(pastString, variablesVar));
+		if (it->first == "{" || (it->first != ";" && it->first != "}"))
+			throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
+	}
+	return location;
+}
+
+void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables){
+	LocationConfig defaultLocation;
+	
+	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator it = variables.begin();
+	while (it != variables.end()){
+		
+		if (it->first == "listen")
+		{
+			
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		else if (it->first == "listen")
+		{
+
+		}
+		
+		for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); ++iter){
+			
+		}
+		std::cout << "IM GEI "<< std::endl;
 	}
 }
 
 
 std::vector<ServerConfig>& ParseConfig::getServers(){
     return _servers;
+}
+
+void    ParseConfig::printTempVariables(std::vector<std::pair<std::string, std::vector <std::string> > > variables){
+	for (std::vector<std::pair<std::string, std::vector <std::string> > >::iterator it = variables.begin(); it != variables.end(); ++it){
+		std::cout << it->first << ": " << std::endl;
+		for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); ++iter){
+			std::cout << *iter << ", ";
+		}
+		std::cout << "IM NOT GEI "<< std::endl;
+	}
 }

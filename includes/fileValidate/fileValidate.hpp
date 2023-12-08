@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdlib>
 
 class fileValidate {
 private:
@@ -18,7 +19,7 @@ public:
 	~fileValidate();
 	void setConfigFile(const std::string &config_file);
 	std::string getConfigFile();
-	std::ifstream validate_config_file();
+	void	validate_config_file(std::ifstream& file);
 	static void check_extension(std::string config_file);
 
 };

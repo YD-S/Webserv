@@ -38,53 +38,9 @@ LocationConfig::~LocationConfig() {
 
 }
 
-void LocationConfig::parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it,
-											 std::vector<std::pair<std::string, std::string> > &config) {
-	std::unordered_multimap<std::string, std::string> myMap;
-	if (it->first.at(0) != '/')
-		throw std::runtime_error("Invalid path of location in " + it->second + " --> " + it->first);
-	setPath(it->first);
-	it = config.erase(it);
-	if (it->first != "{")
-		throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first + " | Expected \"{\"");
-	it = config.erase(it);
-	std::string pastString;
 
-	for (; it->first != "}"; it = config.erase(it)) {
-		// Accessing the string
-		pastString = it->first;
-		it = config.erase(it);
-		for (; it->first != "}" && it->first != "{" && it->first != ";"; it = config.erase(it))
-		{
-			myMap.insert(std::make_pair(pastString, it->first));
-		}
-		if (it->first == "{" || (it->first != ";" && it->first != "}"))
-			throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
-	}
-	std::unordered_map<std::string, void (LocationConfig::*)(const std::string&)> functionMap;
-	addFunctions(functionMap);
-	std::unordered_map<std::string, void (LocationConfig::*)(const std::string&)>::iterator funcIter;
-	for (std::unordered_multimap<std::string, std::string>::iterator it = myMap.begin(); it != myMap.end(); it = myMap.erase(it)) {
-		funcIter = functionMap.find(it->first);
-		if (funcIter != functionMap.end())
-			(this->*funcIter->second)(it->second);
-	}
-}
 
-void LocationConfig::addFunctions(std::unordered_map<std::string, void (LocationConfig::*)(const std::string&)> &functionMap) {
-	functionMap["path"] = &LocationConfig::setPath;
-	functionMap["root"] = &LocationConfig::setRoot;
-	functionMap["index"] = &LocationConfig::addIndex;
-	functionMap["allow_methods"] = &LocationConfig::addMethod;
-	functionMap["directory_Listing_Enabled"] = &LocationConfig::setDirectoryListingEnabled;
-	functionMap["directory_Response_File"] = &LocationConfig::setDirectoryResponseFile;
-	functionMap["cgi_enabled"] = &LocationConfig::setCgiEnabled;
-	functionMap["cgi_path"] = &LocationConfig::addCgiPath;
-	functionMap["cgi_ext"] = &LocationConfig::addCgiExtension;
-	functionMap["upload_Enabled"] = &LocationConfig::setUploadEnabled;
-	functionMap["upload_Path"] = &LocationConfig::setUploadPath;
 
-}
 
 void LocationConfig::setDirectoryListingEnabled(const std::string &boolean){
 	if (boolean == "on")
