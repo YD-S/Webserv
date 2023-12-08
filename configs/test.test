@@ -1,15 +1,19 @@
 
 server {
+    server_name my_server;
+    *listen localhost:8080;
+    *root /var/www/html;
 
-    server_name test_sever;
-
-    listen 80;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html
+    autoindex on
+    cgiEnabled on
+    cgiPath /usr/bin;
+    cgiExtension .cgi;
 
     location / {
-        root /home/www;
-        index index.html index.htm;
+        try_files $uri $uri/ =404;
     }
 
-    location /test {
-    }
 }
+
