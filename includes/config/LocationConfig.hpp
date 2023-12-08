@@ -10,7 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <unordered_map>
+#include "../utils.hpp"
 #include "macros.h"
 
 class LocationConfig {
@@ -39,9 +39,6 @@ public:
     LocationConfig(const LocationConfig& other);
     LocationConfig& operator=(const LocationConfig& other);
     ~LocationConfig();
-
-    void addFunctions(std::unordered_map<std::string, void (LocationConfig::*)(const std::string&)> &functionMap);
-	void parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
 
     void addIndex(const std::string& index);
 

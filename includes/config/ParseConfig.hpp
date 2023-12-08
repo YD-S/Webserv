@@ -12,10 +12,10 @@
 #include <utility>
 #include <string>
 #include <stack>
-#include <unordered_map>
 #include "LocationConfig.hpp"
 #include "ServerConfig.hpp"
 #include "../fileValidate/fileValidate.hpp"
+#include "../utils.hpp"
 #include "macros.h"
 
 class ParseConfig {
@@ -33,12 +33,13 @@ public:
     ~ParseConfig();
 
     bool isDelimiter(char c);
+	LocationConfig parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
 	void	validate_braces(std::ifstream &file);
 	std::vector<std::pair<std::string, std::string> > processFile();
 	void    parseConfig();
-    void    mainSetter(std::unordered_multimap<std::string, std::string> &values);
-    void addFunctionsServer(std::unordered_map<std::string, void (ServerConfig::*)(const std::string&)> &functionMap);
-
+    void    mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables);;
+    void    printTempVariables(std::vector<std::pair<std::string, std::vector <std::string> > > variables);
+    
     std::vector<ServerConfig>& getServers();
 };
 
