@@ -21,8 +21,6 @@ private:
 	std::vector<std::pair<std::string, int> > _listen;
 	
 	std::string _serverName;
-	std::string _errorPages;
-	size_t _clientMaxBodySize;
     std::vector<LocationConfig> _locations;
     LocationConfig _defaultLocation;
 
@@ -33,22 +31,17 @@ public:
     ~ServerConfig();
 
 	void addListen(std::string host, int port);
-	//void setHost(const std::string& host);
     bool isListeningOn(int port);
 	void removeListen(int port);
 	void setServerName(const std::string& name);
 	void addLocation(const LocationConfig& location);
 	void setDefaultLocation(const LocationConfig& location);
-	void setClientMaxBodySize(size_t size);
-	void setClientMaxBodySize(const std::string& size);
-	void setErrorPages(const std::string& errorPages);
-
+	void setHostPort(const std::string& host, int port);
 
     std::string getServerName();
-	//std::string getHostName();
-	//int getPort();
 	std::vector<LocationConfig>& getLocations();
 	LocationConfig& getDefaultLocation();
+	const std::vector<std::pair<std::string, int> >& getListen() const;
 };
 
 

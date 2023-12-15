@@ -25,13 +25,15 @@ private:
     std::string _directoryResponseFile;
 
     bool _cgiEnabled;
-    std::vector<std::string> _cgiPath;
-    std::vector<std::string> _cgiExtension;
+    std::vector<std::pair<std::string, std::string> > _cgi;
 
     bool _uploadEnabled;
     std::string _uploadPath;
 
 	std::string _redirect;
+    std::vector<std::pair<int, std::string> > _errorPages;
+    
+	size_t _clientMaxBodySize;
 
 public:
 
@@ -54,6 +56,8 @@ public:
 
     void setDirectoryResponseFile(const std::string &directoryResponseFile);
 
+    void addCgi(const std::string &extension, const std::string &path);
+
     void setCgiEnabled(bool cgiEnabled);
     
     void setCgiEnabled(const std::string &boolean);
@@ -63,6 +67,12 @@ public:
 	void setUploadEnabled(const std::string &uploadEnabled);
 
     void setUploadPath(const std::string &uploadPath);
+
+    void addErrorPage(const int &code, const std::string &path);
+
+    void setClientMaxBodySize(const size_t size);
+
+    void setRedirect(const std::string &redirect);
 
     const std::string &getPath() const;
 
@@ -82,16 +92,10 @@ public:
 
     const std::string &getUploadPath() const;
 
-    const std::vector<std::string>& getCgiPath() const;
+    const std::vector<std::pair<std::string, std::string> >& getCgi() const;
 
-    // Setter for _cgiPath
-    void addCgiPath(const std::string& cgiPath);
+    const std::vector<std::pair<int, std::string> > &getErrorPages() const;
 
-    // Getter for _cgiExtension
-    const std::vector<std::string>& getCgiExtension() const;
-
-    // Setter for _cgiExtension
-    void addCgiExtension(const std::string& cgiExtension);
 };
 
 

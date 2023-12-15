@@ -15,14 +15,12 @@ ServerConfig &ServerConfig::operator=(const ServerConfig &other) {
             this->_listen.push_back(std::make_pair(it->first, it->second));
         }
         this->_serverName = other._serverName;
-		this->_errorPages = other._errorPages;
-		this->_clientMaxBodySize = other._clientMaxBodySize;
-		this->_defaultLocation = other._defaultLocation;
         this->_locations.clear();
         for (std::vector<LocationConfig>::const_iterator it = other._locations.begin();
              it != other._locations.end(); ++it) {
             this->_locations.push_back(LocationConfig(*it));
         }
+		this->_defaultLocation = other._defaultLocation;
     }
     return *this;
 }
@@ -72,23 +70,18 @@ void ServerConfig::setDefaultLocation(const LocationConfig &location) {
     this->_defaultLocation = location;
 }
 
-void ServerConfig::setClientMaxBodySize(size_t size){
-	_clientMaxBodySize = size;
-}
-void ServerConfig::setClientMaxBodySize(const std::string& size){
-	try {
-		_clientMaxBodySize = stoi(size);
-	} catch (std::exception &e) { std::runtime_error("clientMaxBodySize too large!"); }
-}
-
-void ServerConfig::setErrorPages(const std::string& errorPages){
-	_errorPages = errorPages;
-}
-
 std::vector<LocationConfig>& ServerConfig::getLocations(){
 	return _locations;
 }
 
 LocationConfig& ServerConfig::getDefaultLocation(){
 	return _defaultLocation;
+}
+
+void	ServerConfig::setHostPort(const std::string& host, int port){
+	_listen.push_back(std::make_pair(host, port));
+}
+
+const std::vector<std::pair<std::string, int> >& ServerConfig::getListen() const{
+	return _listen;
 }

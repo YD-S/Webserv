@@ -15,21 +15,25 @@ LocationConfig &LocationConfig::operator=(const LocationConfig &other) {
     if (this != &other) {
         this->_path = other._path;
         this->_root = other._root;
-        this->_indexes = other._indexes;
-        this->_methods = other._methods;
+        _indexes.clear();
+        for (std::vector<std::string>::const_iterator it = other.getIndexes().begin(); it != other.getIndexes().end(); ++it)
+            this->addIndex(*it);
+        _methods.clear();
+        for (std::vector<std::string>::const_iterator it = other.getMethods().begin(); it != other.getMethods().end(); ++it)
+            this->addMethod(*it);
         this->_directoryListingEnabled = other._directoryListingEnabled;
         this->_directoryResponseFile = other._directoryResponseFile;
         this->_cgiEnabled = other._cgiEnabled;
-        this->_cgiPath.clear();
-		for (std::vector<std::string>::const_iterator it = other._cgiPath.begin(); it != other._cgiPath.end(); ++it){
-			this->_cgiPath.push_back(*it);
-		}
-		this->_cgiExtension.clear();
-		for (std::vector<std::string>::const_iterator it = other._cgiExtension.begin(); it != other._cgiExtension.end(); ++it){
-			this->_cgiExtension.push_back(*it);
-		}
+        _cgi.clear();
+        for (std::vector<std::pair<std::string, std::string> >::const_iterator it = other.getCgi().begin(); it != other.getCgi().end(); ++it)
+            this->addCgi(it->first, it->second);
         this->_uploadEnabled = other._uploadEnabled;
         this->_uploadPath = other._uploadPath;
+        this->_redirect = other._redirect;
+        _errorPages.clear();
+        for (std::vector<std::pair<int, std::string> >::const_iterator it = other.getErrorPages().begin(); it != other.getErrorPages().end(); ++it)
+            this->addErrorPage(it->first, it->second);
+        this->_clientMaxBodySize = other._clientMaxBodySize;
     }
     return *this;
 }
@@ -141,18 +145,26 @@ const std::string &LocationConfig::getUploadPath() const {
     return _uploadPath;
 }
 
-const std::vector<std::string>& LocationConfig::getCgiPath() const {
-    return _cgiPath;
+void LocationConfig::addCgi(const std::string &extension, const std::string &path){
+    _cgi.push_back(std::make_pair(extension, path));
 }
 
-void LocationConfig::addCgiPath(const std::string& cgiPath) {
-	_cgiPath.push_back(cgiPath);
+void LocationConfig::addErrorPage(const int &code, const std::string &path){
+    _errorPages.push_back(std::make_pair(code, path));
 }
 
-const std::vector<std::string>& LocationConfig::getCgiExtension() const {
-	return _cgiExtension;
+void LocationConfig::setClientMaxBodySize(const size_t size){
+    _clientMaxBodySize = size;
 }
 
-void LocationConfig::addCgiExtension(const std::string& cgiExtension) {
-	_cgiExtension.push_back(cgiExtension);
+void LocationConfig::setRedirect(const std::string &redirect){
+    _redirect = redirect;
+}
+
+const std::vector<std::pair<std::string, std::string> >& LocationConfig::getCgi() const{
+    return _cgi;
+}
+
+const std::vector<std::pair<int, std::string> > &LocationConfig::getErrorPages() const{
+    return _errorPages;
 }

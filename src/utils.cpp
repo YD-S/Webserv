@@ -1,6 +1,5 @@
-#include <sys/stat.h>
 #include "utils.hpp"
-#include <sstream>
+
 
 bool is_dir(const std::string& path) {
     struct stat buf = {};
@@ -31,4 +30,28 @@ int stoi(const std::string& str) {
     }
     
     return result;
+}
+
+size_t stoul(const std::string& str) {
+    std::istringstream iss(str);
+    size_t result;
+    
+    if (!(iss >> result)) {
+        // Handling the conversion error here
+        throw std::invalid_argument("stoi: Invalid input");
+    }
+
+    // Check for overflow or underflow
+    if (iss.fail() || !iss.eof()) {
+        throw std::out_of_range("stoi: Out of range");
+    }
+    
+    return result;
+}
+
+
+void    ft_error(std::string msg, int errorCode)
+{
+	LOG_ERROR(msg);
+	exit(errorCode);
 }

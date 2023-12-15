@@ -8,17 +8,16 @@
 #include <string>
 
 int main(int argc, char *argv[]) {
-
-    fileValidate config_file;
-    LOG_INFO("Starting webserv...");
+    ParseConfig parse;
+	LOG_INFO("Starting webserv...");
 	if (argc == 1){
-		config_file.setConfigFile("config/default.conf");
+		parse = ParseConfig();
 	}
 	else if (argc == 2){
 		std::string path = argv[1];
-		ParseConfig parse(path);
-		parse.parseConfig();
-
+		parse = ParseConfig(path);
 	}
+	parse.parseConfig();
+	parse.printAll();
 	return 0;
 }
