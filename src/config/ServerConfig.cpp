@@ -62,7 +62,7 @@ void ServerConfig::removeListen(int port) {
 	//	_listen.erase(it);
 }
 
-void ServerConfig::addLocation(const LocationConfig &location) {
+void ServerConfig::addLocation(const LocationConfig& location) {
     this->_locations.push_back(location);
 }
 
@@ -78,7 +78,7 @@ LocationConfig& ServerConfig::getDefaultLocation(){
 	return _defaultLocation;
 }
 
-void	ServerConfig::setHostPort(const std::string& host, int port){
+void	ServerConfig::setHostPort(const std::string host, int port){
 	_listen.push_back(std::make_pair(host, port));
 }
 

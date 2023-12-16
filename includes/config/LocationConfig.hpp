@@ -19,6 +19,7 @@ private:
     std::string _path;
     std::string _root;
     std::vector<std::string> _indexes;
+    bool _autoIndex;
     std::vector<std::string> _methods;
 
     bool _directoryListingEnabled;
@@ -44,6 +45,8 @@ public:
 
     void addIndex(const std::string& index);
 
+    void setAutoIndex(bool autoIndex);
+    
     void addMethod(const std::string& method);
 
 	void setPath(const std::string &path);
@@ -95,6 +98,10 @@ public:
     const std::vector<std::pair<std::string, std::string> >& getCgi() const;
 
     const std::vector<std::pair<int, std::string> > &getErrorPages() const;
+
+    bool isAutoIndexEnabled() const;
+
+    const std::string &getRedirect() const;    
 
 };
 

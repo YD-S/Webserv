@@ -42,10 +42,6 @@ LocationConfig::~LocationConfig() {
 
 }
 
-
-
-
-
 void LocationConfig::setDirectoryListingEnabled(const std::string &boolean){
 	if (boolean == "on")
 		this->_directoryListingEnabled = true;
@@ -167,4 +163,16 @@ const std::vector<std::pair<std::string, std::string> >& LocationConfig::getCgi(
 
 const std::vector<std::pair<int, std::string> > &LocationConfig::getErrorPages() const{
     return _errorPages;
+}
+
+void LocationConfig::setAutoIndex(bool autoIndex){
+    _autoIndex = autoIndex;
+}
+
+bool LocationConfig::isAutoIndexEnabled() const{
+    return _autoIndex;
+}
+
+const std::string &LocationConfig::getRedirect() const{
+    return _redirect;
 }

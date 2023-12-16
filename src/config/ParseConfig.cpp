@@ -127,41 +127,11 @@ void    ParseConfig::parseConfig() {
 			//mainSetter(variables);
         }
         else {
-            LOG_ERROR("AYO WTF");
-			exit(-1);
+            ft_error("Invalid config line in " + it->second + " --> " + it->first, 1);
 		}
-		//printTempVariables(variables);
-		mainSetter(variables);
-		const std::vector<LocationConfig>& locations = server.getLocations();
-        for (std::vector<LocationConfig>::const_iterator locationIt = locations.begin(); locationIt != locations.end(); ++locationIt) {
-            const LocationConfig& location = *locationIt;
-
-            std::cout << "Location:" << std::endl;
-            std::cout << "  Path: " << location.getPath() << std::endl;
-            std::cout << "  Root: " << location.getRoot() << std::endl;
-
-            // Print Location Details (add more details as needed)
-            std::cout << "  Indexes: ";
-            const std::vector<std::string>& indexes = location.getIndexes();
-            for (std::vector<std::string>::const_iterator indexIt = indexes.begin(); indexIt != indexes.end(); ++indexIt) {
-                const std::string& index = *indexIt;
-                std::cout << index << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "  Methods: ";
-            const std::vector<std::string>& methods = location.getMethods();
-            for (std::vector<std::string>::const_iterator methodIt = methods.begin(); methodIt != methods.end(); ++methodIt) {
-                const std::string& method = *methodIt;
-                std::cout << method << " ";
-            }
-            std::cout << std::endl;
-
-            // Add more details if needed
-        }
-    }
+		mainSetter(variables, server);
+	}
 }
-
 void ParseConfig::validate_braces(std::ifstream &file) {
 	std::stack<std::pair<int, int> > brace_stack;  // (line, column)
 
@@ -214,6 +184,7 @@ LocationConfig ParseConfig::parseLocation(std::vector<std::pair<std::string, std
 		if (it->first == "{" || (it->first != ";" && it->first != "}"))
 			throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
 	}
+	LocationSetter(variables, location);
 	return location;
 }
 
@@ -232,6 +203,134 @@ std::string ParseConfig::extractAndRemoveFirst(std::vector<std::string>& values)
         return "";
     }
 }
+
+void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables, LocationConfig &location){
+
+	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator temp;
+	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator it = variables.begin();
+	for (; it != variables.end(); it = variables.erase(it)){
+		
+		if (it->first == "root")
+		{
+			location.setRoot(extractAndRemoveFirst(it->second));
+			if (!it->second.empty())
+				LOG_WARNING("root has more than one value. Setting only the first one.");
+		}
+		else if (it->first == "index")
+		{
+			for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); iter = it->second.erase(iter)){
+				location.addIndex(*iter);
+			}
+		}
+		else if (it->first == "autoindex")
+		{
+			std::vector <std::string>::iterator iter = it->second.begin();
+			if (*iter == "on")
+				location.setAutoIndex(true);
+			else if (*iter == "off")
+				location.setAutoIndex(false);
+			else
+				ft_error("autoIndex has an invalid value!", 1);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("autoIndex has more than one value. Setting only the first one.");
+		}
+		else if (it->first == "method")
+		{
+			for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); iter = it->second.erase(iter)){
+				location.addMethod(*iter);
+			}
+		}
+		else if (it->first == "directory_listing")
+		{
+			std::vector <std::string>::iterator iter = it->second.begin();
+			location.setDirectoryListingEnabled(*iter);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("directory_listing has more than one value. Setting only the first one.");
+		}
+		else if (it->first == "directory_response_file")
+		{
+			std::vector <std::string>::iterator iter = it->second.begin();
+			location.setDirectoryResponseFile(*iter);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("directory_listing has more than one value. Setting only the first one.");
+		}
+		else if (it->first == "cgiEnabled")
+		{
+			std::vector <std::string>::iterator iter = it->second.begin();
+			location.setCgiEnabled(*iter);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("directory_listing has more than one value. Setting only the first one.");
+		}
+		else if (it->first == "cgi")
+		{
+			if (it->second.size() != 2){
+				LOG_ERROR("Cgi syntax error. Needs 2 arguments: extension, path");
+				exit(1);
+			}
+			std::vector <std::string>::iterator iter = it->second.begin();
+			std::string extension = *iter;
+			iter = it->second.erase(iter);
+			location.addCgi(extension, *iter);
+		}
+		else if (it->first == "upload_enabled")
+		{
+			std::vector <std::string>::iterator iter = it->second.begin();
+			location.setUploadEnabled(*iter);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("upload_enabled has more than one value. Setting only the first one.");
+		}
+		else if (it->first == "upload_path")
+		{
+			std::vector <std::string>::iterator iter = it->second.begin();
+			location.setUploadPath(*iter);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("upload_path has more than one value. Setting only the first one.");
+		}
+		else if (it->first == "redirect")
+		{
+			std::vector <std::string>::iterator iter = it->second.begin();
+			location.setRedirect(*iter);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("redirect has more than one value. Setting only the first one.");
+		}
+		else if (it->first == "error_page")
+		{
+			int code = 0;
+			if (it->second.size() != 2){
+				LOG_ERROR("error_page syntax error. Needs 2 arguments: extension, path");
+				exit(1);
+			}
+			std::vector <std::string>::iterator iter = it->second.begin();
+			try {
+				code = stoi(*iter);
+			} catch (std::exception &e) { LOG_ERROR("Error code not valid!"); exit(1); }
+			iter = it->second.erase(iter);
+			location.addErrorPage(code, *iter);
+		}
+		else if (it->first == "clientMaxBodySize")
+		{
+			int size = 0;
+			std::vector <std::string>::iterator iter = it->second.begin();
+			try {
+				size = stoul(*iter);
+			} catch (std::exception &e) { LOG_ERROR("Max body size not valid!"); exit(1); }
+			location.setClientMaxBodySize(size);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("clientMaxBodySize has more than one value. Setting only the first one.");
+		}
+		else
+			ft_error("Unkown variable \"" + it->first +  "\", exiting...", 1);
+	}
+}
+
 
 void ParseConfig::separateHostPort(ServerConfig &server, const std::string& input) {
     size_t colonPos = input.find(':');
@@ -252,20 +351,20 @@ void ParseConfig::separateHostPort(ServerConfig &server, const std::string& inpu
     }
 }
 
-void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables){
-	ServerConfig server;
+void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables, ServerConfig& server){
 	LocationConfig defaultLocation;
 	
 	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator temp;
 	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator it = variables.begin();
 	for (; it != variables.end(); it = variables.erase(it)){
-		
 		if (it->first == "server_name")
 		{
-			server.setServerName(extractAndRemoveFirst(it->second));
+			std::vector <std::string>::iterator iter = it->second.begin();
+			server.setServerName(*iter);
+			iter = it->second.erase(iter);
 			if (!it->second.empty())
 				LOG_WARNING("server_name has more than one value. Setting only the first one.");
-			temp = ++it;
+			temp = it + 1;
 			for (; temp != variables.end(); ++temp)
 				if (temp->first == "server_name")
 					ft_error("server_name was declared more that once. Exiting...", 1);
@@ -287,6 +386,19 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 			for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); iter = it->second.erase(iter)){
 				defaultLocation.addIndex(*iter);
 			}
+		}
+		else if (it->first == "autoindex")
+		{
+			std::vector <std::string>::iterator iter = it->second.begin();
+			if (*iter == "on")
+				defaultLocation.setAutoIndex(true);
+			else if (*iter == "off")
+				defaultLocation.setAutoIndex(false);
+			else
+				ft_error("autoIndex has an invalid value!", 1);
+			iter = it->second.erase(iter);
+			if (!it->second.empty())
+				LOG_WARNING("autoIndex has more than one value. Setting only the first one.");
 		}
 		else if (it->first == "method")
 		{
@@ -381,9 +493,6 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 		}
 		else
 			ft_error("Unkown variable \"" + it->first +  "\", exiting...", 1);
-		for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); ++iter){
-			
-		}
 	}
 	server.setDefaultLocation(defaultLocation);
 	_servers.push_back(server);
@@ -396,12 +505,57 @@ std::vector<ServerConfig>& ParseConfig::getServers(){
 
 void    ParseConfig::printTempVariables(std::vector<std::pair<std::string, std::vector <std::string> > > variables){
 	for (std::vector<std::pair<std::string, std::vector <std::string> > >::iterator it = variables.begin(); it != variables.end(); ++it){
-		std::cout << it->first << ": " << std::endl;
+		std::cout << it->first << ": ";
 		for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); ++iter){
 			std::cout << *iter << ", ";
 		}
-		std::cout << "IM NOT GEI "<< std::endl;
+		std::cout << std::endl;
 	}
+}
+
+void ParseConfig::printLocation(const LocationConfig& location){
+	std::cout << "  Path: " << location.getPath() << std::endl;
+	std::cout << "  Root: " << location.getRoot() << std::endl;
+
+	// Print Location Details (add more details as needed)
+	std::cout << "  Indexes: ";
+	const std::vector<std::string>& indexes = location.getIndexes();
+	for (std::vector<std::string>::const_iterator indexIt = indexes.begin(); indexIt != indexes.end(); ++indexIt) {
+		const std::string& index = *indexIt;
+		std::cout << index << " ";
+	}
+	std::cout << std::endl;
+
+	std::cout << "  AutoIndex: " << location.isAutoIndexEnabled() << std::endl;
+
+	std::cout << "  Methods: ";
+	const std::vector<std::string>& methods = location.getMethods();
+	for (std::vector<std::string>::const_iterator methodIt = methods.begin(); methodIt != methods.end(); ++methodIt) {
+		const std::string& method = *methodIt;
+		std::cout << method << " ";
+	}
+	std::cout << std::endl;
+
+	std::cout << "  DirectoryListingEnabled: " << location.isDirectoryListingEnabled() << std::endl;
+	std::cout << "  DirectoryResponseFile: " << location.getDirectoryResponseFile() << std::endl;
+	std::cout << "  CgiEnabled: " << location.isCgiEnabled() << std::endl;
+
+	std::cout << "  Cgi: ";
+	for (std::vector<std::pair<std::string, std::string> >::const_iterator cgiIt = location.getCgi().begin(); cgiIt != location.getCgi().end(); ++cgiIt) {
+		std::cout << " ext: "<< cgiIt->first << " path: " << cgiIt->second;
+	}
+	std::cout << std::endl;
+
+	std::cout << "  UploadEnabled: " << location.isUploadEnabled() << std::endl;
+	std::cout << "  UploadPath: " << location.getUploadPath() << std::endl;
+	std::cout << "  Redirect: " << location.getRedirect() << std::endl;
+	
+	std::cout << "  ErrorPages: ";
+	for (std::vector<std::pair<int, std::string> >::const_iterator errorPageIt = location.getErrorPages().begin(); errorPageIt != location.getErrorPages().end(); ++errorPageIt) {
+		std::cout << " code: "<< errorPageIt->first << " path: " << errorPageIt->second;
+	}
+	std::cout << std::endl;
+	std::cout << std::endl;
 }
 
 void ParseConfig::printAll()
@@ -411,45 +565,22 @@ void ParseConfig::printAll()
 
         std::cout << "Server Name: " << server.getServerName() << std::endl;
 
-        // Print Listen Configurations
-        const std::vector<std::pair<std::string, int> >& listenConfigurations = server.getListen();
-        for (std::vector<std::pair<std::string, int> >::const_iterator listenIt = listenConfigurations.begin(); listenIt != listenConfigurations.end(); ++listenIt) {
-            const std::pair<std::string, int>& listen = *listenIt;
-            std::cout << "Listen: " << listen.first << ":" << listen.second << std::endl;
-        }
+		std::cout << "  Listen: ";
+		for (std::vector<std::pair<std::string, int> >::const_iterator listenIt = server.getListen().begin(); listenIt != server.getListen().end(); ++listenIt) {
+			std::cout << " "<< listenIt->first << ":" << listenIt->second;
+		}
+		std::cout << std::endl;
 
         // Print Default Location
         const LocationConfig& defaultLocation = server.getDefaultLocation();
         std::cout << "Default Location:" << std::endl;
-        std::cout << "  Path: " << defaultLocation.getPath() << std::endl;
-        std::cout << "  Root: " << defaultLocation.getRoot() << std::endl;
+		printLocation(defaultLocation);
 
         // Print Locations
         const std::vector<LocationConfig>& locations = server.getLocations();
         for (std::vector<LocationConfig>::const_iterator locationIt = locations.begin(); locationIt != locations.end(); ++locationIt) {
-            const LocationConfig& location = *locationIt;
-
-            std::cout << "Location:" << std::endl;
-            std::cout << "  Path: " << location.getPath() << std::endl;
-            std::cout << "  Root: " << location.getRoot() << std::endl;
-
-            // Print Location Details (add more details as needed)
-            std::cout << "  Indexes: ";
-            const std::vector<std::string>& indexes = location.getIndexes();
-            for (std::vector<std::string>::const_iterator indexIt = indexes.begin(); indexIt != indexes.end(); ++indexIt) {
-                const std::string& index = *indexIt;
-                std::cout << index << " ";
-            }
-            std::cout << std::endl;
-
-            std::cout << "  Methods: ";
-            const std::vector<std::string>& methods = location.getMethods();
-            for (std::vector<std::string>::const_iterator methodIt = methods.begin(); methodIt != methods.end(); ++methodIt) {
-                const std::string& method = *methodIt;
-                std::cout << method << " ";
-            }
-            std::cout << std::endl;
-
+			std::cout << "Location:" << std::endl;
+			printLocation(*locationIt);
             // Add more details if needed
         }
 

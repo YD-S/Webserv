@@ -37,10 +37,12 @@ public:
 	void	validate_braces(std::ifstream &file);
 	std::vector<std::pair<std::string, std::string> > processFile();
 	void    parseConfig();
-    void    mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables);;
+    void    mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables, ServerConfig& server);
+    void    LocationSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables, LocationConfig &location);
     void    printTempVariables(std::vector<std::pair<std::string, std::vector <std::string> > > variables);
     std::string extractAndRemoveFirst(std::vector<std::string>& values);
     void separateHostPort(ServerConfig &server, const std::string& input);
+    void printLocation(const LocationConfig& location);
     void printAll();
 
     std::vector<ServerConfig>& getServers();

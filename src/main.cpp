@@ -16,8 +16,14 @@ int main(int argc, char *argv[]) {
 	else if (argc == 2){
 		std::string path = argv[1];
 		parse = ParseConfig(path);
+		
 	}
 	parse.parseConfig();
+	if (parse.getServers().empty())
+			LOG_ERROR("NO SERVER >:(");
+	const std::vector<LocationConfig>& locations = (*(parse.getServers().begin())).getLocations();
+	if (locations.empty())
+			LOG_ERROR("NO LOCATIONS >:(");
 	parse.printAll();
 	return 0;
 }

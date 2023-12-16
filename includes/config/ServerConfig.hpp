@@ -36,7 +36,7 @@ public:
 	void setServerName(const std::string& name);
 	void addLocation(const LocationConfig& location);
 	void setDefaultLocation(const LocationConfig& location);
-	void setHostPort(const std::string& host, int port);
+	void setHostPort(const std::string host, int port);
 
     std::string getServerName();
 	std::vector<LocationConfig>& getLocations();
