@@ -94,6 +94,8 @@ void    ParseConfig::parseConfig() {
         ServerConfig server;
         pastString.clear();
         pastString = it->first;
+		if ((it + 1) == config.end())
+			ft_error("Invalid config of server in " + it->second + " --> " + it->first, 1);
         it = config.erase(it);
         currentString.clear();
         currentString = it->first;
@@ -110,17 +112,21 @@ void    ParseConfig::parseConfig() {
                 if (it->first == "}")
                     break ;
                 if (pastString == "}" && lastVar != ";" && lastVar != "{" && !lastVar.empty())
-					throw std::runtime_error("Invalid config of server in " + it->second + " --> " + it->first);
+					ft_error("Invalid config of server in " + it->second + " --> " + it->first, 1);
 				pastString = it->first;
                 it = config.erase(it);
                 for (; it != config.end() && it->first != "}" && it->first != "{" && it->first != ";"; it = config.erase(it))
                 {
                     variablesVar.push_back(it->first);
                 }
+				if (it == config.end())
+					ft_error("Fatal syntax error.", 1);
+				if (it->first == "}")
+					ft_error("Fatal syntax error.", 1);
 				variables.push_back(std::make_pair(pastString, variablesVar));
                 if (it->first == "{" || (it->first != ";" && it->first != "}"))
-                    throw std::runtime_error("Invalid config of server in " + it->second + " --> " + it->first);
-                if (it->first == "}")
+                    ft_error("Invalid config of server in " + it->second + " --> " + it->first, 1);
+			    if (it->first == "}")
                     break ;
 				lastVar = it->first;
             }
@@ -130,6 +136,16 @@ void    ParseConfig::parseConfig() {
             ft_error("Invalid config line in " + it->second + " --> " + it->first, 1);
 		}
 		mainSetter(variables, server);
+	}
+	std::vector<ServerConfig>::iterator it = _servers.begin();
+	if (it == _servers.end())
+		ft_error("No servers declared!", 1);
+	for (; it != _servers.end(); ++it)
+	{
+		if ((*it).getDefaultLocation().getRoot().empty())
+			ft_error("No default root declared!", 1);
+		else if ((*it).getListen().empty())
+			ft_error("No default listen declared!", 1);
 	}
 }
 void ParseConfig::validate_braces(std::ifstream &file) {
@@ -145,7 +161,7 @@ void ParseConfig::validate_braces(std::ifstream &file) {
 				brace_stack.push(std::make_pair(line_number, i + 1));  // i + 1 is the column
 			} else if (line[i] == '}') {
 				if (brace_stack.empty()) {
-					throw std::runtime_error("Error: Unmatched closing brace at line " + to_string(line_number) + ", column " + to_string(i + 1));
+					ft_error("Error: Unmatched closing brace at line " + to_string(line_number) + ", column " + to_string(i + 1), 1);
 				} else {
 					brace_stack.pop();
 				}
@@ -155,7 +171,7 @@ void ParseConfig::validate_braces(std::ifstream &file) {
 
 	while (!brace_stack.empty()) {
 		const std::pair<int, int> &position = brace_stack.top();
-		throw std::runtime_error("Error: Unmatched opening brace at line " + to_string(position.first) + ", column " + to_string(position.second));
+		ft_error("Error: Unmatched opening brace at line " + to_string(position.first) + ", column " + to_string(position.second), 1);
 	}
 }
 
@@ -165,11 +181,11 @@ LocationConfig ParseConfig::parseLocation(std::vector<std::pair<std::string, std
 	LocationConfig location;
 
 	if (it->first.at(0) != '/')
-		throw std::runtime_error("Invalid path of location in " + it->second + " --> " + it->first);
+		ft_error("Invalid path of location in " + it->second + " --> " + it->first, 1);
 	location.setPath(it->first);
 	it = config.erase(it);
 	if (it->first != "{")
-		throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first + " | Expected \"{\"");
+		ft_error("Invalid config of location in " + it->second + " --> " + it->first + " | Expected \"{\"", 1);
 	it = config.erase(it);
 	std::string pastString;
 	for (; it->first != "}"; it = config.erase(it)) {
@@ -180,9 +196,13 @@ LocationConfig ParseConfig::parseLocation(std::vector<std::pair<std::string, std
 		{
 			variablesVar.push_back(it->first);
 		}
+		if (it == config.end())
+			ft_error("Fatal syntax error.", 1);
+		if (it->first == "}")
+			ft_error("Fatal syntax error.", 1);
 		variables.push_back(std::make_pair(pastString, variablesVar));
 		if (it->first == "{" || (it->first != ";" && it->first != "}"))
-			throw std::runtime_error("Invalid config of location in " + it->second + " --> " + it->first);
+			ft_error("Invalid config of location in " + it->second + " --> " + it->first, 1);
 	}
 	LocationSetter(variables, location);
 	return location;
@@ -212,6 +232,8 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 		
 		if (it->first == "root")
 		{
+			if (it->second.empty())
+				ft_error("root has no value.", 1);
 			location.setRoot(extractAndRemoveFirst(it->second));
 			if (!it->second.empty())
 				LOG_WARNING("root has more than one value. Setting only the first one.");
@@ -255,7 +277,7 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 			location.setDirectoryResponseFile(*iter);
 			iter = it->second.erase(iter);
 			if (!it->second.empty())
-				LOG_WARNING("directory_listing has more than one value. Setting only the first one.");
+				LOG_WARNING("directory_response_file has more than one value. Setting only the first one.");
 		}
 		else if (it->first == "cgiEnabled")
 		{
@@ -263,7 +285,7 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 			location.setCgiEnabled(*iter);
 			iter = it->second.erase(iter);
 			if (!it->second.empty())
-				LOG_WARNING("directory_listing has more than one value. Setting only the first one.");
+				LOG_WARNING("cgiEnabled has more than one value. Setting only the first one.");
 		}
 		else if (it->first == "cgi")
 		{
@@ -328,6 +350,7 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 		}
 		else
 			ft_error("Unkown variable \"" + it->first +  "\", exiting...", 1);
+
 	}
 }
 
@@ -346,7 +369,7 @@ void ParseConfig::separateHostPort(ServerConfig &server, const std::string& inpu
 		}
         server.setHostPort(input.substr(0, colonPos), stoi(input.substr(colonPos + 1)));
     } else {
-        LOG_ERROR("host syntax error!");
+        LOG_ERROR("listen syntax error!");
 		exit(1);
     }
 }
@@ -360,6 +383,8 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 		if (it->first == "server_name")
 		{
 			std::vector <std::string>::iterator iter = it->second.begin();
+			if (it->second.empty())
+				ft_error("server_name has no value.", 1);
 			server.setServerName(*iter);
 			iter = it->second.erase(iter);
 			if (!it->second.empty())
@@ -371,12 +396,16 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 		}
 		else if (it->first == "listen")
 		{
+			if (it->second.empty())
+				ft_error("listen has no value.", 1);
 			for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); ++iter){
 				separateHostPort(server, *iter);
 			}
 		}
 		else if (it->first == "root")
 		{
+			if (it->second.empty())
+				ft_error("root has no value.", 1);
 			defaultLocation.setRoot(extractAndRemoveFirst(it->second));
 			if (!it->second.empty())
 				LOG_WARNING("root has more than one value. Setting only the first one.");
@@ -420,15 +449,15 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 			defaultLocation.setDirectoryResponseFile(*iter);
 			iter = it->second.erase(iter);
 			if (!it->second.empty())
-				LOG_WARNING("directory_listing has more than one value. Setting only the first one.");
+				LOG_WARNING("directory_response_file has more than one value. Setting only the first one.");
 		}
-		else if (it->first == "cgi_enabled")
+		else if (it->first == "cgiEnabled")
 		{
 			std::vector <std::string>::iterator iter = it->second.begin();
 			defaultLocation.setCgiEnabled(*iter);
 			iter = it->second.erase(iter);
 			if (!it->second.empty())
-				LOG_WARNING("directory_listing has more than one value. Setting only the first one.");
+				LOG_WARNING("cgiEnabled has more than one value. Setting only the first one.");
 		}
 		else if (it->first == "cgi")
 		{
