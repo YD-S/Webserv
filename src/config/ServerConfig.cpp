@@ -1,7 +1,7 @@
 #include "../includes/config/ServerConfig.hpp"
 
-ServerConfig::ServerConfig() {
-
+ServerConfig::ServerConfig(): _defaultLocation(LocationConfig()) {
+    
 }
 
 ServerConfig::ServerConfig(const ServerConfig &other) {

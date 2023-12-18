@@ -3,11 +3,11 @@
 //
 #include "../includes/config/LocationConfig.hpp"
 
-LocationConfig::LocationConfig() : _directoryListingEnabled(), _cgiEnabled(), _uploadEnabled() {
-
+LocationConfig::LocationConfig() : _autoIndex(false), _directoryListingEnabled(false), _cgiEnabled(false), _uploadEnabled(false), _clientMaxBodySize(10000) {
+    
 }
 
-LocationConfig::LocationConfig(const LocationConfig &other) : _directoryListingEnabled(), _cgiEnabled(), _uploadEnabled() {
+LocationConfig::LocationConfig(const LocationConfig &other) {
     *this = other;
 }
 
@@ -18,6 +18,7 @@ LocationConfig &LocationConfig::operator=(const LocationConfig &other) {
         _indexes.clear();
         for (std::vector<std::string>::const_iterator it = other.getIndexes().begin(); it != other.getIndexes().end(); ++it)
             this->addIndex(*it);
+        this->_autoIndex = other._autoIndex;
         _methods.clear();
         for (std::vector<std::string>::const_iterator it = other.getMethods().begin(); it != other.getMethods().end(); ++it)
             this->addMethod(*it);

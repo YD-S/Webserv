@@ -178,7 +178,7 @@ void ParseConfig::validate_braces(std::ifstream &file) {
 LocationConfig ParseConfig::parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config) {
 	std::vector<std::pair<std::string, std::vector <std::string> > > variables;
 	
-	LocationConfig location;
+	LocationConfig location = LocationConfig();
 
 	if (it->first.at(0) != '/')
 		ft_error("Invalid path of location in " + it->second + " --> " + it->first, 1);
@@ -375,7 +375,7 @@ void ParseConfig::separateHostPort(ServerConfig &server, const std::string& inpu
 }
 
 void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables, ServerConfig& server){
-	LocationConfig defaultLocation;
+	LocationConfig defaultLocation = LocationConfig();
 	
 	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator temp;
 	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator it = variables.begin();
