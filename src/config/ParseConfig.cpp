@@ -377,6 +377,7 @@ void ParseConfig::separateHostPort(ServerConfig &server, const std::string& inpu
 void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables, ServerConfig& server){
 	LocationConfig defaultLocation = LocationConfig();
 	
+	defaultLocation.addIndex("index.html");
 	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator temp;
 	std::vector<std::pair<std::string, std::vector <std::string> > >::iterator it = variables.begin();
 	for (; it != variables.end(); it = variables.erase(it)){
@@ -412,6 +413,7 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 		}
 		else if (it->first == "index")
 		{
+			defaultLocation.clearIndex();
 			for (std::vector <std::string>::iterator iter = it->second.begin(); iter != it->second.end(); iter = it->second.erase(iter)){
 				defaultLocation.addIndex(*iter);
 			}
