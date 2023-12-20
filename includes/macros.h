@@ -6,6 +6,7 @@
 #define WEBSERV_MACROS_H
 
 #include <iostream>
+#include <csignal>
 
 #define unused __attribute__((unused))
 

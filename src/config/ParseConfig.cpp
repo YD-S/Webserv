@@ -1,4 +1,5 @@
 #include "../includes/config/ParseConfig.hpp"
+#include "utils.hpp"
 
 ParseConfig::ParseConfig() {
 
@@ -331,7 +332,7 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 			}
 			std::vector <std::string>::iterator iter = it->second.begin();
 			try {
-				code = stoi(*iter);
+				code = ft_stoi(*iter);
 			} catch (std::exception &e) { LOG_ERROR("Error code not valid!"); exit(1); }
 			iter = it->second.erase(iter);
 			location.addErrorPage(code, *iter);
@@ -341,7 +342,7 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 			int size = 0;
 			std::vector <std::string>::iterator iter = it->second.begin();
 			try {
-				size = stoul(*iter);
+				size = ft_stoul(*iter);
 			} catch (std::exception &e) { LOG_ERROR("Max body size not valid!"); exit(1); }
 			location.setClientMaxBodySize(size);
 			iter = it->second.erase(iter);
@@ -367,7 +368,7 @@ void ParseConfig::separateHostPort(ServerConfig &server, const std::string& inpu
 			LOG_ERROR("port not specified!");
 			exit(1);
 		}
-        server.setHostPort(input.substr(0, colonPos), stoi(input.substr(colonPos + 1)));
+        server.setHostPort(input.substr(0, colonPos), ft_stoi(input.substr(colonPos + 1)));
     } else {
         LOG_ERROR("listen syntax error!");
 		exit(1);
@@ -503,7 +504,7 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 			}
 			std::vector <std::string>::iterator iter = it->second.begin();
 			try {
-				code = stoi(*iter);
+				code = ft_stoi(*iter);
 			} catch (std::exception &e) { LOG_ERROR("Error code not valid!"); exit(1); }
 			iter = it->second.erase(iter);
 			defaultLocation.addErrorPage(code, *iter);
@@ -513,7 +514,7 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 			int size = 0;
 			std::vector <std::string>::iterator iter = it->second.begin();
 			try {
-				size = stoul(*iter);
+				size = ft_stoul(*iter);
 			} catch (std::exception &e) { LOG_ERROR("Max body size not valid!"); exit(1); }
 			defaultLocation.setClientMaxBodySize(size);
 			iter = it->second.erase(iter);

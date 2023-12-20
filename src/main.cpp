@@ -3,13 +3,28 @@
 #include "../includes/config/ServerConfig.hpp"
 #include "../includes/config/LocationConfig.hpp"
 #include "../includes/config/ParseConfig.hpp"
+#include "PollManager/PollManager.hpp"
 #include <iostream>
 #include <fstream>
 #include <string>
 
+std::vector<int> sockets;
+
+void ft_handle_sigint(int signal) {
+	(void)signal;
+	LOG_INFO("Stopping webserv...");
+	for (unsigned long i = 0; i < sockets.size(); i++) {
+		close(sockets[i]);
+		LOG_INFO("Socket " << sockets[i] << " closed");
+	}
+	exit(0);
+}
+
 int main(int argc, char *argv[]) {
     ParseConfig parse;
+	PollManager PollManager;
 	LOG_INFO("Starting webserv...");
+	signal(SIGINT, ft_handle_sigint);
 	if (argc == 1){
 		parse = ParseConfig();
 	}
@@ -25,5 +40,8 @@ int main(int argc, char *argv[]) {
 	if (locations.empty())
 			LOG_ERROR("NO LOCATIONS >:(");
 	parse.printAll();
+	PollManager.SocketConfig(parse.getServers());
+	PollManager.binder(parse.getServers());
+	while(1);
 	return 0;
 }

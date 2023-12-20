@@ -15,35 +15,35 @@ std::string pathToFilename(const std::string& path) {
     return path.substr(pos + 1);
 }
 
-int stoi(const std::string& str) {
+int ft_stoi(const std::string& str) {
     std::istringstream iss(str);
     int result;
     
     if (!(iss >> result)) {
         // Handling the conversion error here
-        throw std::invalid_argument("stoi: Invalid input");
+        throw std::invalid_argument("ft_stoi: Invalid input");
     }
 
     // Check for overflow or underflow
     if (iss.fail() || !iss.eof()) {
-        throw std::out_of_range("stoi: Out of range");
+        throw std::out_of_range("ft_stoi: Out of range");
     }
     
     return result;
 }
 
-size_t stoul(const std::string& str) {
+size_t ft_stoul(const std::string& str) {
     std::istringstream iss(str);
     size_t result;
     
     if (!(iss >> result)) {
         // Handling the conversion error here
-        throw std::invalid_argument("stoi: Invalid input");
+        throw std::invalid_argument("ft_stoi: Invalid input");
     }
 
     // Check for overflow or underflow
     if (iss.fail() || !iss.eof()) {
-        throw std::out_of_range("stoi: Out of range");
+        throw std::out_of_range("ft_stoi: Out of range");
     }
     
     return result;

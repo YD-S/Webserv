@@ -25,8 +25,8 @@ std::string to_string(T value) {
     ss << value;
     return ss.str();
 }
-int stoi(const std::string& str);
-size_t stoul(const std::string& str);
+int ft_stoi(const std::string& str);
+size_t ft_stoul(const std::string& str);
 std::string pathToFilename(const std::string& path);
 void    ft_error(std::string msg, int errorCode);
 

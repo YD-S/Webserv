@@ -5,10 +5,25 @@
 #ifndef WEBSERV_SERVERCONFIG_HPP
 #define WEBSERV_SERVERCONFIG_HPP
 
-
+#include <vector>
 #include <iostream>
 #include <fstream>
-#include <vector>
+#include <string>
+#include <cstring>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <sys/select.h>
+#include <algorithm>
+#include <csignal>
+#include <iomanip>
+#include <sstream>
+#include <ctime>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <cstdio>
 #include <utility>
 #include <string>
 #include <stack>
