@@ -177,3 +177,7 @@ bool LocationConfig::isAutoIndexEnabled() const{
 const std::string &LocationConfig::getRedirect() const{
     return _redirect;
 }
+
+void  LocationConfig::clearIndex(){
+    _indexes.clear();
+}

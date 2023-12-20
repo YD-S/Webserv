@@ -103,6 +103,7 @@ public:
 
     const std::string &getRedirect() const;    
 
+    void clearIndex();
 };
 
 
