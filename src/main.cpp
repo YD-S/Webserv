@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 			LOG_ERROR("NO LOCATIONS >:(");
 	parse.printAll();
 	PollManager.SocketConfig(parse.getServers());
-	PollManager.binder(parse.getServers());
+	PollManager.Binder(parse.getServers());
 	while(1);
 	return 0;
 }

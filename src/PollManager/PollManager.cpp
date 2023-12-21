@@ -36,17 +36,17 @@ void PollManager::SocketConfig(const std::vector<ServerConfig> &Servers){
 	for (unsigned long i = 0; i < Servers.size(); ++i) {
 		struct sockaddr_in server;
 		server.sin_family = AF_INET;
-		server.sin_addr.s_addr = inet_addr(Servers[i].getListen()[0].first.c_str());
+		server.sin_addr.s_addr = INADDR_ANY;
 		server.sin_port = htons(Servers[i].getListen()[0].second);
 		_servers.push_back(server);
 	}
 }
 
-void PollManager::binder(const std::vector<ServerConfig> &Servers) {
+void PollManager::Binder(const std::vector<ServerConfig> &Servers) {
 	if(_servers.size() != sockets.size())
 		LOG_ERROR("Servers and sockets size mismatch");
-	for (unsigned long i = 0; i < _servers.size(); ++i) {
-		if (bind(sockets[i], (struct sockaddr *)&_servers[i], sizeof(_servers[i])) < 0)
+	for (unsigned long i = 0; i < _servers.size(); i++) {
+		if (bind(sockets[i], (struct sockaddr *)&_servers[i], sizeof(_servers[i])) == -1)
 		{
 			LOG_ERROR("Socket binding failed");
 			for (unsigned long iter = 0; iter < sockets.size(); iter++) {
@@ -56,5 +56,20 @@ void PollManager::binder(const std::vector<ServerConfig> &Servers) {
 		}
 	}
 	for (unsigned long i = 0; i < sockets.size(); i++)
-		LOG_INFO("Socket " << sockets[i] << " bound to " << Servers[i].getListen()[0].first << ":" << Servers[i].getListen()[0].second);
+		LOG_INFO("Socket " << sockets[i] << " is bound to " << Servers[i].getListen()[0].first << ":" << Servers[i].getListen()[0].second);
+	for(unsigned long i = 0; i < sockets.size(); i++){
+		if (listen(sockets[i], 25) < 0)
+		{
+			LOG_ERROR("Socket listening failed");
+			for (unsigned long iter = 0; iter < sockets.size(); iter++) {
+				close(sockets[iter]);
+				LOG_INFO("Socket " << sockets[iter] << " closed");
+			}
+		}
+
+	}
+}
+
+void PollManager::Poller() {
+
 }
