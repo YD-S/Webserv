@@ -71,5 +71,53 @@ void PollManager::Binder(const std::vector<ServerConfig> &Servers) {
 }
 
 void PollManager::Poller() {
-
+	fd_set fds;
+	FD_ZERO(&fds);
+	for (unsigned long i = 0; i < sockets.size(); i++)
+		FD_SET(sockets.at(i), &fds);
+	int max_fd = *std::max_element(sockets.begin(), sockets.end());
+	while(1){
+		fd_set read_fd = fds;
+		if (select(max_fd + 1, &read_fd, NULL, NULL, NULL) < 0)
+		{
+			LOG_ERROR("Socket select failed");
+			for (unsigned long iter = 0; iter < sockets.size(); iter++) {
+				close(sockets[iter]);
+				LOG_INFO("Socket " << sockets[iter] << " closed");
+			}
+		}
+		for(unsigned long i = 0; i < sockets.size(); i++){
+			if(FD_ISSET(sockets[i], &read_fd)){
+				struct sockaddr_in Client_Data;
+				socklen_t Size_Client = sizeof(Client_Data);
+				int client_socket = accept(sockets[i], (struct sockaddr *)&Client_Data, &Size_Client);
+				if (client_socket < 0)
+				{
+					LOG_ERROR("Socket accept failed");
+					for (unsigned long iter = 0; iter < sockets.size(); iter++) {
+						close(sockets[iter]);
+						LOG_INFO("Socket " << sockets[iter] << " closed");
+					}
+				}
+				LOG_INFO("Socket " << client_socket << " accepted");
+				char buffer[1024] = {0};
+				int Read_value = read(client_socket, buffer, 1024);
+				if (Read_value < 0)
+				{
+					LOG_ERROR("Socket read failed");
+					for (unsigned long iter = 0; iter < sockets.size(); iter++) {
+						close(sockets[iter]);
+						LOG_INFO("Socket " << sockets[iter] << " closed");
+					}
+				}
+				std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!$";
+				LOG_INFO("Socket " << client_socket << " read");
+				LOG_INFO("Socket " << client_socket << " read: " << buffer);
+				send(client_socket, response.c_str(), response.length(), 0);
+				LOG_INFO("Socket " << client_socket << " sent");
+				close(client_socket);
+				LOG_INFO("Socket " << client_socket << " closed");
+			}
+		}
+	}
 }

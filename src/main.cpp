@@ -42,6 +42,6 @@ int main(int argc, char *argv[]) {
 	parse.printAll();
 	PollManager.SocketConfig(parse.getServers());
 	PollManager.Binder(parse.getServers());
-	while(1);
+	PollManager.Poller();
 	return 0;
 }
