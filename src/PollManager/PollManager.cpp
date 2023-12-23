@@ -20,39 +20,35 @@ PollManager &PollManager::operator=(const PollManager &src) {
 	return *this;
 }
 
-void PollManager::SocketConfig(const std::vector<ServerConfig> &Servers){
-	for (unsigned long i = 0; i < Servers.size(); ++i) {
+void PollManager::SocketConfig(const std::vector<ServerConfig> &Servers_Config){
+	for (unsigned long i = 0; i < Servers_Config.size(); ++i) {
 		int j = socket(AF_INET, SOCK_STREAM, 0);
-		if(j == -1)
+		if(j < 0)
 		{
 			LOG_ERROR("Socket creation failed");
-			for (unsigned long iter = 0; iter < sockets.size(); iter++) {
-				close(sockets[iter]);
-				LOG_INFO("Socket " << sockets[iter] << " closed");
-			}
+			kill(getpid(), SIGINT);
 		}
 		sockets.push_back(j);
 	}
-	for (unsigned long i = 0; i < Servers.size(); ++i) {
+	for (unsigned long i = 0; i < Servers_Config.size(); ++i) {
 		struct sockaddr_in server;
 		server.sin_family = AF_INET;
 		server.sin_addr.s_addr = INADDR_ANY;
-		server.sin_port = htons(Servers[i].getListen()[0].second);
+		server.sin_port = htons(Servers_Config[i].getListen()[0].second);
 		_servers.push_back(server);
 	}
 }
 
 void PollManager::Binder(const std::vector<ServerConfig> &Servers) {
-	if(_servers.size() != sockets.size())
+	if(_servers.size() != sockets.size()) {
 		LOG_ERROR("Servers and sockets size mismatch");
+		kill(getpid(), SIGINT);
+	}
 	for (unsigned long i = 0; i < _servers.size(); i++) {
-		if (bind(sockets[i], (struct sockaddr *)&_servers[i], sizeof(_servers[i])) == -1)
+		if (bind(sockets[i], (struct sockaddr *)&_servers[i], sizeof(struct sockaddr_in)) == -1)
 		{
 			LOG_ERROR("Socket binding failed");
-			for (unsigned long iter = 0; iter < sockets.size(); iter++) {
-				close(sockets[iter]);
-				LOG_INFO("Socket " << sockets[iter] << " closed");
-			}
+			kill(getpid(), SIGINT);
 		}
 	}
 	for (unsigned long i = 0; i < sockets.size(); i++)
@@ -61,10 +57,7 @@ void PollManager::Binder(const std::vector<ServerConfig> &Servers) {
 		if (listen(sockets[i], 25) < 0)
 		{
 			LOG_ERROR("Socket listening failed");
-			for (unsigned long iter = 0; iter < sockets.size(); iter++) {
-				close(sockets[iter]);
-				LOG_INFO("Socket " << sockets[iter] << " closed");
-			}
+			kill(getpid(), SIGINT);
 		}
 
 	}
@@ -81,10 +74,7 @@ void PollManager::Poller() {
 		if (select(max_fd + 1, &read_fd, NULL, NULL, NULL) < 0)
 		{
 			LOG_ERROR("Socket select failed");
-			for (unsigned long iter = 0; iter < sockets.size(); iter++) {
-				close(sockets[iter]);
-				LOG_INFO("Socket " << sockets[iter] << " closed");
-			}
+			kill(getpid(), SIGINT);
 		}
 		for(unsigned long i = 0; i < sockets.size(); i++){
 			if(FD_ISSET(sockets[i], &read_fd)){
@@ -94,10 +84,7 @@ void PollManager::Poller() {
 				if (client_socket < 0)
 				{
 					LOG_ERROR("Socket accept failed");
-					for (unsigned long iter = 0; iter < sockets.size(); iter++) {
-						close(sockets[iter]);
-						LOG_INFO("Socket " << sockets[iter] << " closed");
-					}
+					kill(getpid(), SIGINT);
 				}
 				LOG_INFO("Socket " << client_socket << " accepted");
 				char buffer[1024] = {0};
@@ -105,12 +92,9 @@ void PollManager::Poller() {
 				if (Read_value < 0)
 				{
 					LOG_ERROR("Socket read failed");
-					for (unsigned long iter = 0; iter < sockets.size(); iter++) {
-						close(sockets[iter]);
-						LOG_INFO("Socket " << sockets[iter] << " closed");
-					}
+					kill(getpid(), SIGINT);
 				}
-				std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!$";
+				std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!";
 				LOG_INFO("Socket " << client_socket << " read");
 				LOG_INFO("Socket " << client_socket << " read: " << buffer);
 				send(client_socket, response.c_str(), response.length(), 0);

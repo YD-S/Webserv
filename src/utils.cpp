@@ -55,3 +55,9 @@ void    ft_error(std::string msg, int errorCode)
 	LOG_ERROR(msg);
 	exit(errorCode);
 }
+
+std::string ft_socket_to_string(struct sockaddr_in addr) {
+	std::stringstream ss;
+	ss << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port);
+	return ss.str();
+}

@@ -5,7 +5,6 @@
 #include "../includes/config/ParseConfig.hpp"
 #include "PollManager/PollManager.hpp"
 #include <iostream>
-#include <fstream>
 #include <string>
 
 std::vector<int> sockets;

@@ -6,6 +6,7 @@
 #define WEBSERV_POLLMANAGER_HPP
 
 #include "config/ServerConfig.hpp"
+#include "utils.hpp"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -40,7 +41,7 @@ public:
 	~PollManager();
 	PollManager(const PollManager &src);
 	PollManager &operator=(const PollManager &src);
-	void SocketConfig(const std::vector<ServerConfig> &Servers);
+	void SocketConfig(const std::vector<ServerConfig> &Servers_Config);
 	void Binder(const std::vector<ServerConfig> &Servers);
 	void Poller();
 };
