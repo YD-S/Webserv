@@ -6,6 +6,11 @@
 #define WEBSERV_POLLMANAGER_HPP
 
 #include "config/ServerConfig.hpp"
+<<<<<<< Updated upstream
+=======
+#include "utils.hpp"
+#include "HttpResponse.hpp"
+>>>>>>> Stashed changes
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -46,6 +51,7 @@ public:
 	void SocketConfig(const std::vector<ServerConfig> &Servers_Config);
 	void Binder(const std::vector<ServerConfig> &Servers);
 	void Poller();
+	HttpResponse Response_Builder(HttpResponse response);
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP

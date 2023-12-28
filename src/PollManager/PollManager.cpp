@@ -107,3 +107,93 @@ void PollManager::Poller() {
 		}
 	}
 }
+
+HttpResponse PollManager::Response_Builder(HttpResponse response) {
+	response.setVersion("HTTP/1.1");
+	switch (response.getStatus()){
+		case 200:
+			response.addHeader("Status", "200 OK");
+			break;
+		case 201:
+			response.addHeader("Status", "201 Created");
+			break;
+		case 202:
+			response.addHeader("Status", "202 Accepted");
+			break;
+		case 203:
+			response.addHeader("Status", "203 Non-Authoritative Information");
+			break;
+		case 204:
+			response.addHeader("Status", "204 No Content");
+			break;
+		case 205:
+			response.addHeader("Status", "205 Reset Content");
+			break;
+		case 206:
+			response.addHeader("Status", "206 Partial Content");
+			break;
+		case 300:
+			response.addHeader("Status", "300 Multiple Choices");
+			break;
+		case 301:
+			response.addHeader("Status", "301 Moved Permanently");
+			break;
+		case 302:
+			response.addHeader("Status", "302 Found");
+			break;
+		case 303:
+			response.addHeader("Status", "303 See Other");
+			break;
+		case 304:
+			response.addHeader("Status", "304 Not Modified");
+			break;
+		case 305:
+			response.addHeader("Status", "305 Use Proxy");
+			break;
+		case 306:
+			response.addHeader("Status", "306 Switch Proxy");
+			break;
+		case 307:
+			response.addHeader("Status", "307 Temporary Redirect");
+			break;
+		case 308:
+			response.addHeader("Status", "308 Permanent Redirect");
+			break;
+		case 400:
+			response.addHeader("Status", "400 Bad Request");
+			break;
+		case 401:
+			response.addHeader("Status", "401 Unauthorized");
+			break;
+		case 402:
+			response.addHeader("Status", "402 Payment Required");
+			break;
+		case 403:
+			response.addHeader("Status", "403 Forbidden");
+			break;
+		case 404:
+			response.addHeader("Status", "404 Not Found");
+			break;
+		case 405:
+			response.addHeader("Status", "405 Method Not Allowed");
+			break;
+		case 406:
+			response.addHeader("Status", "406 Not Acceptable");
+			break;
+		case 407:
+			response.addHeader("Status", "407 Proxy Authentication Required");
+			break;
+		case 408:
+			response.addHeader("Status", "408 Request Timeout");
+			break;
+		case 502:
+			response.addHeader("Status", "502 Bad Gateway");
+			break;
+		case 504:
+			response.addHeader("Status", "504 Gateway Timeout");
+			break;
+		default:
+			response.addHeader("Status", "500 Internal Server Error");
+			break;
+	}
+}
