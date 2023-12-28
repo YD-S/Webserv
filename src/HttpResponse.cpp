@@ -85,3 +85,83 @@ std::string HttpResponse::toPrintableString() {
     }
     return response;
 }
+
+static bool startsWith(const std::string& mainStr, const std::string& searchStr) {
+    if (mainStr.length() < searchStr.length()) {
+        // The main string is shorter than the search string, so it can't start with it.
+        return false;
+    }
+
+    // Compare the substring of the main string with the search string
+    return mainStr.substr(0, searchStr.length()) == searchStr;
+}
+
+static int fileExists(const std::string filename) {
+    FILE* file = std::fopen(filename.c_str(), "r");
+    if (file != NULL) {
+        std::fclose(file);
+        return 1;
+    }
+
+    // Check if the failure is due to file not existing or permission issues
+    if (errno == ENOENT) {
+        return 0;
+    } else {
+        return -1;
+    }
+
+    return false;
+}
+
+int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
+    int status;
+    if (request.getMethod() == "GET"){
+        for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
+            if (startsWith((*it).getRoot(), request.getPath())){
+                if (!((*it).hasMethod("GET")))
+                    return (401);
+                status = fileExists((*it).getPath().substr(request.getPath().length()));
+                if (status == 1) // Needs an additional check (400) requested variable doesnt exist, but the path does.
+                    return 200;
+                else if (!status)
+                    return 404;
+                else
+                    return 403;
+            }
+        }
+        return 404;
+    }
+    if (request.getMethod() == "POST"){
+        for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
+            if (startsWith((*it).getRoot(), request.getPath())){
+                if (!((*it).hasMethod("POST")))
+                    return (401);
+                status = fileExists((*it).getPath().substr(request.getPath().length()));
+                if (status == 1) // Needs some additional checks, like the return of 200 (result of operator)
+                    return 201; // 204 when variables change but no response
+                else if (!status) // (400) requested variable doesnt exist, but the path does.
+                    return 404;
+                else
+                    return 403;
+            }
+        }
+        return 404;
+    }
+    if (request.getMethod() == "DELETE"){
+        for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
+            if (startsWith((*it).getRoot(), request.getPath())){
+                if (!((*it).hasMethod("DELETE")))
+                    return (401);
+                status = fileExists((*it).getPath().substr(request.getPath().length()));
+                if (status == 1)
+                    return 204;
+                else if (!status)
+                    return 404;
+                else
+                    return 403;
+            }
+        }
+        return 404;
+    }
+    return 501;
+}

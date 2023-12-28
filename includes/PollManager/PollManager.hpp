@@ -6,11 +6,7 @@
 #define WEBSERV_POLLMANAGER_HPP
 
 #include "config/ServerConfig.hpp"
-<<<<<<< Updated upstream
-=======
 #include "utils.hpp"
-#include "HttpResponse.hpp"
->>>>>>> Stashed changes
 #include <vector>
 #include <iostream>
 #include <fstream>
