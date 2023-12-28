@@ -212,8 +212,6 @@ HttpRequest HttpRequest::parse(std::string request){
 
     if (_method == "GET")
         parseGetParams(_path);
-    else if (_method == "STATUS")
-        
 
     while (std::getline(stream, line, '\n')) {
         // Find the position of the colon in the line
@@ -230,7 +228,7 @@ HttpRequest HttpRequest::parse(std::string request){
         } else {
             if (_method == "POST")
                 parsePostParams(stream);
-            else if (_method == "GET")
+            else if (_method == "GET" || _method == "DELETE")
                 std::getline(stream, _body, '\0');
             else
                 ft_error("Unkown method!", 1);
