@@ -6,7 +6,6 @@
 #define WEBSERV_POLLMANAGER_HPP
 
 #include "config/ServerConfig.hpp"
-#include "utils.hpp"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -29,6 +28,9 @@
 #include <utility>
 #include <string>
 #include <stack>
+#include "HttpResponse.hpp"
+#include "HttpRequest.hpp"
+#include "HttpStatus.hpp"
 
 extern std::vector<int> sockets;
 
