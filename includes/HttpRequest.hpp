@@ -5,19 +5,24 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <iostream>
+#include <sstream>
+#include <cstdlib>
+#include <cstring>
+#include "utils.hpp"
 #include "macros.h"
 
 class HttpRequest {
 
 private:
-    std::string method;
-    std::string path;
-    std::string version;
+    std::string _method;
+    std::string _path;
+    std::string _version;
 
-    std::map<std::string, std::string> params;
-    std::map<std::string, std::string> headers;
+    std::map<std::string, std::string> _params;
+    std::map<std::string, std::string> _headers;
 
-    std::string body;
+    std::string _body;
 
 public:
 
@@ -25,6 +30,8 @@ public:
     HttpRequest(const HttpRequest& other);
     HttpRequest& operator=(const HttpRequest& other);
     ~HttpRequest();
+
+    HttpRequest parse(std::string request);
 
     HttpRequest setMethod(const std::string &method);
 
@@ -59,6 +66,12 @@ public:
     std::string toPrintableString();
 
     std::string getQueryString();
+    
+    void parseGetParams(const std::string &path_string);
+    
+    void parsePostParams(std::istringstream &stream);
+
+    void printHttpRequest() const;
 };
 
 

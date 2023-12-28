@@ -94,6 +94,8 @@ void PollManager::Poller() {
 					LOG_ERROR("Socket read failed");
 					kill(getpid(), SIGINT);
 				}
+				HttpRequest request = HttpRequest();
+				request.parse(buffer);
 				std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!";
 				LOG_INFO("Socket " << client_socket << " read");
 				LOG_INFO("Socket " << client_socket << " read: " << buffer);
