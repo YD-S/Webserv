@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "HttpRequest.hpp"
+#include "config/ServerConfig.hpp"
 
 class HttpResponse {
 private:
@@ -45,6 +47,8 @@ public:
     std::string toRawString();
 
     std::string toPrintableString();
+
+    int findStatus(HttpRequest &request, ServerConfig &config);
 };
 
 

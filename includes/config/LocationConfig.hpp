@@ -104,6 +104,8 @@ public:
     const std::string &getRedirect() const;    
 
     void clearIndex();
+
+    bool hasMethod(std::string method) const;
 };
 
 
