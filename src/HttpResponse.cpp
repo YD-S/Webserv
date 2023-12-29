@@ -186,7 +186,7 @@ bool    HttpResponse::isCGI(std::string &path){
     return false;
 }
 
-void    HttpResponse::build(HttpRequest &request, ServerConfig &server){
+void    HttpResponse::build(HttpRequest &request, ServerConfig &server){ // Need CGI, ContentType header.
     LOG_ERROR("STARTS HERE");
     request.printHttpRequest();
     LOG_ERROR("ENDS HERE");
