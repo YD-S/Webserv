@@ -33,8 +33,15 @@ void PollManager::SocketConfig(const std::vector<ServerConfig> &Servers_Config){
 	for (unsigned long i = 0; i < Servers_Config.size(); ++i) {
 		struct sockaddr_in server;
 		server.sin_family = AF_INET;
-		server.sin_addr.s_addr = INADDR_ANY;
-		server.sin_port = htons(Servers_Config[i].getListen()[0].second);
+		for(unsigned long j = 0; j < Servers_Config[i].getListen().size(); j++) {
+			if (Servers_Config[i].getListen()[j].first == "localhost")
+				server.sin_addr.s_addr = inet_addr("127.0.0.1");
+			else if (Servers_Config[i].getListen()[j].first == "0.0.0.0")
+				server.sin_addr.s_addr = INADDR_ANY;
+			else
+				server.sin_addr.s_addr = inet_addr(Servers_Config[i].getListen()[j].first.c_str());
+			server.sin_port = htons(Servers_Config[i].getListen()[j].second);
+		}
 		_servers.push_back(server);
 	}
 }
@@ -94,6 +101,10 @@ void PollManager::Poller() {
 					LOG_ERROR("Socket read failed");
 					kill(getpid(), SIGINT);
 				}
+				Clients client = Clients(client_socket, Client_Data);
+				clients.push_back(client);
+				std::cout << "Server: " << _servers[i].sin_addr.s_addr << "::" << _servers[i].sin_port << " Has accepeted a client "  << client.getIp() << "::" << client.getPort() << std::endl;
+
 				HttpRequest request = HttpRequest();
 				request.parse(buffer);
 				std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!";
@@ -141,21 +152,6 @@ HttpResponse PollManager::Response_Builder(HttpResponse response) {
 		case 302:
 			response.addHeader("Status", "302 Found");
 			break;
-		case 303:
-			response.addHeader("Status", "303 See Other");
-			break;
-		case 304:
-			response.addHeader("Status", "304 Not Modified");
-			break;
-		case 305:
-			response.addHeader("Status", "305 Use Proxy");
-			break;
-		case 306:
-			response.addHeader("Status", "306 Switch Proxy");
-			break;
-		case 307:
-			response.addHeader("Status", "307 Temporary Redirect");
-			break;
 		case 308:
 			response.addHeader("Status", "308 Permanent Redirect");
 			break;
@@ -165,26 +161,17 @@ HttpResponse PollManager::Response_Builder(HttpResponse response) {
 		case 401:
 			response.addHeader("Status", "401 Unauthorized");
 			break;
-		case 402:
-			response.addHeader("Status", "402 Payment Required");
-			break;
 		case 403:
 			response.addHeader("Status", "403 Forbidden");
 			break;
 		case 404:
 			response.addHeader("Status", "404 Not Found");
 			break;
-		case 405:
-			response.addHeader("Status", "405 Method Not Allowed");
-			break;
-		case 406:
-			response.addHeader("Status", "406 Not Acceptable");
-			break;
-		case 407:
-			response.addHeader("Status", "407 Proxy Authentication Required");
-			break;
 		case 408:
 			response.addHeader("Status", "408 Request Timeout");
+			break;
+		case 501:
+			response.addHeader("Status", "501 Not Implemented");
 			break;
 		case 502:
 			response.addHeader("Status", "502 Bad Gateway");
@@ -196,4 +183,5 @@ HttpResponse PollManager::Response_Builder(HttpResponse response) {
 			response.addHeader("Status", "500 Internal Server Error");
 			break;
 	}
+	return response;
 }

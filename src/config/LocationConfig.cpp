@@ -181,3 +181,11 @@ const std::string &LocationConfig::getRedirect() const{
 void  LocationConfig::clearIndex(){
     _indexes.clear();
 }
+
+bool LocationConfig::hasMethod(std::string method) const{
+	for(std::vector<std::string>::const_iterator it = _methods.begin(); it != _methods.end(); ++it){
+		if (method == *it)
+			return true;
+	}
+	return false;
+}

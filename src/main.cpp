@@ -4,10 +4,12 @@
 #include "../includes/config/LocationConfig.hpp"
 #include "../includes/config/ParseConfig.hpp"
 #include "PollManager/PollManager.hpp"
+#include "Clients/Clients.hpp"
 #include <iostream>
 #include <string>
 
 std::vector<int> sockets;
+std::vector<Clients> clients;
 
 void ft_handle_sigint(int signal) {
 	(void)signal;

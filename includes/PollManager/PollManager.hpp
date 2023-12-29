@@ -32,8 +32,10 @@
 #include "HttpResponse.hpp"
 #include "HttpRequest.hpp"
 #include "HttpStatus.hpp"
+#include "Clients/Clients.hpp"
 
 extern std::vector<int> sockets;
+extern std::vector<Clients> clients;
 
 class PollManager {
 private:
