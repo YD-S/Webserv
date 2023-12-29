@@ -133,7 +133,7 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
                     return (401);
                 if (request.getPath().empty() || request.getPath().at(0) != '/')
                     return 402;
-                _status = fileExists(((*it).getRoot() + (request.getPath())).substr(1));
+                _status = fileExists(((*it).getRoot() + (request.getPath())).substr(1)); // when the size of the path is 1, it should return the root.
                 if (_status == 1) // Needs an additional check (400) requested variable doesnt exist, but the path does.
                     return 200;
                 else if (!_status)
