@@ -103,9 +103,7 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
 				}
 				Clients client = Clients(client_socket, Client_Data);
 				clients.push_back(client);
-				std::cout << "Server: " << ft_socket_to_string(_servers[i]) << " Has accepeted a client "  << ft_socket_to_string(client.getAddr()) << std::endl;
-
-				
+				std::cout << "Server: " <<  servers[i].getServerName() << " Ip and Port " << ft_socket_to_string(_servers[i]) << " Has accepeted a client "  << ft_socket_to_string(client.getAddr()) << std::endl;
 				HttpRequest request = HttpRequest();
 				request.parse(buffer);
 				HttpResponse response = HttpResponse();
