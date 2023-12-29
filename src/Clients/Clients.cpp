@@ -19,6 +19,7 @@ Clients::Clients(int fd, struct sockaddr_in addr) {
 	inet_ntop(AF_INET, &(addr.sin_addr), str, INET_ADDRSTRLEN);
 	this->ip = ntohs(addr.sin_addr.s_addr);
 	this->port = to_string(addr.sin_port);
+	this->addr = addr;
 }
 
 Clients &Clients::operator=(const Clients &src) {
@@ -27,6 +28,7 @@ Clients &Clients::operator=(const Clients &src) {
 		this->request = src.request;
 		this->ip = src.ip;
 		this->fd = src.fd;
+		this->addr = src.addr;
 	}
 	return *this;
 }
@@ -47,6 +49,10 @@ void Clients::setFd(int fd) {
 	this->fd = fd;
 }
 
+void Clients::setAddr(struct sockaddr_in addr) {
+	this->addr = addr;
+}
+
 std::string Clients::getPort() {
 	return this->port;
 }
@@ -61,4 +67,8 @@ int Clients::getIp() {
 
 int Clients::getFd() {
 	return this->fd;
+}
+
+struct sockaddr_in Clients::getAddr() {
+	return this->addr;
 }

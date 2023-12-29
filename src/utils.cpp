@@ -58,6 +58,13 @@ void    ft_error(std::string msg, int errorCode)
 
 std::string ft_socket_to_string(struct sockaddr_in addr) {
 	std::stringstream ss;
-	ss << inet_ntoa(addr.sin_addr) << ":" << ntohs(addr.sin_port);
+	ss << inet_ntoa(addr.sin_addr) << "::" << ntohs(addr.sin_port);
 	return ss.str();
 }
+
+std::string intToInAddr(unsigned long ip) {
+	struct in_addr addr;
+	addr.s_addr = htonl(ip);
+	return inet_ntoa(addr);
+}
+

@@ -21,6 +21,7 @@ private:
 	std::string request;
 	int ip;
 	int fd;
+	struct sockaddr_in addr;
 	Clients();
 
 public:
@@ -32,10 +33,12 @@ public:
 	void setRequest(std::string request);
 	void setIp(int ip);
 	void setFd(int fd);
+	void setAddr(struct sockaddr_in addr);
 	std::string getPort();
 	std::string getRequest();
 	int getIp();
 	int getFd();
+	struct sockaddr_in getAddr();
 };
 
 
