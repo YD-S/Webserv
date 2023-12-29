@@ -105,11 +105,12 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
 				clients.push_back(client);
 				std::cout << "Server: " << ft_socket_to_string(_servers[i]) << " Has accepeted a client "  << ft_socket_to_string(client.getAddr()) << std::endl;
 
+				
 				HttpRequest request = HttpRequest();
 				request.parse(buffer);
 				HttpResponse response = HttpResponse();
 				response.build(request, servers[i]);
-				std::string responseString = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!";
+				std::string responseString = response.toRawString();
 				LOG_INFO("Socket " << client_socket << " read");
 				LOG_INFO("Socket " << client_socket << " read: " << buffer);
 				send(client_socket, responseString.c_str(), responseString.length(), 0);

@@ -57,6 +57,10 @@ public:
     void    build(HttpRequest &request, ServerConfig &server);
 
     bool    isCGI(std::string &path);
+
+    int fileExists(std::string filename);
+
+    void printAll() const;
 };
 
 
