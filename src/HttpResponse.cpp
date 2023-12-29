@@ -6,20 +6,20 @@
 #include "HttpStatus.hpp"
 #include "utils.hpp"
 
-HttpResponse::HttpResponse() : status(HttpStatus::IM_A_TEAPOT) {
-    this->version = "HTTP/1.1";
+HttpResponse::HttpResponse() : _status(HttpStatus::IM_A_TEAPOT) {
+    this->_version = "HTTP/1.1";
 }
 
-HttpResponse::HttpResponse(const HttpResponse &other) : status() {
+HttpResponse::HttpResponse(const HttpResponse &other) : _status() {
     *this = other;
 }
 
 HttpResponse &HttpResponse::operator=(const HttpResponse &other) {
     if (this != &other) {
-        this->version = other.version;
-        this->status = other.status;
-        this->headers = other.headers;
-        this->body = other.body;
+        this->_version = other._version;
+        this->_status = other._status;
+        this->_headers = other._headers;
+        this->_body = other._body;
     }
     return *this;
 }
@@ -28,49 +28,49 @@ HttpResponse::~HttpResponse() {
 
 }
 
-HttpResponse HttpResponse::setVersion(const std::string &version) {
-    this->version = version;
+HttpResponse HttpResponse::setVersion(const std::string &_version) {
+    this->_version = _version;
     return *this;
 }
 
-HttpResponse HttpResponse::setStatus(int status) {
-    this->status = status;
+HttpResponse HttpResponse::setStatus(int _status) {
+    this->_status = _status;
     return *this;
 }
 
 HttpResponse HttpResponse::addHeader(const std::string &key, const std::string &value) {
-    this->headers.insert(std::make_pair(key, value));
+    this->_headers.insert(std::make_pair(key, value));
     return *this;
 }
 
-HttpResponse HttpResponse::setBody(const std::string &body) {
-    this->body = body;
+HttpResponse HttpResponse::setBody(const std::string &_body) {
+    this->_body = _body;
     return *this;
 }
 
 const std::string &HttpResponse::getVersion() const {
-    return version;
+    return _version;
 }
 
 int HttpResponse::getStatus() const {
-    return status;
+    return _status;
 }
 
 const std::map<std::string, std::string> &HttpResponse::getHeaders() const {
-    return headers;
+    return _headers;
 }
 
 const std::string &HttpResponse::getBody() const {
-    return body;
+    return _body;
 }
 
 std::string HttpResponse::toRawString() {
-    std::string response = this->version + " " + to_string(this->status) + " " + HttpStatus::getReasonString(this->status) + "\r\n";
-    for (std::map<std::string, std::string>::iterator it = this->headers.begin(); it != this->headers.end(); ++it) {
+    std::string response = this->_version + " " + to_string(this->_status) + " " + HttpStatus::getReasonString(this->_status) + "\r\n";
+    for (std::map<std::string, std::string>::iterator it = this->_headers.begin(); it != this->_headers.end(); ++it) {
         response += it->first + ": " + it->second + "\r\n";
     }
     response += "\r\n";
-    response += this->body;
+    response += this->_body;
     return response;
 }
 
@@ -118,16 +118,16 @@ void HttpResponse::getContentType(){
 }
 
 int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
-    int status;
+    int _status;
     if (request.getMethod() == "GET"){
         for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
             if (startsWith((*it).getRoot(), request.getPath())){
                 if (!((*it).hasMethod("GET")))
                     return (401);
-                status = fileExists((*it).getPath().substr(request.getPath().length()));
-                if (status == 1) // Needs an additional check (400) requested variable doesnt exist, but the path does.
+                _status = fileExists((*it).getPath().substr(request.getPath().length()));
+                if (_status == 1) // Needs an additional check (400) requested variable doesnt exist, but the path does.
                     return 200;
-                else if (!status)
+                else if (!_status)
                     return 404;
                 else
                     return 403;
@@ -140,10 +140,10 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
             if (startsWith((*it).getRoot(), request.getPath())){
                 if (!((*it).hasMethod("POST")))
                     return (401);
-                status = fileExists((*it).getPath().substr(request.getPath().length()));
-                if (status == 1) // Needs some additional checks, like the return of 200 (result of operator)
+                _status = fileExists((*it).getPath().substr(request.getPath().length()));
+                if (_status == 1) // Needs some additional checks, like the return of 200 (result of operator)
                     return 201; // 204 when variables change but no response
-                else if (!status) // (400) requested variable doesnt exist, but the path does.
+                else if (!_status) // (400) requested variable doesnt exist, but the path does.
                     return 404;
                 else
                     return 403;
@@ -156,10 +156,10 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
             if (startsWith((*it).getRoot(), request.getPath())){
                 if (!((*it).hasMethod("DELETE")))
                     return (401);
-                status = fileExists((*it).getPath().substr(request.getPath().length()));
-                if (status == 1)
+                _status = fileExists((*it).getPath().substr(request.getPath().length()));
+                if (_status == 1)
                     return 204;
-                else if (!status)
+                else if (!_status)
                     return 404;
                 else
                     return 403;
@@ -170,8 +170,16 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
     return 501;
 }
 
+bool    HttpResponse::isCGI(std::string &path){
+    int extPoint = path.find_last_of(".");
+    if (path.substr(extPoint) == ".py" || path.substr(extPoint) == ".sh")
+        return true;
+    return false;
+}
+
 void    HttpResponse::build(HttpRequest &request, ServerConfig &server){
     setVersion("HTTP/1.1");
     setStatus(findStatus(request, server));
-    
+    //if (isCGI(request.getPath()))
+    //    _body = CGI();
 }

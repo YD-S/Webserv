@@ -9,18 +9,19 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <iostream>
 #include "HttpRequest.hpp"
 #include "config/ServerConfig.hpp"
 #include "config/LocationConfig.hpp"
 
 class HttpResponse {
 private:
-    std::string version;
-    int status;
+    std::string _version;
+    int _status;
 
-    std::map<std::string, std::string> headers;
+    std::map<std::string, std::string> _headers;
 
-    std::string body;
+    std::string _body;
 
 public:
 
@@ -54,6 +55,8 @@ public:
     void    getContentType();
 
     void    build(HttpRequest &request, ServerConfig &server);
+
+    bool    isCGI(std::string &path);
 };
 
 

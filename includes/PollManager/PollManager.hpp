@@ -48,7 +48,7 @@ public:
 	PollManager &operator=(const PollManager &src);
 	void SocketConfig(const std::vector<ServerConfig> &Servers_Config);
 	void Binder(const std::vector<ServerConfig> &Servers);
-	void Poller();
+	void Poller(std::vector<ServerConfig> &Servers);
 	HttpResponse Response_Builder(HttpResponse response);
 };
 

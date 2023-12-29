@@ -70,7 +70,7 @@ void PollManager::Binder(const std::vector<ServerConfig> &Servers) {
 	}
 }
 
-void PollManager::Poller() {
+void PollManager::Poller(std::vector<ServerConfig> &servers) {
 	fd_set fds;
 	FD_ZERO(&fds);
 	for (unsigned long i = 0; i < sockets.size(); i++)
@@ -107,10 +107,12 @@ void PollManager::Poller() {
 
 				HttpRequest request = HttpRequest();
 				request.parse(buffer);
-				std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!";
+				HttpResponse response = HttpResponse();
+				response.build(request, servers[i]);
+				std::string responseString = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 12\r\n\r\nHello world!";
 				LOG_INFO("Socket " << client_socket << " read");
 				LOG_INFO("Socket " << client_socket << " read: " << buffer);
-				send(client_socket, response.c_str(), response.length(), 0);
+				send(client_socket, responseString.c_str(), responseString.length(), 0);
 				LOG_INFO("Socket " << client_socket << " sent");
 				close(client_socket);
 				LOG_INFO("Socket " << client_socket << " closed");
