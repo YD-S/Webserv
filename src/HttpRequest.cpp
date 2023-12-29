@@ -234,5 +234,6 @@ HttpRequest HttpRequest::parse(std::string request){
                 ft_error("Unkown method!", 1);
         }
     }
+    printHttpRequest();
     return *this;
 }

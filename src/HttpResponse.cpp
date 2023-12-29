@@ -96,10 +96,15 @@ static bool startsWith(const std::string& mainStr, const std::string& searchStr)
     return mainStr.substr(0, searchStr.length()) == searchStr;
 }
 
-static int fileExists(const std::string filename) {
-    FILE* file = std::fopen(filename.c_str(), "r");
+int HttpResponse::fileExists(std::string filename) {
+    std::ifstream file(filename.c_str(), std::ios::in | std::ios::binary);
     if (file != NULL) {
-        std::fclose(file);
+        if (!isCGI(filename)){
+            if (!std::getline(file, _body, '\0'))
+                return 500;
+            addHeader("Content-length", to_string(_body.length()));
+        }
+        file.close();
         return 1;
     }
 
@@ -121,19 +126,23 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
     int _status;
     if (request.getMethod() == "GET"){
         for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
-            if (startsWith((*it).getRoot(), request.getPath())){
+           // LOG_ERROR((*it).getRoot().substr(0, request.getPath().length()));
+            LOG_ERROR(((*it).getRoot() + (request.getPath())).substr(1));
+       //     if (startsWith((*it).getRoot(), request.getPath())){
                 if (!((*it).hasMethod("GET")))
                     return (401);
-                _status = fileExists((*it).getPath().substr(request.getPath().length()));
+                if (request.getPath().empty() || request.getPath().at(0) != '/')
+                    return 402;
+                _status = fileExists(((*it).getRoot() + (request.getPath())).substr(1));
                 if (_status == 1) // Needs an additional check (400) requested variable doesnt exist, but the path does.
                     return 200;
                 else if (!_status)
                     return 404;
                 else
                     return 403;
-            }
+           // }
         }
-        return 404;
+        return 500;
     }
     if (request.getMethod() == "POST"){
         for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
@@ -178,8 +187,27 @@ bool    HttpResponse::isCGI(std::string &path){
 }
 
 void    HttpResponse::build(HttpRequest &request, ServerConfig &server){
+    LOG_ERROR("STARTS HERE");
+    request.printHttpRequest();
+    LOG_ERROR("ENDS HERE");
     setVersion("HTTP/1.1");
     setStatus(findStatus(request, server));
     //if (isCGI(request.getPath()))
     //    _body = CGI();
+    LOG_ERROR("STARTS HERE");
+    printAll();
+    LOG_ERROR("ENDS HERE");
+}
+
+void HttpResponse::printAll() const {
+        std::cout << "Version: " << _version << std::endl;
+        std::cout << "Status: " << _status << std::endl;
+
+        // Print headers
+        std::cout << "Headers:" << std::endl;
+        for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it) {
+            std::cout << "  " << it->first << ": " << it->second << std::endl;
+        }
+
+        std::cout << "Body: " << _body << std::endl;
 }
