@@ -18,7 +18,7 @@ Clients::Clients(int fd, struct sockaddr_in addr) {
 	char str[INET_ADDRSTRLEN];
 	inet_ntop(AF_INET, &(addr.sin_addr), str, INET_ADDRSTRLEN);
 	this->ip = ntohs(addr.sin_addr.s_addr);
-	this->port = std::to_string(addr.sin_port);
+	this->port = to_string(addr.sin_port);
 }
 
 Clients &Clients::operator=(const Clients &src) {
