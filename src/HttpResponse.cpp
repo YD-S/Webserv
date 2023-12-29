@@ -113,6 +113,10 @@ static int fileExists(const std::string filename) {
     return false;
 }
 
+void HttpResponse::getContentType(){
+    
+}
+
 int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
     int status;
     if (request.getMethod() == "GET"){
@@ -164,4 +168,10 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
         return 404;
     }
     return 501;
+}
+
+void    HttpResponse::build(HttpRequest &request, ServerConfig &server){
+    setVersion("HTTP/1.1");
+    setStatus(findStatus(request, server));
+    
 }

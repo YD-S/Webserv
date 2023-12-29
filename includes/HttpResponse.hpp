@@ -11,6 +11,7 @@
 #include <map>
 #include "HttpRequest.hpp"
 #include "config/ServerConfig.hpp"
+#include "config/LocationConfig.hpp"
 
 class HttpResponse {
 private:
@@ -49,6 +50,10 @@ public:
     std::string toPrintableString();
 
     int findStatus(HttpRequest &request, ServerConfig &config);
+
+    void    getContentType();
+
+    void    build(HttpRequest &request, ServerConfig &server);
 };
 
 
