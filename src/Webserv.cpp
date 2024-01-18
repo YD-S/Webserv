@@ -23,6 +23,13 @@ void Webserv::run() {
 	pollManager.SocketConfig(parse.getServers());
 	pollManager.Binder(parse.getServers());
 	pollManager.Poller(parse.getServers());
+
+    while (1) {
+        std::map<HttpRequest, Clients> requests = pollManager.getRequests();
+        // do stuff
+        std::map<HttpResponse, Clients> responses;
+        pollManager.setResponses(responses);
+    }
 }
 
 Webserv::Webserv(const Webserv &other) {

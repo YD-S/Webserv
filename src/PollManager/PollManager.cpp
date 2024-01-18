@@ -187,3 +187,11 @@ HttpResponse PollManager::Response_Builder(HttpResponse response) {
 	return response;
 }
 
+std::map<HttpRequest, Clients> PollManager::getRequests() const {
+    throw std::runtime_error("Not implemented");
+}
+
+void PollManager::setResponses(unused std::map<HttpResponse, Clients> responses) {
+    throw std::runtime_error("Not implemented");
+}
+

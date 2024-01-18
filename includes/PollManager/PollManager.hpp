@@ -50,6 +50,9 @@ public:
 	void Binder(const std::vector<ServerConfig> &Servers);
 	void Poller(std::vector<ServerConfig> &Servers);
 	HttpResponse Response_Builder(HttpResponse response);
+
+    std::map<HttpRequest, Clients> getRequests() const;
+    void setResponses(std::map<HttpResponse, Clients> responses);
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP
