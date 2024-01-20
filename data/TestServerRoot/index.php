@@ -1,6 +1,8 @@
-<?php session_start();
+<?php
+header('Content-Type: text/html; charset=utf-8');
 
-echo "<h3>_GET</h3><pre>";
+echo "<h3>";
+echo "_GET</h3><pre>";
 var_dump($_GET);
 echo "</pre><hr><h3>_POST</h3><pre>";
 var_dump($_POST);
@@ -14,11 +16,7 @@ echo "</pre><hr><h3>_ENV</h3><pre>";
 var_dump($_ENV);
 echo "</pre><hr><h3>_COOKIE</h3><pre>";
 var_dump($_COOKIE);
-echo "</pre><hr><h3>_SESSION</h3><pre>";
-var_dump($_SESSION);
 echo "</pre><hr><h3>GLOBALS</h3><pre>";
 var_dump($GLOBALS);
 echo "</pre>";
-
-
 ?>
