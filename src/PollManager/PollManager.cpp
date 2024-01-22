@@ -76,48 +76,49 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
 	for (unsigned long i = 0; i < sockets.size(); i++)
 		FD_SET(sockets.at(i), &fds);
 	int max_fd = *std::max_element(sockets.begin(), sockets.end());
-	while(1){
-		fd_set read_fd = fds;
-		if (select(max_fd + 1, &read_fd, NULL, NULL, NULL) < 0)
-		{
-			LOG_ERROR("Socket select failed");
-			kill(getpid(), SIGINT);
-		}
-		for(unsigned long i = 0; i < sockets.size(); i++){
-			if(FD_ISSET(sockets[i], &read_fd)){
-				struct sockaddr_in Client_Data;
-				socklen_t Size_Client = sizeof(Client_Data);
-				int client_socket = accept(sockets[i], (struct sockaddr *)&Client_Data, &Size_Client);
-				if (client_socket < 0)
-				{
-					LOG_ERROR("Socket accept failed");
-					kill(getpid(), SIGINT);
-				}
-				LOG_INFO("Socket " << client_socket << " accepted");
-				char buffer[1024] = {0};
-				int Read_value = read(client_socket, buffer, 1024);
-				if (Read_value < 0)
-				{
-					LOG_ERROR("Socket read failed");
-					kill(getpid(), SIGINT);
-				}
-				Clients client = Clients(client_socket, Client_Data);
-				clients.push_back(client);
-				std::cout << "Server: " <<  servers[i].getServerName() << " Ip and Port " << ft_socket_to_string(_servers[i]) << " Has accepeted a client "  << ft_socket_to_string(client.getAddr()) << std::endl;
-				HttpRequest request = HttpRequest();
-				request.parse(buffer);
-				HttpResponse response = HttpResponse();
-				response.build(request, servers[i]);
-				std::string responseString = response.toRawString();
-				LOG_INFO("Socket " << client_socket << " read");
-				LOG_INFO("Socket " << client_socket << " read: " << buffer);
-				send(client_socket, responseString.c_str(), responseString.length(), 0);
-				LOG_INFO("Socket " << client_socket << " sent");
-				close(client_socket);
-				LOG_INFO("Socket " << client_socket << " closed");
+//	while(1){
+	fd_set read_fd = fds;
+	if (select(max_fd + 1, &read_fd, NULL, NULL, NULL) < 0)
+	{
+		LOG_ERROR("Socket select failed");
+		kill(getpid(), SIGINT);
+	}
+	for(unsigned long i = 0; i < sockets.size(); i++){
+		if(FD_ISSET(sockets[i], &read_fd)){
+			socklen_t Size_Client = sizeof(Client_Data);
+			client_socket = accept(sockets[i], (struct sockaddr *)&Client_Data, &Size_Client);
+			if (client_socket < 0)
+			{
+				LOG_ERROR("Socket accept failed");
+				kill(getpid(), SIGINT);
 			}
+			LOG_INFO("Socket " << client_socket << " accepted");
+			char buffer[1024] = {0};
+			int Read_value = read(client_socket, buffer, 1024);
+			if (Read_value < 0)
+			{
+				LOG_ERROR("Socket read failed");
+				kill(getpid(), SIGINT);
+			}
+			Clients client = Clients(client_socket, Client_Data);
+			clients.push_back(client);
+			FD_SET(client_socket, &fds);
+			std::cout << "Server: " <<  servers[i].getServerName() << " Ip and Port " << ft_socket_to_string(_servers[i]) << " Has accepeted a client "  << ft_socket_to_string(client.getAddr()) << std::endl;
+			HttpRequest request = HttpRequest();
+			request.parse(buffer);
+			_requests.push_back(std::make_pair(request, client));
+//			HttpResponse response = HttpResponse();
+//			response.build(request, servers[i]);
+//			std::string responseString = response.toRawString();
+//			LOG_INFO("Socket " << client_socket << " read");
+//			LOG_INFO("Socket " << client_socket << " read: " << buffer);
+//			send(client_socket, responseString.c_str(), responseString.length(), 0);
+//			LOG_INFO("Socket " << client_socket << " sent");
+//			close(client_socket);
+//			LOG_INFO("Socket " << client_socket << " closed");
 		}
 	}
+//	}
 }
 
 HttpResponse PollManager::Response_Builder(HttpResponse response) {
@@ -187,11 +188,13 @@ HttpResponse PollManager::Response_Builder(HttpResponse response) {
 	return response;
 }
 
-std::map<HttpRequest, Clients> PollManager::getRequests() const {
-    throw std::runtime_error("Not implemented");
+std::vector<std::pair<const HttpRequest &, const Clients &> > PollManager::getRequests() {
+	return _requests;
 }
 
-void PollManager::setResponses(unused std::map<HttpResponse, Clients> responses) {
-    throw std::runtime_error("Not implemented");
+void PollManager::setResponses(std::vector<std::pair<const HttpResponse &, const Clients &> > responses) {
+	for (std::vector<std::pair<const HttpResponse &, const Clients &> >::iterator it = responses.begin(); it != responses.end(); ++it) {
+		_responses.push_back(*it);
+	}
 }
 

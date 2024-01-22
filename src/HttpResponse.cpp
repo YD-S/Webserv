@@ -114,8 +114,6 @@ int HttpResponse::fileExists(std::string filename) {
     } else {
         return -1;
     }
-
-    return false;
 }
 
 void HttpResponse::getContentType(){
@@ -123,26 +121,32 @@ void HttpResponse::getContentType(){
 }
 
 int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
-    int _status;
     if (request.getMethod() == "GET"){
         for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
-           // LOG_ERROR((*it).getRoot().substr(0, request.getPath().length()));
-            LOG_ERROR(((*it).getRoot() + (request.getPath())).substr(1));
-       //     if (startsWith((*it).getRoot(), request.getPath())){
-                if (!((*it).hasMethod("GET")))
-                    return (401);
-                if (request.getPath().empty() || request.getPath().at(0) != '/')
-                    return 402;
-                _status = fileExists(((*it).getRoot() + (request.getPath())).substr(1)); // when the size of the path is 1, it should return the root.
-                if (_status == 1) // Needs an additional check (400) requested variable doesnt exist, but the path does.
-                    return 200;
-                else if (!_status)
-                    return 404;
-                else
-                    return 403;
-           // }
-        }
-        return 500;
+			std::string combinedPath = (it)->getRoot() + request.getPath();
+			LOG_ERROR(combinedPath);
+				if (combinedPath.at(combinedPath.length() - 1) == '/')
+					combinedPath = combinedPath.substr(1);
+			// LOG_ERROR(combinedPath);
+				// if (startsWith((it).getRoot(), request.getPath())){
+				if (!(*it).hasMethod("GET"))
+					return 401;
+				if (request.getPath().empty() || request.getPath().at(0) != '/')
+					return 402;
+
+				if (combinedPath.size() == 1)
+					return 200; // Assuming this is the intended behavior for path size 1
+
+				int _status = fileExists(combinedPath);
+				if (_status == 1)
+					return 200;
+				else if (!_status)
+					return 404;
+				else
+					return 403;
+				// }
+			}
+			return 500;
     }
     if (request.getMethod() == "POST"){
         for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){

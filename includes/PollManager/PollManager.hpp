@@ -40,6 +40,10 @@ extern std::vector<Clients> clients;
 class PollManager {
 private:
 	std::vector<struct sockaddr_in> _servers;
+	int client_socket;
+	struct sockaddr_in Client_Data;
+	std::vector<std::pair<const HttpRequest &, const Clients &> > _requests;
+	std::vector<std::pair<const HttpResponse &, const Clients &> > _responses;
 
 public:
 	PollManager();
@@ -51,8 +55,8 @@ public:
 	void Poller(std::vector<ServerConfig> &Servers);
 	HttpResponse Response_Builder(HttpResponse response);
 
-    std::map<HttpRequest, Clients> getRequests() const;
-    void setResponses(std::map<HttpResponse, Clients> responses);
+	std::vector<std::pair<const HttpRequest &, const Clients &> > getRequests();
+    void setResponses(std::vector<std::pair<const HttpResponse &, const Clients &> > responses);
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP
