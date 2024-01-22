@@ -25,10 +25,10 @@ void Webserv::run() {
 	pollManager.Poller(parse.getServers());
 
     while (1) {
-        std::map<HttpRequest, Clients> requests = pollManager.getRequests();
+//        std::map<HttpRequest, Clients> requests = pollManager.getRequests();
         // do stuff
-        std::map<HttpResponse, Clients> responses;
-        pollManager.setResponses(responses);
+//        std::map<HttpResponse, Clients> responses;
+//        pollManager.setResponses(responses);
     }
 }
 

@@ -78,7 +78,9 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
 	int max_fd = *std::max_element(sockets.begin(), sockets.end());
 //	while(1){
 	fd_set read_fd = fds;
-	if (select(max_fd + 1, &read_fd, NULL, NULL, NULL) < 0)
+	fd_set write_fd = fds;
+	fd_set error_fd = fds;
+	if (select(max_fd + 1, &read_fd, &write_fd, &error_fd, NULL) < 0)
 	{
 		LOG_ERROR("Socket select failed");
 		kill(getpid(), SIGINT);
@@ -106,7 +108,7 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
 			std::cout << "Server: " <<  servers[i].getServerName() << " Ip and Port " << ft_socket_to_string(_servers[i]) << " Has accepeted a client "  << ft_socket_to_string(client.getAddr()) << std::endl;
 			HttpRequest request = HttpRequest();
 			request.parse(buffer);
-			_requests.push_back(std::make_pair(request, client));
+			_requests.push_back(std::make_pair(&request, &client));
 //			HttpResponse response = HttpResponse();
 //			response.build(request, servers[i]);
 //			std::string responseString = response.toRawString();
@@ -188,12 +190,12 @@ HttpResponse PollManager::Response_Builder(HttpResponse response) {
 	return response;
 }
 
-std::vector<std::pair<const HttpRequest &, const Clients &> > PollManager::getRequests() {
+std::vector<std::pair<const HttpRequest *, const Clients *> > PollManager::getRequests() {
 	return _requests;
 }
 
-void PollManager::setResponses(std::vector<std::pair<const HttpResponse &, const Clients &> > responses) {
-	for (std::vector<std::pair<const HttpResponse &, const Clients &> >::iterator it = responses.begin(); it != responses.end(); ++it) {
+void PollManager::setResponses(std::vector<std::pair<const HttpResponse *, const Clients *> > responses) {
+	for (std::vector<std::pair<const HttpResponse *, const Clients *> >::iterator it = responses.begin(); it != responses.end(); ++it) {
 		_responses.push_back(*it);
 	}
 }
