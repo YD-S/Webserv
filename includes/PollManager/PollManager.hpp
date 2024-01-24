@@ -57,6 +57,8 @@ public:
 	std::vector<std::pair<const HttpRequest *, const Clients *> > getRequests();
     void setResponses(std::vector<std::pair<const HttpResponse *, const Clients *> > responses);
     void setRequestHandled(const HttpRequest *request);
+
+    std::vector<std::pair<const HttpResponse *, const Clients *> > getResponses();
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP

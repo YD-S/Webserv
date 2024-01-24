@@ -33,13 +33,14 @@ void Webserv::run() {
             continue;
         }
         LOG_DEBUG("Requests: " << requests.size());
+        responses = pollManager.getResponses();
         for (unsigned long i = 0; i < requests.size(); i++) {
             HttpResponse *response = new HttpResponse();
             response->setVersion(requests[i].first->getVersion());
             response->setStatus(HttpStatus::OK);
             response->addHeader("Server", "webserv");
             response->addHeader("Content-Type", "text/html");
-            response->setBody("<html><body><h1>Hello, world!</h1></body></html>");
+            response->setBody("<html><body><h1>Hello, world!</h1><p>" + to_string(rand()) + "</p></body></html>");
 
             responses.push_back(std::make_pair(response, requests[i].second));
             pollManager.setRequestHandled(requests[i].first);
