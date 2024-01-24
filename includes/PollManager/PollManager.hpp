@@ -53,7 +53,6 @@ public:
 	void SocketConfig(const std::vector<ServerConfig> &Servers_Config);
 	void Binder(const std::vector<ServerConfig> &Servers);
 	void Poller(std::vector<ServerConfig> &Servers);
-	HttpResponse Response_Builder(HttpResponse response);
 
 	std::vector<std::pair<const HttpRequest *, const Clients *> > getRequests();
     void setResponses(std::vector<std::pair<const HttpResponse *, const Clients *> > responses);
