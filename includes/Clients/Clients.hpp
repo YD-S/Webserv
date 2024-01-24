@@ -37,7 +37,7 @@ public:
 	std::string getPort();
 	std::string getRequest();
 	int getIp();
-	int getFd();
+	int getFd() const;
 	struct sockaddr_in getAddr();
 };
 

@@ -65,7 +65,7 @@ int Clients::getIp() {
 	return this->ip;
 }
 
-int Clients::getFd() {
+int Clients::getFd() const {
 	return this->fd;
 }
 

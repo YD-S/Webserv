@@ -72,19 +72,30 @@ void PollManager::Binder(const std::vector<ServerConfig> &Servers) {
 
 void PollManager::Poller(std::vector<ServerConfig> &servers) {
 	fd_set fds;
+    fd_set write_fd;
+    FD_ZERO(&fds);
 	FD_ZERO(&fds);
 	for (unsigned long i = 0; i < sockets.size(); i++)
 		FD_SET(sockets.at(i), &fds);
+	for (unsigned long i = 0; i < clients.size(); i++)
+		FD_SET(clients.at(i).getFd(), &write_fd);
 	int max_fd = *std::max_element(sockets.begin(), sockets.end());
 //	while(1){
 	fd_set read_fd = fds;
-	fd_set write_fd = fds;
 	fd_set error_fd = fds;
-	if (select(max_fd + 1, &read_fd, &write_fd, &error_fd, NULL) < 0)
+    timeval timeout = {0, 0};
+    // Print all write fds
+    for (unsigned int i = 0; i < clients.size(); i++) {
+        LOG_DEBUG("Write fd: " << FD_ISSET(clients[i].getFd(), &write_fd));
+    }
+	if (select(max_fd + 1, &read_fd, &write_fd, &error_fd, &timeout) < 0)
 	{
 		LOG_ERROR("Socket select failed");
 		kill(getpid(), SIGINT);
 	}
+    for (unsigned int i = 0; i < clients.size(); i++) {
+        LOG_DEBUG("Write fd: " << FD_ISSET(clients[i].getFd(), &write_fd));
+    }
 	for(unsigned long i = 0; i < sockets.size(); i++){
 		if(FD_ISSET(sockets[i], &read_fd)){
 			socklen_t Size_Client = sizeof(Client_Data);
@@ -121,6 +132,19 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
 		}
 	}
 //	}
+    for (unsigned long i = 0; i < _responses.size(); i++) {
+        const HttpResponse *response = _responses[i].first;
+        const Clients *client = _responses[i].second;
+        if (!FD_ISSET(client->getFd(), &write_fd)) {
+            LOG_DEBUG("Socket " << client->getFd() << " is not ready to write");
+            continue;
+        }
+        _responses.erase(_responses.begin() + i);
+        std::string responseString = response->toRawString();
+        send(client->getFd(), responseString.c_str(), responseString.length(), 0);
+        LOG_INFO("Socket " << client->getFd() << " sent");
+        close(client->getFd());
+    }
 }
 
 std::vector<std::pair<const HttpRequest *, const Clients *> > PollManager::getRequests() {
@@ -131,5 +155,14 @@ void PollManager::setResponses(std::vector<std::pair<const HttpResponse *, const
 	for (std::vector<std::pair<const HttpResponse *, const Clients *> >::iterator it = responses.begin(); it != responses.end(); ++it) {
 		_responses.push_back(*it);
 	}
+}
+
+void PollManager::setRequestHandled(const HttpRequest *request) {
+    for (std::vector<std::pair<const HttpRequest *, const Clients *> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
+        if (it->first == request) {
+            _requests.erase(it);
+            return;
+        }
+    }
 }
 

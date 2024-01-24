@@ -46,7 +46,7 @@ public:
 
     const std::string &getBody() const;
 
-    std::string toRawString();
+    std::string toRawString() const;
 
     std::string toPrintableString();
 

@@ -64,9 +64,9 @@ const std::string &HttpResponse::getBody() const {
     return _body;
 }
 
-std::string HttpResponse::toRawString() {
+std::string HttpResponse::toRawString() const  {
     std::string response = this->_version + " " + to_string(this->_status) + " " + HttpStatus::getReasonString(this->_status) + "\r\n";
-    for (std::map<std::string, std::string>::iterator it = this->_headers.begin(); it != this->_headers.end(); ++it) {
+    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it) {
         response += it->first + ": " + it->second + "\r\n";
     }
     response += "\r\n";

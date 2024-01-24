@@ -13,16 +13,22 @@ class Webserv {
 private:
     ParseConfig parse;
 	PollManager pollManager;
+    bool running;
 
 public:
     Webserv();
     Webserv(const Webserv& other);
     Webserv& operator=(const Webserv& other);
+
     ~Webserv();
 
     void run();
 
+    void stop();
+
     void parseConfig(std::string path);
+
+    const std::string &getDateString();
 };
 
 
