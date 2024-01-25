@@ -2,17 +2,17 @@
 // Created by Yash on 29/12/23.
 //
 
-#include "Clients/Clients.hpp"
+#include "Client/Client.hpp"
 
-Clients::Clients() {}
+Client::Client() {}
 
-Clients::~Clients() {}
+Client::~Client() {}
 
-Clients::Clients(const Clients &src) {
+Client::Client(const Client &src) {
 	*this = src;
 }
 
-Clients::Clients(int fd, struct sockaddr_in addr) {
+Client::Client(int fd, struct sockaddr_in addr) {
 	this->fd = fd;
 	this->request = "";
 	char str[INET_ADDRSTRLEN];
@@ -22,7 +22,7 @@ Clients::Clients(int fd, struct sockaddr_in addr) {
 	this->addr = addr;
 }
 
-Clients &Clients::operator=(const Clients &src) {
+Client &Client::operator=(const Client &src) {
 	if (this != &src) {
 		this->port = src.port;
 		this->request = src.request;
@@ -33,42 +33,42 @@ Clients &Clients::operator=(const Clients &src) {
 	return *this;
 }
 
-void Clients::setPort(std::string port) {
+void Client::setPort(std::string port) {
 	this->port = port;
 }
 
-void Clients::setRequest(std::string request) {
+void Client::setRequest(std::string request) {
 	this->request = request;
 }
 
-void Clients::setIp(int ip) {
+void Client::setIp(int ip) {
 	this->ip = ip;
 }
 
-void Clients::setFd(int fd) {
+void Client::setFd(int fd) {
 	this->fd = fd;
 }
 
-void Clients::setAddr(struct sockaddr_in addr) {
+void Client::setAddr(struct sockaddr_in addr) {
 	this->addr = addr;
 }
 
-std::string Clients::getPort() {
+std::string Client::getPort() {
 	return this->port;
 }
 
-std::string Clients::getRequest() {
+std::string Client::getRequest() {
 	return this->request;
 }
 
-int Clients::getIp() {
+int Client::getIp() {
 	return this->ip;
 }
 
-int Clients::getFd() const {
+int Client::getFd() const {
 	return this->fd;
 }
 
-struct sockaddr_in Clients::getAddr() {
+struct sockaddr_in Client::getAddr() {
 	return this->addr;
 }

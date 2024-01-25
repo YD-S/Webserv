@@ -18,7 +18,7 @@ SRC_FILES = main.cpp config/ServerConfig.cpp config/LocationConfig.cpp \
  			HttpRequest.cpp HttpResponse.cpp HttpStatus.cpp MimeTypes.cpp \
  			fileValidate/fileValidate.cpp utils.cpp ICgiExecutor.cpp \
  			cgi/BinCgiExecutor.cpp config/ParseConfig.cpp PollManager/PollManager.cpp \
- 			Clients/Clients.cpp Webserv.cpp
+ 			Client/Client.cpp Webserv.cpp
 
 SRC= $(addprefix $(SRC_DIR)/, $(SRC_FILES))
 OBJ= $(addprefix $(OBJ_DIR)/, $(SRC_FILES:.cpp=.o))

@@ -22,8 +22,8 @@ void Webserv::parseConfig(std::string path) {
 void Webserv::run() {
     pollManager.socketConfig(parse.getServers());
     pollManager.binder(parse.getServers());
-    std::vector<std::pair<const HttpResponse *, const Clients *> > responses;
-    std::vector<std::pair<const HttpRequest *, const Clients *> > requests;
+    std::vector<std::pair<const HttpResponse *, const Client *> > responses;
+    std::vector<std::pair<const HttpRequest *, const Client *> > requests;
 
     while (1) {
 //        LOG_DEBUG("Polling...");

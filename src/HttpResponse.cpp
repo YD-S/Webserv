@@ -71,6 +71,7 @@ std::string HttpResponse::toRawString() const  {
     }
     response += "\r\n";
     response += this->_body;
+    response += "\n";
     return response;
 }
 

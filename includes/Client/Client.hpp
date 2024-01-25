@@ -2,8 +2,8 @@
 // Created by Yash on 29/12/23.
 //
 
-#ifndef WEBSERV_CLIENTS_HPP
-#define WEBSERV_CLIENTS_HPP
+#ifndef WEBSERV_CLIENT_HPP
+#define WEBSERV_CLIENT_HPP
 #include "utils.hpp"
 #include <vector>
 #include <iostream>
@@ -15,20 +15,20 @@
 #include <sys/types.h>
 
 
-class Clients {
+class Client {
 private:
 	std::string port;
 	std::string request;
 	int ip;
 	int fd;
 	struct sockaddr_in addr;
-	Clients();
+	Client();
 
 public:
-	~Clients();
-	Clients(const Clients &src);
-	Clients(int fd, struct sockaddr_in addr);
-	Clients &operator=(const Clients &src);
+	~Client();
+	Client(const Client &src);
+	Client(int fd, struct sockaddr_in addr);
+	Client &operator=(const Client &src);
 	void setPort(std::string port);
 	void setRequest(std::string request);
 	void setIp(int ip);
@@ -42,4 +42,4 @@ public:
 };
 
 
-#endif //WEBSERV_CLIENTS_HPP
+#endif //WEBSERV_CLIENT_HPP

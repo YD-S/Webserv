@@ -1,16 +1,11 @@
 #include "macros.h"
-#include "fileValidate/fileValidate.hpp"
-#include "../includes/config/ServerConfig.hpp"
-#include "../includes/config/LocationConfig.hpp"
-#include "../includes/config/ParseConfig.hpp"
-#include "PollManager/PollManager.hpp"
-#include "Clients/Clients.hpp"
+#include "config/ServerConfig.hpp"
+#include "Client/Client.hpp"
 #include "Webserv.hpp"
 #include <iostream>
-#include <string>
 
 std::vector<int> sockets;
-std::vector<Clients> clients;
+std::vector<Client> clients;
 
 void ft_handle_sigint(int signal) {
 	(void)signal;

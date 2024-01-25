@@ -32,18 +32,18 @@
 #include "HttpResponse.hpp"
 #include "HttpRequest.hpp"
 #include "HttpStatus.hpp"
-#include "Clients/Clients.hpp"
+#include "Client/Client.hpp"
 
 extern std::vector<int> sockets;
-extern std::vector<Clients> clients;
+extern std::vector<Client> clients;
 
 class PollManager {
 private:
 	std::vector<struct sockaddr_in> _servers;
 	int clientSocket;
 	struct sockaddr_in clientData;
-	std::vector<std::pair<const HttpRequest *, const Clients *> > _requests;
-	std::vector<std::pair<const HttpResponse *, const Clients *> > _responses;
+	std::vector<std::pair<const HttpRequest *, const Client *> > _requests;
+	std::vector<std::pair<const HttpResponse *, const Client *> > _responses;
 
 public:
 	PollManager();
@@ -54,10 +54,10 @@ public:
 	void binder(const std::vector<ServerConfig> &Servers);
 	void Poller(std::vector<ServerConfig> &Servers);
 
-	std::vector<std::pair<const HttpRequest *, const Clients *> > getRequests();
-    void setResponses(std::vector<std::pair<const HttpResponse *, const Clients *> > responses);
+	std::vector<std::pair<const HttpRequest *, const Client *> > getRequests();
+    void setResponses(std::vector<std::pair<const HttpResponse *, const Client *> > responses);
     void setRequestHandled(const HttpRequest *request);
-    std::vector<std::pair<const HttpResponse *, const Clients *> > getResponses();
+    std::vector<std::pair<const HttpResponse *, const Client *> > getResponses();
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP
