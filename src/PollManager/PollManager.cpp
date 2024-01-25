@@ -23,10 +23,10 @@ PollManager &PollManager::operator=(const PollManager &src) {
 void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig){
 	for (unsigned long i = 0; i < serversConfig.size(); ++i) {
 		int j = socket(AF_INET, SOCK_STREAM, 0);
-        int opt = 1;
-        setsockopt(j, SOL_SOCKET, SO_REUSEADDR, &opt,sizeof(int));
-        setsockopt(j, SOL_SOCKET, SO_REUSEPORT, &opt,sizeof(int));
-        setsockopt(j, SOL_SOCKET, SO_KEEPALIVE, &opt,sizeof(int));
+//        int opt = 1;
+//        setsockopt(j, SOL_SOCKET, SO_REUSEADDR, &opt,sizeof(int));
+//        setsockopt(j, SOL_SOCKET, SO_REUSEPORT, &opt,sizeof(int));
+//        setsockopt(j, SOL_SOCKET, SO_KEEPALIVE, &opt,sizeof(int));
 		if(j < 0)
 		{
 			LOG_ERROR("Socket creation failed");
@@ -58,7 +58,7 @@ void PollManager::binder(const std::vector<ServerConfig> &servers) {
 	for (unsigned long i = 0; i < _servers.size(); i++) {
 		if (bind(sockets[i], (struct sockaddr *)&_servers[i], sizeof(struct sockaddr_in)) == -1)
 		{
-			LOG_ERROR("Bind failed: " << errno);
+			LOG_ERROR("Bind failed");
 			kill(getpid(), SIGINT);
 		}
 	}
@@ -82,34 +82,26 @@ void PollManager::poller(unused std::vector<ServerConfig> &servers) {
 	FD_ZERO(&read_fd);
 	FD_ZERO(&error_fd);
     int max_fd = 0;
+
+    // Server sockets for reading and error checking
     FILL_SET(sockets, sockets.at(i), read_fd, max_fd);
     FILL_SET(sockets, sockets.at(i), error_fd, max_fd);
+
+    // Client sockets for writing and error checking
     FILL_SET(clients, clients.at(i).getFd(), write_fd, max_fd);
     FILL_SET(clients, clients.at(i).getFd(), error_fd, max_fd);
 
-//	for (unsigned long i = 0; i < sockets.size(); i++) {
-//        if (sockets.at(i) > max_fd) {
-//            max_fd = sockets.at(i);
-//        }
-//        FD_SET(sockets.at(i), &fds);
-//    }
-//	for (unsigned long i = 0; i < clients.size(); i++) {
-//        if (clients.at(i).getFd() > max_fd) {
-//            max_fd = clients.at(i).getFd();
-//        }
-//        FD_SET(clients.at(i).getFd(), &write_fd);
-//    }
     timeval timeout = {0, 0};
 	if (select(max_fd + 1, &read_fd, &write_fd, &error_fd, &timeout) < 0) {
-        LOG_ERROR("Select failed: " << errno);
+        LOG_ERROR("Select failed");
     }
 	for(unsigned long i = 0; i < sockets.size(); i++){
 		if(FD_ISSET(sockets[i], &read_fd)){
-			socklen_t Size_Client = sizeof(clientData);
-            clientSocket = accept(sockets[i], (struct sockaddr *)&clientData, &Size_Client);
+			socklen_t sizeClient = sizeof(clientData);
+            clientSocket = accept(sockets[i], (struct sockaddr *)&clientData, &sizeClient);
 			if (clientSocket < 0)
 			{
-                LOG_ERROR("Accept failed: " << errno);
+                LOG_ERROR("Accept failed");
                 continue;
 			}
 			LOG_DEBUG("Socket " << clientSocket << " accepted");
@@ -117,7 +109,7 @@ void PollManager::poller(unused std::vector<ServerConfig> &servers) {
 			int readValue = read(clientSocket, buffer, 1024);
 			if (readValue < 0)
 			{
-                LOG_ERROR("Read failed: " << errno);
+                LOG_ERROR("Read failed");
                 continue;
 			}
 			Client client = Client(clientSocket, clientData);
@@ -125,6 +117,7 @@ void PollManager::poller(unused std::vector<ServerConfig> &servers) {
 			HttpRequest request = HttpRequest();
 			request.parse(buffer);
 			_requests.push_back(std::make_pair(&request, &client));
+            LOG_DEBUG("Request received from socket " << clientSocket);
 		}
 	}
 
@@ -136,7 +129,8 @@ void PollManager::poller(unused std::vector<ServerConfig> &servers) {
             continue;
         responsesSent.push_back(response);
         std::string responseString = response->toRawString();
-        send(client->getFd(), responseString.c_str(), responseString.length(), MSG_DONTWAIT);
+        send(client->getFd(), responseString.c_str(), responseString.length(), 0);
+        LOG_DEBUG("Response sent to socket " << client->getFd());
         close(client->getFd());
         // Delete the connection from the clients vector
         for (unsigned long j = 0; j < clients.size(); j++) {
@@ -155,7 +149,6 @@ void PollManager::poller(unused std::vector<ServerConfig> &servers) {
             }
         }
     }
-    LOG_DEBUG("Remaining responses: " << _responses.size());
 }
 
 std::vector<std::pair<const HttpRequest *, const Client *> > PollManager::getRequests() {

@@ -67,4 +67,3 @@ std::string intToInAddr(unsigned long ip) {
 	addr.s_addr = htonl(ip);
 	return inet_ntoa(addr);
 }
-
