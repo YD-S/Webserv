@@ -37,9 +37,10 @@
 extern std::vector<int> sockets;
 extern std::vector<Client> clients;
 
-#define FILL_SET(vector, fd, set, max) \
+// Used to easily fill a set with a vector of file descriptors
+#define FILL_SET(vector, get_fd_expr, set, max) \
     for (unsigned int i=0; i < vector.size(); i++) { \
-        int fd_val = fd;                \
+        int fd_val = get_fd_expr; \
         FD_SET(fd_val, &set); \
         if (fd_val > max) \
             max = fd_val; \
@@ -60,12 +61,18 @@ public:
 	PollManager &operator=(const PollManager &src);
 	void socketConfig(const std::vector<ServerConfig> &serversConfig);
 	void binder(const std::vector<ServerConfig> &servers);
-	void poller(std::vector<ServerConfig> &servers);
+	void poller();
 
 	std::vector<std::pair<const HttpRequest *, const Client *> > getRequests();
     void setResponses(std::vector<std::pair<const HttpResponse *, const Client *> > responses);
     void setRequestHandled(const HttpRequest *request);
     std::vector<std::pair<const HttpResponse *, const Client *> > getResponses();
+
+    void removeSentResponses(const std::vector<const HttpResponse *> &responsesSent);
+
+    std::vector<const HttpResponse *> sendResponses(fd_set &write_fd);
+
+    void readRequests(fd_set &read_fd);
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP
