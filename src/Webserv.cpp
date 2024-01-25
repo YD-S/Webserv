@@ -26,8 +26,7 @@ void Webserv::run() {
     std::vector<std::pair<const HttpRequest *, const Client *> > requests;
 
     while (1) {
-//        LOG_DEBUG("Polling...");
-        pollManager.poller(parse.getServers());
+        pollManager.poller();
         requests = pollManager.getRequests();
         if (requests.empty()) {
             continue;

@@ -37,6 +37,8 @@
 extern std::vector<int> sockets;
 extern std::vector<Client> clients;
 
+#define BUFFER_SIZE 1024
+
 #define FILL_SET(vector, fd, set, max) \
     for (unsigned int i=0; i < vector.size(); i++) { \
         int fd_val = fd;                \
@@ -60,7 +62,7 @@ public:
 	PollManager &operator=(const PollManager &src);
 	void socketConfig(const std::vector<ServerConfig> &serversConfig);
 	void binder(const std::vector<ServerConfig> &servers);
-	void poller(std::vector<ServerConfig> &servers);
+	void poller();
 
 	std::vector<std::pair<const HttpRequest *, const Client *> > getRequests();
     void setResponses(std::vector<std::pair<const HttpResponse *, const Client *> > responses);

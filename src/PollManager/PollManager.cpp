@@ -23,10 +23,6 @@ PollManager &PollManager::operator=(const PollManager &src) {
 void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig){
 	for (unsigned long i = 0; i < serversConfig.size(); ++i) {
 		int j = socket(AF_INET, SOCK_STREAM, 0);
-//        int opt = 1;
-//        setsockopt(j, SOL_SOCKET, SO_REUSEADDR, &opt,sizeof(int));
-//        setsockopt(j, SOL_SOCKET, SO_REUSEPORT, &opt,sizeof(int));
-//        setsockopt(j, SOL_SOCKET, SO_KEEPALIVE, &opt,sizeof(int));
 		if(j < 0)
 		{
 			LOG_ERROR("Socket creation failed");
@@ -74,7 +70,7 @@ void PollManager::binder(const std::vector<ServerConfig> &servers) {
 	}
 }
 
-void PollManager::poller(unused std::vector<ServerConfig> &servers) {
+void PollManager::poller() {
     fd_set write_fd;
 	fd_set read_fd;
 	fd_set error_fd;
@@ -105,17 +101,23 @@ void PollManager::poller(unused std::vector<ServerConfig> &servers) {
                 continue;
 			}
 			LOG_DEBUG("Socket " << clientSocket << " accepted");
-			char buffer[1024] = {0};
-			int readValue = read(clientSocket, buffer, 1024);
-			if (readValue < 0)
-			{
-                LOG_ERROR("Read failed");
-                continue;
-			}
+            std::string requestString;
+            char buffer[BUFFER_SIZE] = {0};
+            int readValue = 0;
+            do {
+                for (int i = 0; i < BUFFER_SIZE; i++)
+                    buffer[i] = 0;
+                readValue = read(clientSocket, buffer, BUFFER_SIZE);
+                if (readValue < 0) {
+                    LOG_ERROR("Read failed");
+                    continue;
+                }
+                requestString += buffer;
+            } while (readValue == BUFFER_SIZE);
 			Client client = Client(clientSocket, clientData);
 			clients.push_back(client);
 			HttpRequest request = HttpRequest();
-			request.parse(buffer);
+			request.parse(requestString);
 			_requests.push_back(std::make_pair(&request, &client));
             LOG_DEBUG("Request received from socket " << clientSocket);
 		}
