@@ -75,13 +75,13 @@ const std::string &HttpRequest::getBody() const {
     return _body;
 }
 
-std::string HttpRequest::toRawString() {
+std::string HttpRequest::toRawString() const {
     std::string rawString = _method + " " + _path;
     // Add the query parameters to the raw string
     if (!_params.empty())
         rawString += "?" + getQueryString();
     rawString += " " + _version + "\r\n";
-    for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it) {
+    for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it) {
         rawString += it->first + ": " + it->second + "\r\n";
     }
     rawString += "\r\n";
@@ -89,7 +89,7 @@ std::string HttpRequest::toRawString() {
     return rawString;
 }
 
-std::string HttpRequest::toPrintableString() {
+std::string HttpRequest::toPrintableString() const {
     std::string request = this->toRawString();
     // replace \r\n with \n
     std::string::size_type pos = 0;
@@ -117,9 +117,9 @@ const std::string &HttpRequest::getParam(const std::string &key) const {
     return _params.find(key)->second;
 }
 
-std::string HttpRequest::getQueryString() {
+std::string HttpRequest::getQueryString() const {
     std::string queryString = "";
-    for (std::map<std::string, std::string>::iterator it = _params.begin(); it != _params.end(); ++it) {
+    for (std::map<std::string, std::string>::const_iterator it = _params.begin(); it != _params.end(); ++it) {
         queryString += it->first + "=" + it->second + (it != _params.end() ? "&" : "");
     }
     queryString = queryString.substr(0, queryString.size() - 1);
@@ -224,7 +224,7 @@ HttpRequest HttpRequest::parse(std::string request){
 
             this->addHeader(header, value);
             // Print the parsed header and value
-            std::cout << "Header: '" << header << "', Value: '" << value << "'" << std::endl;
+//            std::cout << "Header: '" << header << "', Value: '" << value << "'" << std::endl;
         } else {
             if (_method == "POST")
                 parsePostParams(stream);
@@ -234,6 +234,14 @@ HttpRequest HttpRequest::parse(std::string request){
                 ft_error("Unkown method!", 1);
         }
     }
-    printHttpRequest();
+//    printHttpRequest();
     return *this;
+}
+
+int HttpRequest::getFd() const {
+    return _serverFd;
+}
+
+void HttpRequest::setFd(int fd) {
+    _serverFd = fd;
 }

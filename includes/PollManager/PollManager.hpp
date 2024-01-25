@@ -34,7 +34,7 @@
 #include "HttpStatus.hpp"
 #include "Client/Client.hpp"
 
-extern std::vector<int> sockets;
+extern std::vector<std::pair<int, const ServerConfig *> > serverSockets;
 extern std::vector<Client> clients;
 
 #define BUFFER_SIZE 1024

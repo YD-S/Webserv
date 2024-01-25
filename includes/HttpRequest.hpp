@@ -24,6 +24,8 @@ private:
 
     std::string _body;
 
+    int _serverFd;
+
 public:
 
     HttpRequest();
@@ -61,17 +63,22 @@ public:
 
     const std::string &getBody() const;
 
-    std::string toRawString();
+    std::string toRawString() const;
 
-    std::string toPrintableString();
+    std::string toPrintableString() const;
 
-    std::string getQueryString();
+    std::string getQueryString() const;
     
     void parseGetParams(const std::string &path_string);
     
     void parsePostParams(std::istringstream &stream);
 
     void printHttpRequest() const;
+
+    int getFd() const;
+
+    void setFd(int fd);
+
 };
 
 

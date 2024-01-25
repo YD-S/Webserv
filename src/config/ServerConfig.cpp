@@ -45,7 +45,7 @@ bool ServerConfig::isListeningOn(int port) {
 	return false;
 }
 
-std::string ServerConfig::getServerName() {
+std::string ServerConfig::getServerName() const {
     return _serverName;
 }
 
@@ -70,18 +70,18 @@ void ServerConfig::setDefaultLocation(const LocationConfig &location) {
     this->_defaultLocation = location;
 }
 
-std::vector<LocationConfig>& ServerConfig::getLocations(){
+const std::vector<LocationConfig>& ServerConfig::getLocations() const {
 	return _locations;
 }
 
-LocationConfig& ServerConfig::getDefaultLocation(){
+const LocationConfig& ServerConfig::getDefaultLocation() const {
 	return _defaultLocation;
 }
 
-void	ServerConfig::setHostPort(const std::string host, int port){
+void	ServerConfig::setHostPort(const std::string host, int port) {
 	_listen.push_back(std::make_pair(host, port));
 }
 
-const std::vector<std::pair<std::string, int> >& ServerConfig::getListen() const{
+const std::vector<std::pair<std::string, int> >& ServerConfig::getListen() const {
 	return _listen;
 }

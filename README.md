@@ -104,8 +104,8 @@ HttpRequest req = HttpRequest()
         .setMethod("POST")
         .setPath("/index.html")
         .setVersion("HTTP/1.1")
-        .addHeader("Content-Type", MimeTypes::getType("html"))
-        .addHeader("Content-Length", "12")
+        .setHeader("Content-Type", MimeTypes::getType("html"))
+        .setHeader("Content-Length", "12")
         .addParam("param1", "value")
         .addParam("param2", "434")
         .setBody("Hello World!");
@@ -120,8 +120,8 @@ Here is an example:
 HttpResponse response = HttpResponse()
         .setVersion("HTTP/1.1")
         .setStatus(HttpStatus::OK)
-        .addHeader("Content-Type", MimeTypes::getType("html"))
-        .addHeader("Content-Length", "12")
+        .setHeader("Content-Type", MimeTypes::getType("html"))
+        .setHeader("Content-Length", "12")
         .setBody("Hello World!");
 ```
 

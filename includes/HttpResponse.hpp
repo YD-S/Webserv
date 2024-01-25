@@ -34,7 +34,7 @@ public:
 
     HttpResponse setStatus(int status);
 
-    HttpResponse addHeader(const std::string& key, const std::string& value);
+    HttpResponse setHeader(const std::string& key, const std::string& value);
 
     HttpResponse setBody(const std::string &body);
 

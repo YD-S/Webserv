@@ -38,7 +38,7 @@ HttpResponse HttpResponse::setStatus(int _status) {
     return *this;
 }
 
-HttpResponse HttpResponse::addHeader(const std::string &key, const std::string &value) {
+HttpResponse HttpResponse::setHeader(const std::string &key, const std::string &value) {
     this->_headers.insert(std::make_pair(key, value));
     return *this;
 }
@@ -103,7 +103,7 @@ int HttpResponse::fileExists(std::string filename) {
         if (!isCGI(filename)){
             if (!std::getline(file, _body, '\0'))
                 return 500;
-            addHeader("Content-length", to_string(_body.length()));
+            setHeader("Content-length", to_string(_body.length()));
         }
         file.close();
         return 1;

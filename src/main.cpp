@@ -4,15 +4,15 @@
 #include "Webserv.hpp"
 #include <iostream>
 
-std::vector<int> sockets;
+std::vector<std::pair<int, const ServerConfig *> > serverSockets;
 std::vector<Client> clients;
 
 void ft_handle_sigint(int signal) {
 	(void)signal;
 	LOG_INFO("Stopping webserv...");
-	for (unsigned long i = 0; i < sockets.size(); i++) {
-		close(sockets[i]);
-		LOG_INFO("Socket " << sockets[i] << " closed");
+	for (unsigned long i = 0; i < serverSockets.size(); i++) {
+		close(serverSockets[i].first);
+		LOG_INFO("Socket " << serverSockets[i].first << " closed");
 	}
 	exit(0);
 }

@@ -24,11 +24,13 @@ public:
 
     void run();
 
-    void stop();
-
     void parseConfig(std::string path);
 
-    const std::string &getDateString();
+    const HttpResponse handleRequest(const HttpRequest *request, const ServerConfig *config);
+
+    const HttpResponse handleWithLocation(const HttpRequest *request, const LocationConfig *config);
+
+    const ServerConfig *getServerConfigByFd(int fd);
 };
 
 
