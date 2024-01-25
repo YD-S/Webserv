@@ -20,7 +20,7 @@ PollManager &PollManager::operator=(const PollManager &src) {
 	return *this;
 }
 
-void PollManager::SocketConfig(const std::vector<ServerConfig> &Servers_Config){
+void PollManager::socketConfig(const std::vector<ServerConfig> &Servers_Config){
 	for (unsigned long i = 0; i < Servers_Config.size(); ++i) {
 		int j = socket(AF_INET, SOCK_STREAM, 0);
 		if(j < 0)
@@ -46,7 +46,7 @@ void PollManager::SocketConfig(const std::vector<ServerConfig> &Servers_Config){
 	}
 }
 
-void PollManager::Binder(const std::vector<ServerConfig> &Servers) {
+void PollManager::binder(const std::vector<ServerConfig> &Servers) {
 	if(_servers.size() != sockets.size()) {
 		LOG_ERROR("Servers and sockets size mismatch");
 		kill(getpid(), SIGINT);
@@ -97,24 +97,24 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
     }
 	for(unsigned long i = 0; i < sockets.size(); i++){
 		if(FD_ISSET(sockets[i], &read_fd)){
-			socklen_t Size_Client = sizeof(Client_Data);
-			client_socket = accept(sockets[i], (struct sockaddr *)&Client_Data, &Size_Client);
-			if (client_socket < 0)
+			socklen_t Size_Client = sizeof(clientData);
+            clientSocket = accept(sockets[i], (struct sockaddr *)&clientData, &Size_Client);
+			if (clientSocket < 0)
 			{
 				LOG_ERROR("Socket accept failed");
-				kill(getpid(), SIGINT);
+                continue;
 			}
-			LOG_DEBUG("Socket " << client_socket << " accepted");
+			LOG_DEBUG("Socket " << clientSocket << " accepted");
 			char buffer[1024] = {0};
-			int Read_value = read(client_socket, buffer, 1024);
-			if (Read_value < 0)
+			int readValue = read(clientSocket, buffer, 1024);
+			if (readValue < 0)
 			{
 				LOG_DEBUG("Socket read failed");
-				kill(getpid(), SIGINT);
+                continue;
 			}
-			Clients client = Clients(client_socket, Client_Data);
+			Clients client = Clients(clientSocket, clientData);
 			clients.push_back(client);
-			FD_SET(client_socket, &fds);
+			FD_SET(clientSocket, &fds);
 			std::cout << "Server: " <<  servers[i].getServerName() << " Ip and Port " << ft_socket_to_string(_servers[i]) << " Has accepeted a client "  << ft_socket_to_string(client.getAddr()) << std::endl;
 			HttpRequest request = HttpRequest();
 			request.parse(buffer);

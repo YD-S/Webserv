@@ -20,8 +20,8 @@ void Webserv::parseConfig(std::string path) {
 }
 
 void Webserv::run() {
-	pollManager.SocketConfig(parse.getServers());
-	pollManager.Binder(parse.getServers());
+    pollManager.socketConfig(parse.getServers());
+    pollManager.binder(parse.getServers());
     std::vector<std::pair<const HttpResponse *, const Clients *> > responses;
     std::vector<std::pair<const HttpRequest *, const Clients *> > requests;
 
