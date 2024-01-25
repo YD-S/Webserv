@@ -88,7 +88,6 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
         }
         FD_SET(clients.at(i).getFd(), &write_fd);
     }
-//	while(1){
 	fd_set read_fd = fds;
 	fd_set error_fd = fds;
     timeval timeout = {0, 0};
