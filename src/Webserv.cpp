@@ -27,7 +27,7 @@ void Webserv::run() {
 
     while (1) {
 //        LOG_DEBUG("Polling...");
-	    pollManager.Poller(parse.getServers());
+        pollManager.poller(parse.getServers());
         requests = pollManager.getRequests();
         if (requests.empty()) {
             continue;

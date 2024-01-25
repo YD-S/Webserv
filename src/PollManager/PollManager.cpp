@@ -74,7 +74,7 @@ void PollManager::binder(const std::vector<ServerConfig> &Servers) {
 	}
 }
 
-void PollManager::Poller(std::vector<ServerConfig> &servers) {
+void PollManager::poller(std::vector<ServerConfig> &Servers) {
 	fd_set fds;
     fd_set write_fd;
     FD_ZERO(&fds);
@@ -118,7 +118,7 @@ void PollManager::Poller(std::vector<ServerConfig> &servers) {
 			Client client = Client(clientSocket, clientData);
 			clients.push_back(client);
 			FD_SET(clientSocket, &fds);
-			std::cout << "Server: " <<  servers[i].getServerName() << " Ip and Port " << ft_socket_to_string(_servers[i]) << " Has accepeted a client "  << ft_socket_to_string(client.getAddr()) << std::endl;
+			std::cout << "Server: " << Servers[i].getServerName() << " Ip and Port " << ft_socket_to_string(_servers[i]) << " Has accepeted a client " << ft_socket_to_string(client.getAddr()) << std::endl;
 			HttpRequest request = HttpRequest();
 			request.parse(buffer);
 			_requests.push_back(std::make_pair(&request, &client));
