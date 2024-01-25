@@ -37,6 +37,14 @@
 extern std::vector<int> sockets;
 extern std::vector<Client> clients;
 
+#define FILL_SET(vector, fd, set, max) \
+    for (unsigned int i=0; i < vector.size(); i++) { \
+        int fd_val = fd;                \
+        FD_SET(fd_val, &set); \
+        if (fd_val > max) \
+            max = fd_val; \
+    }
+
 class PollManager {
 private:
 	std::vector<struct sockaddr_in> _servers;
@@ -50,8 +58,8 @@ public:
 	~PollManager();
 	PollManager(const PollManager &src);
 	PollManager &operator=(const PollManager &src);
-	void socketConfig(const std::vector<ServerConfig> &Servers_Config);
-	void binder(const std::vector<ServerConfig> &Servers);
+	void socketConfig(const std::vector<ServerConfig> &serversConfig);
+	void binder(const std::vector<ServerConfig> &servers);
 	void poller(std::vector<ServerConfig> &servers);
 
 	std::vector<std::pair<const HttpRequest *, const Client *> > getRequests();

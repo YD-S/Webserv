@@ -20,8 +20,8 @@ PollManager &PollManager::operator=(const PollManager &src) {
 	return *this;
 }
 
-void PollManager::socketConfig(const std::vector<ServerConfig> &Servers_Config){
-	for (unsigned long i = 0; i < Servers_Config.size(); ++i) {
+void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig){
+	for (unsigned long i = 0; i < serversConfig.size(); ++i) {
 		int j = socket(AF_INET, SOCK_STREAM, 0);
         int opt = 1;
         setsockopt(j, SOL_SOCKET, SO_REUSEADDR, &opt,sizeof(int));
@@ -34,23 +34,23 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &Servers_Config){
 		}
 		sockets.push_back(j);
 	}
-	for (unsigned long i = 0; i < Servers_Config.size(); ++i) {
+	for (unsigned long i = 0; i < serversConfig.size(); ++i) {
 		struct sockaddr_in server;
 		server.sin_family = AF_INET;
-		for(unsigned long j = 0; j < Servers_Config[i].getListen().size(); j++) {
-			if (Servers_Config[i].getListen()[j].first == "localhost")
+		for(unsigned long j = 0; j < serversConfig[i].getListen().size(); j++) {
+			if (serversConfig[i].getListen()[j].first == "localhost")
 				server.sin_addr.s_addr = inet_addr("127.0.0.1");
-			else if (Servers_Config[i].getListen()[j].first == "0.0.0.0")
+			else if (serversConfig[i].getListen()[j].first == "0.0.0.0")
 				server.sin_addr.s_addr = INADDR_ANY;
 			else
-				server.sin_addr.s_addr = inet_addr(Servers_Config[i].getListen()[j].first.c_str());
-			server.sin_port = htons(Servers_Config[i].getListen()[j].second);
+				server.sin_addr.s_addr = inet_addr(serversConfig[i].getListen()[j].first.c_str());
+			server.sin_port = htons(serversConfig[i].getListen()[j].second);
 		}
 		_servers.push_back(server);
 	}
 }
 
-void PollManager::binder(const std::vector<ServerConfig> &Servers) {
+void PollManager::binder(const std::vector<ServerConfig> &servers) {
 	if(_servers.size() != sockets.size()) {
 		LOG_ERROR("Servers and sockets size mismatch");
 		kill(getpid(), SIGINT);
@@ -58,42 +58,47 @@ void PollManager::binder(const std::vector<ServerConfig> &Servers) {
 	for (unsigned long i = 0; i < _servers.size(); i++) {
 		if (bind(sockets[i], (struct sockaddr *)&_servers[i], sizeof(struct sockaddr_in)) == -1)
 		{
-			LOG_ERROR("Socket binding failed");
+			LOG_ERROR("Bind failed: " << errno);
 			kill(getpid(), SIGINT);
 		}
 	}
 	for (unsigned long i = 0; i < sockets.size(); i++)
-		LOG_INFO("Socket " << sockets[i] << " is bound to " << Servers[i].getListen()[0].first << ":" << Servers[i].getListen()[0].second);
+		LOG_INFO("Socket " << sockets[i] << " is bound to " << servers[i].getListen()[0].first << ":" << servers[i].getListen()[0].second);
 	for(unsigned long i = 0; i < sockets.size(); i++){
 		if (listen(sockets[i], 25) < 0)
 		{
-			LOG_ERROR("Socket listening failed");
-			kill(getpid(), SIGINT);
+			LOG_ERROR("Listen failed");
+            kill(getpid(), SIGINT);
 		}
 
 	}
 }
 
-void PollManager::poller(std::vector<ServerConfig> &servers) {
-	fd_set fds;
+void PollManager::poller(unused std::vector<ServerConfig> &servers) {
     fd_set write_fd;
-    FD_ZERO(&fds);
-	FD_ZERO(&fds);
+	fd_set read_fd;
+	fd_set error_fd;
+	FD_ZERO(&write_fd);
+	FD_ZERO(&read_fd);
+	FD_ZERO(&error_fd);
     int max_fd = 0;
-	for (unsigned long i = 0; i < sockets.size(); i++) {
-        if (sockets.at(i) > max_fd) {
-            max_fd = sockets.at(i);
-        }
-        FD_SET(sockets.at(i), &fds);
-    }
-	for (unsigned long i = 0; i < clients.size(); i++) {
-        if (clients.at(i).getFd() > max_fd) {
-            max_fd = clients.at(i).getFd();
-        }
-        FD_SET(clients.at(i).getFd(), &write_fd);
-    }
-	fd_set read_fd = fds;
-	fd_set error_fd = fds;
+    FILL_SET(sockets, sockets.at(i), read_fd, max_fd);
+    FILL_SET(sockets, sockets.at(i), error_fd, max_fd);
+    FILL_SET(clients, clients.at(i).getFd(), write_fd, max_fd);
+    FILL_SET(clients, clients.at(i).getFd(), error_fd, max_fd);
+
+//	for (unsigned long i = 0; i < sockets.size(); i++) {
+//        if (sockets.at(i) > max_fd) {
+//            max_fd = sockets.at(i);
+//        }
+//        FD_SET(sockets.at(i), &fds);
+//    }
+//	for (unsigned long i = 0; i < clients.size(); i++) {
+//        if (clients.at(i).getFd() > max_fd) {
+//            max_fd = clients.at(i).getFd();
+//        }
+//        FD_SET(clients.at(i).getFd(), &write_fd);
+//    }
     timeval timeout = {0, 0};
 	if (select(max_fd + 1, &read_fd, &write_fd, &error_fd, &timeout) < 0) {
         LOG_ERROR("Select failed: " << errno);
@@ -104,7 +109,7 @@ void PollManager::poller(std::vector<ServerConfig> &servers) {
             clientSocket = accept(sockets[i], (struct sockaddr *)&clientData, &Size_Client);
 			if (clientSocket < 0)
 			{
-				LOG_ERROR("Socket accept failed");
+                LOG_ERROR("Accept failed: " << errno);
                 continue;
 			}
 			LOG_DEBUG("Socket " << clientSocket << " accepted");
@@ -112,13 +117,11 @@ void PollManager::poller(std::vector<ServerConfig> &servers) {
 			int readValue = read(clientSocket, buffer, 1024);
 			if (readValue < 0)
 			{
-				LOG_DEBUG("Socket read failed");
+                LOG_ERROR("Read failed: " << errno);
                 continue;
 			}
 			Client client = Client(clientSocket, clientData);
 			clients.push_back(client);
-			FD_SET(clientSocket, &fds);
-			std::cout << "Server: " << servers[i].getServerName() << " Ip and Port " << ft_socket_to_string(_servers[i]) << " Has accepeted a client " << ft_socket_to_string(client.getAddr()) << std::endl;
 			HttpRequest request = HttpRequest();
 			request.parse(buffer);
 			_requests.push_back(std::make_pair(&request, &client));
@@ -129,16 +132,13 @@ void PollManager::poller(std::vector<ServerConfig> &servers) {
     for (unsigned long i = 0; i < _responses.size(); i++) {
         const HttpResponse *response = _responses[i].first;
         const Client *client = _responses[i].second;
-        if (!FD_ISSET(client->getFd(), &write_fd)) {
-            LOG_DEBUG("Socket " << client->getFd() << " is not ready to write");
+        if (!FD_ISSET(client->getFd(), &write_fd))
             continue;
-        }
         responsesSent.push_back(response);
         std::string responseString = response->toRawString();
-        send(client->getFd(), responseString.c_str(), responseString.length()+1, MSG_DONTWAIT);
-        LOG_DEBUG("Socket " << client->getFd() << " sent");
+        send(client->getFd(), responseString.c_str(), responseString.length(), MSG_DONTWAIT);
         close(client->getFd());
-        // Delete the client
+        // Delete the connection from the clients vector
         for (unsigned long j = 0; j < clients.size(); j++) {
             if (clients[j].getFd() == client->getFd()) {
                 clients.erase(clients.begin() + j);
