@@ -53,9 +53,9 @@ public:
 	void setDefaultLocation(const LocationConfig& location);
 	void setHostPort(const std::string host, int port);
 
-    std::string getServerName();
-	std::vector<LocationConfig>& getLocations();
-	LocationConfig& getDefaultLocation();
+    std::string getServerName() const;
+	const std::vector<LocationConfig>& getLocations() const;
+	const LocationConfig& getDefaultLocation() const;
 	const std::vector<std::pair<std::string, int> >& getListen() const;
 };
 

@@ -1,7 +1,7 @@
 //
 // Created by kolterdyx on 14/09/23.
 //
-#include "../includes/config/LocationConfig.hpp"
+#include "config/LocationConfig.hpp"
 
 LocationConfig::LocationConfig() : _autoIndex(false), _directoryListingEnabled(false), _cgiEnabled(false), _uploadEnabled(false), _clientMaxBodySize(10000) {
     

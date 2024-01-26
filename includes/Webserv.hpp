@@ -13,16 +13,24 @@ class Webserv {
 private:
     ParseConfig parse;
 	PollManager pollManager;
+    bool running;
 
 public:
     Webserv();
     Webserv(const Webserv& other);
     Webserv& operator=(const Webserv& other);
+
     ~Webserv();
 
     void run();
 
     void parseConfig(std::string path);
+
+    const HttpResponse handleRequest(const HttpRequest *request, const ServerConfig *config);
+
+    const HttpResponse handleWithLocation(const HttpRequest *request, const LocationConfig *config);
+
+    const ServerConfig *getServerConfigByFd(int fd);
 };
 
 

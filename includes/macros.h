@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include <csignal>
+#include <cstring>
+#include <cerrno>
 
 #define unused __attribute__((unused))
 
@@ -22,9 +24,11 @@
     #define DEBUG 3
 #endif
 
+#define ERRNO ()
+
 // Log
 #if DEBUG <= 3
-    #define LOG_ERROR(msg) std::cerr << RED << "[ERROR] " << msg << RESET << std::endl
+    #define LOG_ERROR(msg) std::cerr << RED << "[ERROR] " << msg << ": " << errno << " " << strerror(errno) << RESET << std::endl
 #else
     #define LOG_ERROR(msg)
 #endif

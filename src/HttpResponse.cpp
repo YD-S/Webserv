@@ -38,7 +38,7 @@ HttpResponse HttpResponse::setStatus(int _status) {
     return *this;
 }
 
-HttpResponse HttpResponse::addHeader(const std::string &key, const std::string &value) {
+HttpResponse HttpResponse::setHeader(const std::string &key, const std::string &value) {
     this->_headers.insert(std::make_pair(key, value));
     return *this;
 }
@@ -64,13 +64,14 @@ const std::string &HttpResponse::getBody() const {
     return _body;
 }
 
-std::string HttpResponse::toRawString() {
+std::string HttpResponse::toRawString() const  {
     std::string response = this->_version + " " + to_string(this->_status) + " " + HttpStatus::getReasonString(this->_status) + "\r\n";
-    for (std::map<std::string, std::string>::iterator it = this->_headers.begin(); it != this->_headers.end(); ++it) {
+    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it) {
         response += it->first + ": " + it->second + "\r\n";
     }
     response += "\r\n";
     response += this->_body;
+    response += "\n";
     return response;
 }
 
@@ -102,7 +103,7 @@ int HttpResponse::fileExists(std::string filename) {
         if (!isCGI(filename)){
             if (!std::getline(file, _body, '\0'))
                 return 500;
-            addHeader("Content-length", to_string(_body.length()));
+            setHeader("Content-length", to_string(_body.length()));
         }
         file.close();
         return 1;

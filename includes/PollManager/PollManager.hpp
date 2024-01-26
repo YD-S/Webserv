@@ -32,30 +32,42 @@
 #include "HttpResponse.hpp"
 #include "HttpRequest.hpp"
 #include "HttpStatus.hpp"
-#include "Clients/Clients.hpp"
+#include "Client/Client.hpp"
 
-extern std::vector<int> sockets;
-extern std::vector<Clients> clients;
+extern std::vector<std::pair<int, const ServerConfig *> > serverSockets;
+extern std::vector<Client> clients;
+
+#define BUFFER_SIZE 1024
+
+#define FILL_SET(vector, fd, set, max) \
+    for (unsigned int i=0; i < vector.size(); i++) { \
+        int fd_val = fd;                \
+        FD_SET(fd_val, &set); \
+        if (fd_val > max) \
+            max = fd_val; \
+    }
 
 class PollManager {
 private:
 	std::vector<struct sockaddr_in> _servers;
-	int client_socket;
-	struct sockaddr_in Client_Data;
-	std::vector<std::pair<const HttpRequest *, const Clients *> > _requests;
-	std::vector<std::pair<const HttpResponse *, const Clients *> > _responses;
+	int clientSocket;
+	struct sockaddr_in clientData;
+	std::vector<std::pair<const HttpRequest *, const Client *> > _requests;
+	std::vector<std::pair<const HttpResponse *, const Client *> > _responses;
 
 public:
 	PollManager();
 	~PollManager();
 	PollManager(const PollManager &src);
 	PollManager &operator=(const PollManager &src);
-	void SocketConfig(const std::vector<ServerConfig> &Servers_Config);
-	void Binder(const std::vector<ServerConfig> &Servers);
-	void Poller(std::vector<ServerConfig> &Servers);
+	void socketConfig(const std::vector<ServerConfig> &serversConfig);
+	void binder(const std::vector<ServerConfig> &servers);
+	void poller();
 
-	std::vector<std::pair<const HttpRequest *, const Clients *> > getRequests();
-    void setResponses(std::vector<std::pair<const HttpResponse *, const Clients *> > responses);
+	std::vector<std::pair<const HttpRequest *, const Client *> > getRequests();
+    void setResponses(std::vector<std::pair<const HttpResponse *, const Client *> > responses);
+    void setRequestHandled(const HttpRequest *request);
+    std::vector<std::pair<const HttpResponse *, const Client *> > getResponses();
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP
