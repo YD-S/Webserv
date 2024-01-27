@@ -52,8 +52,8 @@ private:
 	std::vector<struct sockaddr_in> _servers;
 	int clientSocket;
 	struct sockaddr_in clientData;
-	std::vector<std::pair<const HttpRequest *, const Client *> > _requests;
-	std::vector<std::pair<const HttpResponse *, const Client *> > _responses;
+	std::vector<std::pair<HttpRequest, Client> > _requests;
+	std::vector<std::pair<HttpResponse, Client> > _responses;
 
 public:
 	PollManager();
@@ -64,10 +64,10 @@ public:
 	void binder(const std::vector<ServerConfig> &servers);
 	void poller();
 
-	std::vector<std::pair<const HttpRequest *, const Client *> > getRequests();
-    void setResponses(std::vector<std::pair<const HttpResponse *, const Client *> > responses);
+	std::vector<std::pair<HttpRequest, Client> > getRequests();
+    void setResponses(std::vector<std::pair<HttpResponse, Client> > responses);
     void setRequestHandled(const HttpRequest *request);
-    std::vector<std::pair<const HttpResponse *, const Client *> > getResponses();
+    std::vector<std::pair<HttpResponse,  Client> > getResponses();
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP

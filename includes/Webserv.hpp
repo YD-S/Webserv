@@ -13,7 +13,7 @@ class Webserv {
 private:
     ParseConfig parse;
 	PollManager pollManager;
-    bool running;
+//    bool running;
 
 public:
     Webserv();

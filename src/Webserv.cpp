@@ -22,8 +22,8 @@ void Webserv::parseConfig(std::string path) {
 void Webserv::run() {
     pollManager.socketConfig(parse.getServers());
     pollManager.binder(parse.getServers());
-    std::vector<std::pair<const HttpResponse *, const Client *> > responses;
-    std::vector<std::pair<const HttpRequest *, const Client *> > requests;
+    std::vector<std::pair<HttpResponse, Client> > responses;
+    std::vector<std::pair<HttpRequest, Client> > requests;
 
     while (1) {
         pollManager.poller();
@@ -34,15 +34,15 @@ void Webserv::run() {
         LOG_DEBUG("Requests: " << requests.size());
         responses = pollManager.getResponses();
         for (unsigned long i = 0; i < requests.size(); i++) {
-            std::cout << requests[i].first->toPrintableString() << std::endl;
+            std::cout << requests[i].first.toPrintableString() << std::endl;
 //            const HttpResponse response = handleRequest(requests[i].first, getServerConfigByFd(requests[i].first->getFd()));
             HttpResponse response = HttpResponse();
             response.setStatus(HttpStatus::OK)
                     .setHeader("Server", "webserv")
                     .setHeader("Content-Type", "text/html")
                     .setBody("<html><body><h1>Hello, world!</h1><p>" + to_string(rand()) + "</p></body></html>");
-            responses.push_back(std::make_pair(&response, requests[i].second));
-            pollManager.setRequestHandled(requests[i].first);
+            responses.push_back(std::make_pair(response, requests[i].second));
+            pollManager.setRequestHandled(&requests[i].first);
         }
         LOG_DEBUG("Responses: " << responses.size());
         pollManager.setResponses(responses);

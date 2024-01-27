@@ -119,17 +119,17 @@ void PollManager::poller() {
 			HttpRequest request = HttpRequest();
             request.setFd(serverSockets[i].first);
 			request.parse(requestString);
-			_requests.push_back(std::make_pair(&request, &client));
+			_requests.push_back(std::make_pair(request, client));
             LOG_DEBUG("Request received from socket " << clientSocket);
 		}
 	}
 
     std::vector<const HttpResponse *> responsesSent;
     for (unsigned long i = 0; i < _responses.size(); i++) {
-        const HttpResponse *response = _responses[i].first;
+        HttpResponse *response = &_responses[i].first;
         if (!response)
             continue;
-        const Client *client = _responses[i].second;
+        Client *client = &_responses[i].second;
         if (!FD_ISSET(client->getFd(), &write_fd))
             continue;
         responsesSent.push_back(response);
@@ -148,7 +148,7 @@ void PollManager::poller() {
     // This can probably be optimized
     for (unsigned long i = 0; i < responsesSent.size(); i++) {
         for (unsigned long j = 0; j < _responses.size(); j++) {
-            if (_responses[j].first == responsesSent[i]) {
+            if (&_responses[j].first == responsesSent[i]) {
                 _responses.erase(_responses.begin() + j);
                 break;
             }
@@ -156,26 +156,27 @@ void PollManager::poller() {
     }
 }
 
-std::vector<std::pair<const HttpRequest *, const Client *> > PollManager::getRequests() {
+std::vector<std::pair<HttpRequest, Client> > PollManager::getRequests() {
 	return _requests;
 }
 
-void PollManager::setResponses(std::vector<std::pair<const HttpResponse *, const Client *> > responses) {
-	for (std::vector<std::pair<const HttpResponse *, const Client *> >::iterator it = responses.begin(); it != responses.end(); ++it) {
-		_responses.push_back(*it);
+void PollManager::setResponses(std::vector<std::pair<HttpResponse, Client> > responses) {
+	for (std::vector<std::pair<HttpResponse, Client> >::iterator it = responses.begin(); it != responses.end(); ++it) {
+		_responses.push_back(std::make_pair(it->first, it->second));
 	}
 }
 
 void PollManager::setRequestHandled(const HttpRequest *request) {
-    for (std::vector<std::pair<const HttpRequest *, const Client *> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
-        if (it->first == request) {
-            _requests.erase(it);
+    for (std::vector<std::pair<HttpRequest, Client> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
+        if (&it->first == request) {
+			//erase request at it
+			_requests.erase(it);
             return;
         }
     }
 }
 
-std::vector<std::pair<const HttpResponse *, const Client *> > PollManager::getResponses() {
+std::vector<std::pair<HttpResponse, Client> > PollManager::getResponses() {
     return _responses;
 }
 
