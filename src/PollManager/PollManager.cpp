@@ -5,9 +5,12 @@
 #include "PollManager/PollManager.hpp"
 
 PollManager::PollManager() {
+	LOG_WARNING("PollManager created");
 }
 
-PollManager::~PollManager() {}
+PollManager::~PollManager() {
+	LOG_WARNING("PollManager destroyed");
+}
 
 PollManager::PollManager(const PollManager &src) {
 	*this = src;
@@ -101,6 +104,7 @@ void PollManager::poller() {
                 continue;
 			}
 			LOG_DEBUG("Socket " << clientSocket << " accepted");
+
             std::string requestString;
             char buffer[BUFFER_SIZE] = {0};
             int readValue = 0;
@@ -115,8 +119,10 @@ void PollManager::poller() {
                 requestString += buffer;
             } while (readValue == BUFFER_SIZE);
 			Client client = Client(clientSocket, clientData);
+			FD_SET(clientSocket, &read_fd);
+			FD_SET(clientSocket, &write_fd);
 			clients.push_back(client);
-			HttpRequest request = HttpRequest();
+			HttpRequest request;
             request.setFd(serverSockets[i].first);
 			request.parse(requestString);
 			_requests.push_back(std::make_pair(request, client));
@@ -166,14 +172,14 @@ void PollManager::setResponses(std::vector<std::pair<HttpResponse, Client> > res
 	}
 }
 
-void PollManager::setRequestHandled(const HttpRequest *request) {
+void PollManager::setRequestHandled(HttpRequest *request) {
     for (std::vector<std::pair<HttpRequest, Client> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
-        if (&it->first == request) {
-			//erase request at it
+		if (&it->first == request) {
 			_requests.erase(it);
-            return;
-        }
-    }
+			return;
+		} else
+			LOG_ERROR("Request not found");
+	}
 }
 
 std::vector<std::pair<HttpResponse, Client> > PollManager::getResponses() {

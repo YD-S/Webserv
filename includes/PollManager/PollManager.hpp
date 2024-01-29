@@ -66,7 +66,7 @@ public:
 
 	std::vector<std::pair<HttpRequest, Client> > getRequests();
     void setResponses(std::vector<std::pair<HttpResponse, Client> > responses);
-    void setRequestHandled(const HttpRequest *request);
+    void setRequestHandled(HttpRequest *request);
     std::vector<std::pair<HttpResponse,  Client> > getResponses();
 };
 

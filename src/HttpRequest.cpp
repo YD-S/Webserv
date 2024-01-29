@@ -26,7 +26,7 @@ HttpRequest &HttpRequest::operator=(const HttpRequest &other) {
 }
 
 HttpRequest::~HttpRequest() {
-
+	LOG_ERROR("HttpRequest destroyed");
 }
 
 HttpRequest HttpRequest::setMethod(const std::string &method) {
