@@ -3,47 +3,51 @@
 //
 #include "config/LocationConfig.hpp"
 
-LocationConfig::LocationConfig() : _autoIndex(false), _directoryListingEnabled(false), _cgiEnabled(false), _uploadEnabled(false), _clientMaxBodySize(10000) {
-    
+LocationConfig::LocationConfig() : _autoIndex(false), _directoryListingEnabled(false), _cgiEnabled(false),
+								   _uploadEnabled(false), _clientMaxBodySize(10000) {
 }
 
 LocationConfig::LocationConfig(const LocationConfig &other) {
-    *this = other;
+	*this = other;
 }
 
 LocationConfig &LocationConfig::operator=(const LocationConfig &other) {
-    if (this != &other) {
-        this->_path = other._path;
-        this->_root = other._root;
-        _indexes.clear();
-        for (std::vector<std::string>::const_iterator it = other.getIndexes().begin(); it != other.getIndexes().end(); ++it)
-            this->addIndex(*it);
-        this->_autoIndex = other._autoIndex;
-        _methods.clear();
-        for (std::vector<std::string>::const_iterator it = other.getMethods().begin(); it != other.getMethods().end(); ++it)
-            this->addMethod(*it);
-        this->_directoryListingEnabled = other._directoryListingEnabled;
-        this->_directoryResponseFile = other._directoryResponseFile;
-        this->_cgiEnabled = other._cgiEnabled;
-        _cgi.clear();
-        for (std::vector<std::pair<std::string, std::string> >::const_iterator it = other.getCgi().begin(); it != other.getCgi().end(); ++it)
-            this->addCgi(it->first, it->second);
-        this->_uploadEnabled = other._uploadEnabled;
-        this->_uploadPath = other._uploadPath;
-        this->_redirect = other._redirect;
-        _errorPages.clear();
-        for (std::vector<std::pair<int, std::string> >::const_iterator it = other.getErrorPages().begin(); it != other.getErrorPages().end(); ++it)
-            this->addErrorPage(it->first, it->second);
-        this->_clientMaxBodySize = other._clientMaxBodySize;
-    }
-    return *this;
+	if (this != &other) {
+		this->_path = other._path;
+		this->_root = other._root;
+		_indexes.clear();
+		for (std::vector<std::string>::const_iterator it = other.getIndexes().begin();
+			 it != other.getIndexes().end(); ++it)
+			this->addIndex(*it);
+		this->_autoIndex = other._autoIndex;
+		_methods.clear();
+		for (std::vector<std::string>::const_iterator it = other.getMethods().begin();
+			 it != other.getMethods().end(); ++it)
+			this->addMethod(*it);
+		this->_directoryListingEnabled = other._directoryListingEnabled;
+		this->_directoryResponseFile = other._directoryResponseFile;
+		this->_cgiEnabled = other._cgiEnabled;
+		_cgi.clear();
+		for (std::vector<std::pair<std::string, std::string> >::const_iterator it = other.getCgi().begin();
+			 it != other.getCgi().end(); ++it)
+			this->addCgi(it->first, it->second);
+		this->_uploadEnabled = other._uploadEnabled;
+		this->_uploadPath = other._uploadPath;
+		this->_redirect = other._redirect;
+		_errorPages.clear();
+		for (std::vector<std::pair<int, std::string> >::const_iterator it = other.getErrorPages().begin();
+			 it != other.getErrorPages().end(); ++it)
+			this->addErrorPage(it->first, it->second);
+		this->_clientMaxBodySize = other._clientMaxBodySize;
+	}
+	return *this;
 }
 
 LocationConfig::~LocationConfig() {
 
 }
 
-void LocationConfig::setDirectoryListingEnabled(const std::string &boolean){
+void LocationConfig::setDirectoryListingEnabled(const std::string &boolean) {
 	if (boolean == "on")
 		this->_directoryListingEnabled = true;
 	else if (boolean == "off")
@@ -52,7 +56,7 @@ void LocationConfig::setDirectoryListingEnabled(const std::string &boolean){
 		LOG_SYS_ERROR("directoryListingEnabled has unkown bool type " + boolean);
 }
 
-void LocationConfig::setCgiEnabled(const std::string &boolean){
+void LocationConfig::setCgiEnabled(const std::string &boolean) {
 	if (boolean == "on")
 		this->_cgiEnabled = true;
 	else if (boolean == "off")
@@ -61,7 +65,7 @@ void LocationConfig::setCgiEnabled(const std::string &boolean){
 		LOG_SYS_ERROR("cgiEnabled has unkown bool type " + boolean);
 }
 
-void LocationConfig::setUploadEnabled(const std::string &boolean){
+void LocationConfig::setUploadEnabled(const std::string &boolean) {
 	if (boolean == "on")
 		this->_uploadEnabled = true;
 	else if (boolean == "off")
@@ -71,119 +75,119 @@ void LocationConfig::setUploadEnabled(const std::string &boolean){
 }
 
 void LocationConfig::setPath(const std::string &path) {
-    this->_path = path;
+	this->_path = path;
 }
 
 void LocationConfig::setRoot(const std::string &root) {
-    this->_root = root;
+	this->_root = root;
 }
 
 void LocationConfig::setDirectoryListingEnabled(bool directoryListingEnabled) {
-    this->_directoryListingEnabled = directoryListingEnabled;
+	this->_directoryListingEnabled = directoryListingEnabled;
 }
 
 void LocationConfig::setDirectoryResponseFile(const std::string &directoryResponseFile) {
-    this->_directoryResponseFile = directoryResponseFile;
+	this->_directoryResponseFile = directoryResponseFile;
 }
 
 void LocationConfig::setCgiEnabled(bool cgiEnabled) {
-    this->_cgiEnabled = cgiEnabled;
+	this->_cgiEnabled = cgiEnabled;
 }
 
 void LocationConfig::setUploadEnabled(bool uploadEnabled) {
-    this->_uploadEnabled = uploadEnabled;
+	this->_uploadEnabled = uploadEnabled;
 }
 
 void LocationConfig::setUploadPath(const std::string &uploadPath) {
-    this->_uploadPath = uploadPath;
+	this->_uploadPath = uploadPath;
 }
 
 void LocationConfig::addIndex(const std::string &index) {
-    _indexes.push_back(index);
+	_indexes.push_back(index);
 }
 
 void LocationConfig::addMethod(const std::string &method) {
-    _methods.push_back(method);
+	_methods.push_back(method);
 }
 
 const std::string &LocationConfig::getPath() const {
-    return _path;
+	return _path;
 }
 
 const std::string &LocationConfig::getRoot() const {
-    return _root;
+	return _root;
 }
 
 const std::vector<std::string> &LocationConfig::getIndexes() const {
-    return _indexes;
+	return _indexes;
 }
 
 const std::vector<std::string> &LocationConfig::getMethods() const {
-    return _methods;
+	return _methods;
 }
 
 bool LocationConfig::isDirectoryListingEnabled() const {
-    return _directoryListingEnabled;
+	return _directoryListingEnabled;
 }
 
 const std::string &LocationConfig::getDirectoryResponseFile() const {
-    return _directoryResponseFile;
+	return _directoryResponseFile;
 }
 
 bool LocationConfig::isCgiEnabled() const {
-    return _cgiEnabled;
+	return _cgiEnabled;
 }
 
 bool LocationConfig::isUploadEnabled() const {
-    return _uploadEnabled;
+	return _uploadEnabled;
 }
 
 const std::string &LocationConfig::getUploadPath() const {
-    return _uploadPath;
+	return _uploadPath;
 }
 
-void LocationConfig::addCgi(const std::string &extension, const std::string &path){
-    _cgi.push_back(std::make_pair(extension, path));
+void LocationConfig::addCgi(const std::string &extension, const std::string &path) {
+	_cgi.push_back(std::make_pair(extension, path));
 }
 
-void LocationConfig::addErrorPage(const int &code, const std::string &path){
-    _errorPages.push_back(std::make_pair(code, path));
+void LocationConfig::addErrorPage(const int &code, const std::string &path) {
+	_errorPages.push_back(std::make_pair(code, path));
 }
 
-void LocationConfig::setClientMaxBodySize(const size_t size){
-    _clientMaxBodySize = size;
+void LocationConfig::setClientMaxBodySize(const size_t size) {
+	_clientMaxBodySize = size;
 }
 
-void LocationConfig::setRedirect(const std::string &redirect){
-    _redirect = redirect;
+void LocationConfig::setRedirect(const std::string &redirect) {
+	_redirect = redirect;
 }
 
-const std::vector<std::pair<std::string, std::string> >& LocationConfig::getCgi() const{
-    return _cgi;
+const std::vector<std::pair<std::string, std::string> > &LocationConfig::getCgi() const {
+	return _cgi;
 }
 
-const std::vector<std::pair<int, std::string> > &LocationConfig::getErrorPages() const{
-    return _errorPages;
+const std::vector<std::pair<int, std::string> > &LocationConfig::getErrorPages() const {
+	return _errorPages;
 }
 
-void LocationConfig::setAutoIndex(bool autoIndex){
-    _autoIndex = autoIndex;
+void LocationConfig::setAutoIndex(bool autoIndex) {
+	_autoIndex = autoIndex;
 }
 
-bool LocationConfig::isAutoIndexEnabled() const{
-    return _autoIndex;
+bool LocationConfig::isAutoIndexEnabled() const {
+	return _autoIndex;
 }
 
-const std::string &LocationConfig::getRedirect() const{
-    return _redirect;
+const std::string &LocationConfig::getRedirect() const {
+	return _redirect;
 }
 
-void  LocationConfig::clearIndex(){
-    _indexes.clear();
+void LocationConfig::clearIndex() {
+	_indexes.clear();
 }
 
-bool LocationConfig::hasMethod(std::string method) const{
-	for(std::vector<std::string>::const_iterator it = _methods.begin(); it != _methods.end(); ++it){
+bool LocationConfig::hasMethod(std::string method) const {
+	for (std::vector<std::string>::const_iterator it = _methods.begin(); it != _methods.end(); ++it) {
 		if (method == *it)
 			return true;
 	}
@@ -215,7 +219,8 @@ std::string LocationConfig::toString() {
 	}
 	result += "\n";
 	result += "errorPages: ";
-	for (std::vector<std::pair<int, std::string> >::const_iterator it = _errorPages.begin(); it != _errorPages.end(); ++it) {
+	for (std::vector<std::pair<int, std::string> >::const_iterator it = _errorPages.begin();
+		 it != _errorPages.end(); ++it) {
 		result += to_string(it->first) + " " + it->second + " ";
 	}
 	result += "\n";
@@ -225,9 +230,47 @@ std::string LocationConfig::toString() {
 }
 
 std::string LocationConfig::getErrorPage(const int statusCode) {
-	for (std::vector<std::pair<int, std::string> >::const_iterator it = _errorPages.begin(); it != _errorPages.end(); ++it) {
+	for (std::vector<std::pair<int, std::string> >::const_iterator it = _errorPages.begin();
+		 it != _errorPages.end(); ++it) {
 		if (it->first == statusCode)
 			return it->second;
 	}
 	return "";
+}
+
+void LocationConfig::setDefaultConfig(LocationConfig *defaultLocation) {
+	// TODO: check if booleans like autoindex are defined so they can be inherited or overwritten
+	if (_root.empty())
+		_root = defaultLocation->getRoot();
+	if (_indexes.empty())
+		_indexes = defaultLocation->getIndexes();
+	if (_methods.empty())
+		_methods = defaultLocation->getMethods();
+	if (_directoryResponseFile.empty())
+		_directoryResponseFile = defaultLocation->getDirectoryResponseFile();
+	if (_cgi.empty())
+		_cgi = defaultLocation->getCgi();
+	if (_errorPages.empty())
+		_errorPages = defaultLocation->getErrorPages();
+	else {
+		// For each error page in defaultLocation, check if it exists in this location
+		// If it doesn't, add it
+		for (std::vector<std::pair<int, std::string> >::const_iterator it = defaultLocation->getErrorPages().begin();
+			 it != defaultLocation->getErrorPages().end(); ++it) {
+			bool found = false;
+			for (std::vector<std::pair<int, std::string> >::const_iterator it2 = _errorPages.begin();
+				 it2 != _errorPages.end(); ++it2) {
+				if (it->first == it2->first) {
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				_errorPages.push_back(*it);
+		}
+	}
+	if (_clientMaxBodySize == 10000)
+		_clientMaxBodySize = defaultLocation->_clientMaxBodySize;
+	if (_redirect.empty())
+		_redirect = defaultLocation->getRedirect();
 }
