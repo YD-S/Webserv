@@ -7,12 +7,10 @@
 
 HttpRequest::HttpRequest() {
     this->_version = "HTTP/1.1";
-    LOG_DEBUG("HttpRequest created");
 }
 
 HttpRequest::HttpRequest(const HttpRequest &other) {
     *this = other;
-    LOG_DEBUG("HttpRequest copied");
 }
 
 HttpRequest &HttpRequest::operator=(const HttpRequest &other) {
@@ -24,12 +22,10 @@ HttpRequest &HttpRequest::operator=(const HttpRequest &other) {
         this->_params = other._params;
         this->_body = other._body;
     }
-    LOG_DEBUG("HttpRequest assigned");
     return *this;
 }
 
 HttpRequest::~HttpRequest() {
-	LOG_ERROR("HttpRequest destroyed");
 }
 
 HttpRequest *HttpRequest::setMethod(const std::string &method) {
@@ -226,8 +222,6 @@ HttpRequest *HttpRequest::parse(std::string request){
             std::string value = trim(line.substr(colonPos + 1));
 
             this->addHeader(header, value);
-            // Print the parsed header and value
-//            std::cout << "Header: '" << header << "', Value: '" << value << "'" << std::endl;
         } else {
             if (_method == "POST")
                 parsePostParams(stream);
@@ -237,7 +231,6 @@ HttpRequest *HttpRequest::parse(std::string request){
                 ft_error("Unkown method!", 1);
         }
     }
-//    printHttpRequest();
     return this;
 }
 

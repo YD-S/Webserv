@@ -15,8 +15,8 @@ void Webserv::parseConfig(std::string path) {
 			LOG_ERROR("NO SERVER >:(");
 	const std::vector<LocationConfig>& locations = (*(parse.getServers().begin())).getLocations();
 	if (locations.empty())
-			LOG_ERROR("NO LOCATIONS >:(");
-	parse.printAll();
+			LOG_ERROR("NO LOCATIONS >:("); // TODO: even if there are no locations, we should still be able to serve files from the root
+//	parse.printAll();
 }
 
 void Webserv::run() {
@@ -34,7 +34,6 @@ void Webserv::run() {
         LOG_DEBUG("Requests: " << requests.size());
         responses = pollManager.getResponses();
         for (unsigned long i = 0; i < requests.size(); i++) {
-            std::cout << requests[i].first->toPrintableString() << std::endl;
             HttpResponse *response = handleRequest(requests[i].first, getServerConfigByFd(requests[i].first->getFd()));
             responses.push_back(std::make_pair(response, requests[i].second));
             pollManager.setRequestHandled(requests[i].first);
@@ -45,13 +44,27 @@ void Webserv::run() {
 }
 
 HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const ServerConfig *config) {
-    if (!config->getLocations().size())
-        return handleWithLocation(request, &config->getDefaultLocation());
+    if (config->getLocations().empty()) {
+		return handleWithLocation(request, &config->getDefaultLocation());
+	}
+	// Exact match
+	for (std::vector<LocationConfig>::const_iterator it = config->getLocations().begin(); it != config->getLocations().end(); ++it) {
+		if (request->getPath() == it->getPath()) {
+			return handleWithLocation(request, &(*it));
+		}
+	}
+	// Longest prefix match
+	LocationConfig *longestPrefixMatch = NULL;
     for (std::vector<LocationConfig>::const_iterator it = config->getLocations().begin(); it != config->getLocations().end(); ++it) {
         if (request->getPath().find(it->getPath()) == 0) {
-            return handleWithLocation(request, &(*it));
+			if (longestPrefixMatch == NULL || it->getPath().length() > longestPrefixMatch->getPath().length()) {
+				longestPrefixMatch = const_cast<LocationConfig *>(&(*it));
+			}
         }
     }
+	if (longestPrefixMatch != NULL) {
+		return handleWithLocation(request, longestPrefixMatch);
+	}
     errno = ENOENT;
     LOG_ERROR("No location found for path " << request->getPath());
     HttpResponse *tmp = new HttpResponse();

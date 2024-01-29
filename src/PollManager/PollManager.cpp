@@ -4,12 +4,10 @@
 
 #include "PollManager/PollManager.hpp"
 
-PollManager::PollManager() {
-	LOG_WARNING("PollManager created");
+PollManager::PollManager() : clientSocket(), clientData() {
 }
 
 PollManager::~PollManager() {
-	LOG_WARNING("PollManager destroyed");
 }
 
 PollManager::PollManager(const PollManager &src) {
@@ -54,6 +52,7 @@ void PollManager::binder(const std::vector<ServerConfig> &servers) {
 		LOG_ERROR("Servers and sockets size mismatch");
 		kill(getpid(), SIGINT);
 	}
+	LOG_DEBUG("Binding " << _servers.size() << " servers");
 	for (unsigned long i = 0; i < _servers.size(); i++) {
 		if (bind(serverSockets[i].first, (struct sockaddr *)&_servers[i], sizeof(struct sockaddr_in)) == -1)
 		{
@@ -137,7 +136,6 @@ void PollManager::poller() {
         if (!FD_ISSET(client->getFd(), &write_fd))
             continue;
         std::string responseString = response->toPrintableString();
-        LOG_DEBUG("Response: " << responseString);
         send(client->getFd(), responseString.c_str(), responseString.length(), 0);
         LOG_DEBUG("Response sent to socket " << client->getFd());
         responsesSent.push_back(response);
