@@ -119,12 +119,10 @@ void PollManager::poller() {
                 requestString += buffer;
             } while (readValue == BUFFER_SIZE);
 			Client client = Client(clientSocket, clientData);
-			FD_SET(clientSocket, &read_fd);
-			FD_SET(clientSocket, &write_fd);
 			clients.push_back(client);
-			HttpRequest request;
-            request.setFd(serverSockets[i].first);
-			request.parse(requestString);
+			HttpRequest *request = new HttpRequest();
+            request->setFd(serverSockets[i].first);
+			request->parse(requestString);
 			_requests.push_back(std::make_pair(request, client));
             LOG_DEBUG("Request received from socket " << clientSocket);
 		}
@@ -132,16 +130,17 @@ void PollManager::poller() {
 
     std::vector<const HttpResponse *> responsesSent;
     for (unsigned long i = 0; i < _responses.size(); i++) {
-        HttpResponse *response = &_responses[i].first;
+        HttpResponse *response = _responses[i].first;
         if (!response)
             continue;
         Client *client = &_responses[i].second;
         if (!FD_ISSET(client->getFd(), &write_fd))
             continue;
-        responsesSent.push_back(response);
-        std::string responseString = response->toRawString();
+        std::string responseString = response->toPrintableString();
+        LOG_DEBUG("Response: " << responseString);
         send(client->getFd(), responseString.c_str(), responseString.length(), 0);
         LOG_DEBUG("Response sent to socket " << client->getFd());
+        responsesSent.push_back(response);
         close(client->getFd());
         // Delete the connection from the clients vector
         for (unsigned long j = 0; j < clients.size(); j++) {
@@ -154,35 +153,37 @@ void PollManager::poller() {
     // This can probably be optimized
     for (unsigned long i = 0; i < responsesSent.size(); i++) {
         for (unsigned long j = 0; j < _responses.size(); j++) {
-            if (&_responses[j].first == responsesSent[i]) {
+            if (_responses[j].first == responsesSent[i]) {
                 _responses.erase(_responses.begin() + j);
+                delete responsesSent[i];
                 break;
             }
         }
     }
 }
 
-std::vector<std::pair<HttpRequest, Client> > PollManager::getRequests() {
+std::vector<std::pair<HttpRequest *, Client> > PollManager::getRequests() {
 	return _requests;
 }
 
-void PollManager::setResponses(std::vector<std::pair<HttpResponse, Client> > responses) {
-	for (std::vector<std::pair<HttpResponse, Client> >::iterator it = responses.begin(); it != responses.end(); ++it) {
+void PollManager::setResponses(std::vector<std::pair<HttpResponse *, Client> > responses) {
+	for (std::vector<std::pair<HttpResponse *, Client> >::iterator it = responses.begin(); it != responses.end(); ++it) {
 		_responses.push_back(std::make_pair(it->first, it->second));
 	}
 }
 
 void PollManager::setRequestHandled(HttpRequest *request) {
-    for (std::vector<std::pair<HttpRequest, Client> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
-		if (&it->first == request) {
+    for (std::vector<std::pair<HttpRequest *, Client> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
+		if (it->first == request) {
 			_requests.erase(it);
+            delete it->first;
 			return;
 		} else
 			LOG_ERROR("Request not found");
 	}
 }
 
-std::vector<std::pair<HttpResponse, Client> > PollManager::getResponses() {
+std::vector<std::pair<HttpResponse *, Client> > PollManager::getResponses() {
     return _responses;
 }
 

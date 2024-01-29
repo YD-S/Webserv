@@ -22,8 +22,8 @@ void Webserv::parseConfig(std::string path) {
 void Webserv::run() {
     pollManager.socketConfig(parse.getServers());
     pollManager.binder(parse.getServers());
-    std::vector<std::pair<HttpResponse, Client> > responses;
-    std::vector<std::pair<HttpRequest, Client> > requests;
+    std::vector<std::pair<HttpResponse *, Client> > responses;
+    std::vector<std::pair<HttpRequest *, Client> > requests;
 
     while (1) {
         pollManager.poller();
@@ -34,22 +34,17 @@ void Webserv::run() {
         LOG_DEBUG("Requests: " << requests.size());
         responses = pollManager.getResponses();
         for (unsigned long i = 0; i < requests.size(); i++) {
-            std::cout << requests[i].first.toPrintableString() << std::endl;
-//            const HttpResponse response = handleRequest(requests[i].first, getServerConfigByFd(requests[i].first->getFd()));
-            HttpResponse response = HttpResponse();
-            response.setStatus(HttpStatus::OK)
-                    .setHeader("Server", "webserv")
-                    .setHeader("Content-Type", "text/html")
-                    .setBody("<html><body><h1>Hello, world!</h1><p>" + to_string(rand()) + "</p></body></html>");
+            std::cout << requests[i].first->toPrintableString() << std::endl;
+            HttpResponse *response = handleRequest(requests[i].first, getServerConfigByFd(requests[i].first->getFd()));
             responses.push_back(std::make_pair(response, requests[i].second));
-            pollManager.setRequestHandled(&requests[i].first);
+            pollManager.setRequestHandled(requests[i].first);
         }
         LOG_DEBUG("Responses: " << responses.size());
         pollManager.setResponses(responses);
     }
 }
 
-const HttpResponse Webserv::handleRequest(unused const HttpRequest *request, unused const ServerConfig *config) {
+HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const ServerConfig *config) {
     if (!config->getLocations().size())
         return handleWithLocation(request, &config->getDefaultLocation());
     for (std::vector<LocationConfig>::const_iterator it = config->getLocations().begin(); it != config->getLocations().end(); ++it) {
@@ -59,14 +54,20 @@ const HttpResponse Webserv::handleRequest(unused const HttpRequest *request, unu
     }
     errno = ENOENT;
     LOG_ERROR("No location found for path " << request->getPath());
-    return HttpResponse().setStatus(HttpStatus::IM_A_TEAPOT).setHeader("Server", "webserv").setHeader("Content-Type", "text/html").setBody("<html><body><h1>I'm a teapot</h1></body></html>");
+    HttpResponse *tmp = new HttpResponse();
+    tmp
+        ->setStatus(HttpStatus::IM_A_TEAPOT)
+        .setHeader("Server", "webserv")
+        .setHeader("Content-Type", "text/html")
+        .setBody("<html><body><h1>I'm a teapot</h1></body></html>");
+    return tmp;
 }
 
-const HttpResponse Webserv::handleWithLocation(unused const HttpRequest *request, unused const LocationConfig *config) {
+HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unused const LocationConfig *config) {
     LOG_INFO("Handling request with location " << config->getPath());
-    HttpResponse response = HttpResponse();
+    HttpResponse *response = new HttpResponse();
     response
-            .setStatus(HttpStatus::OK)
+            ->setStatus(HttpStatus::OK)
             .setHeader("Server", "webserv")
             .setHeader("Content-Type", "text/html")
             .setBody("<html><body><h1>Hello, world!</h1><p>" + to_string(rand()) + "</p></body></html>");

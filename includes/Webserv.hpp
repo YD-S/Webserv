@@ -26,9 +26,9 @@ public:
 
     void parseConfig(std::string path);
 
-    const HttpResponse handleRequest(const HttpRequest *request, const ServerConfig *config);
+    HttpResponse * handleRequest(const HttpRequest *request, const ServerConfig *config);
 
-    const HttpResponse handleWithLocation(const HttpRequest *request, const LocationConfig *config);
+    HttpResponse * handleWithLocation(const HttpRequest *request, const LocationConfig *config);
 
     const ServerConfig *getServerConfigByFd(int fd);
 };

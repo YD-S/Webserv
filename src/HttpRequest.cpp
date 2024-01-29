@@ -7,10 +7,12 @@
 
 HttpRequest::HttpRequest() {
     this->_version = "HTTP/1.1";
+    LOG_DEBUG("HttpRequest created");
 }
 
 HttpRequest::HttpRequest(const HttpRequest &other) {
     *this = other;
+    LOG_DEBUG("HttpRequest copied");
 }
 
 HttpRequest &HttpRequest::operator=(const HttpRequest &other) {
@@ -22,6 +24,7 @@ HttpRequest &HttpRequest::operator=(const HttpRequest &other) {
         this->_params = other._params;
         this->_body = other._body;
     }
+    LOG_DEBUG("HttpRequest assigned");
     return *this;
 }
 
