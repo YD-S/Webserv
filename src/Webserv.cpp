@@ -64,25 +64,30 @@ HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const Se
 	if (longestPrefixMatch != NULL) {
 		return handleWithLocation(request, longestPrefixMatch);
 	}
-    errno = ENOENT;
-    LOG_SYS_ERROR("No location found for path " << request->getPath());
-    HttpResponse *tmp = new HttpResponse();
-    tmp
-        ->setStatus(HttpStatus::IM_A_TEAPOT)
-        ->setHeader("Server", "webserv")
-        ->setHeader("Content-Type", "text/html")
-        ->setBody("<html><body><h1>I'm a teapot</h1></body></html>");
-    return tmp;
+	// No match
+	return handleWithLocation(request, &config->getDefaultLocation());
 }
 
 HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unused const LocationConfig *config) {
-    LOG_INFO("Handling request with location " << config->getPath());
+    LOG_DEBUG("Handling request with location " << config->getPath());
     HttpResponse *response = new HttpResponse();
-    response
-            ->setStatus(HttpStatus::OK)
-            ->setHeader("Server", "webserv")
-            ->setHeader("Content-Type", "text/html")
-            ->setBody("<html><body><h1>Hello, world!</h1><p>" + to_string(rand()) + "</p></body></html>");
+
+	const std::vector<std::string>& methods = config->getMethods();
+	if (!methods.empty()) {
+		bool methodFound = false;
+		for (std::vector<std::string>::const_iterator it = methods.begin(); it != methods.end(); ++it) {
+			if (*it == request->getMethod()) {
+				methodFound = true;
+				break;
+			}
+		}
+		if (!methodFound) {
+			LOG_ERROR("Method " << request->getMethod() << " not allowed");
+			setErrorResponse(response, HttpStatus::METHOD_NOT_ALLOWED);
+			return response;
+		}
+	}
+
     return response;
 }
 
@@ -112,5 +117,13 @@ const ServerConfig *Webserv::getServerConfigByFd(int fd) {
     errno = 0;
     LOG_SYS_ERROR("No server config found for fd " << fd);
     return NULL;
+}
+
+void Webserv::setErrorResponse(HttpResponse *response, const int statusCode) {
+	response
+		->setStatus(statusCode)
+		->setHeader("Server", "webserv")
+		->setHeader("Content-Type", "text/html")
+		->setBody("<html><body><h1>" + to_string(statusCode) + " " + std::string(HttpStatus::getReasonString(statusCode)) + "</h1></body></html>");
 }
 

@@ -31,6 +31,8 @@ public:
     HttpResponse * handleWithLocation(const HttpRequest *request, const LocationConfig *config);
 
     const ServerConfig *getServerConfigByFd(int fd);
+
+	void setErrorResponse(HttpResponse *response, int statusCode);
 };
 
 
