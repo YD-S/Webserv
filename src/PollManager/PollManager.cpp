@@ -26,7 +26,7 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig){
 		int j = socket(AF_INET, SOCK_STREAM, 0);
 		if(j < 0)
 		{
-			LOG_ERROR("Socket creation failed");
+			LOG_SYS_ERROR("Socket creation failed");
 			kill(getpid(), SIGINT);
 		}
 		serverSockets.push_back(std::make_pair(j, &serversConfig[i]));
@@ -49,14 +49,14 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig){
 
 void PollManager::binder(const std::vector<ServerConfig> &servers) {
 	if(_servers.size() != serverSockets.size()) {
-		LOG_ERROR("Servers and sockets size mismatch");
+		LOG_SYS_ERROR("Servers and sockets size mismatch");
 		kill(getpid(), SIGINT);
 	}
 	LOG_DEBUG("Binding " << _servers.size() << " servers");
 	for (unsigned long i = 0; i < _servers.size(); i++) {
 		if (bind(serverSockets[i].first, (struct sockaddr *)&_servers[i], sizeof(struct sockaddr_in)) == -1)
 		{
-			LOG_ERROR("Bind failed");
+			LOG_SYS_ERROR("Bind failed");
 			kill(getpid(), SIGINT);
 		}
 	}
@@ -65,7 +65,7 @@ void PollManager::binder(const std::vector<ServerConfig> &servers) {
 	for(unsigned long i = 0; i < serverSockets.size(); i++){
 		if (listen(serverSockets[i].first, 25) < 0)
 		{
-			LOG_ERROR("Listen failed");
+			LOG_SYS_ERROR("Listen failed");
             kill(getpid(), SIGINT);
 		}
 
@@ -91,7 +91,7 @@ void PollManager::poller() {
 
     timeval timeout = {0, 0};
 	if (select(max_fd + 1, &read_fd, &write_fd, &error_fd, &timeout) < 0) {
-        LOG_ERROR("Select failed");
+        LOG_SYS_ERROR("Select failed");
     }
 	for(unsigned long i = 0; i < serverSockets.size(); i++){
 		if(FD_ISSET(serverSockets[i].first, &read_fd)){
@@ -99,7 +99,7 @@ void PollManager::poller() {
             clientSocket = accept(serverSockets[i].first, (struct sockaddr *)&clientData, &sizeClient);
 			if (clientSocket < 0)
 			{
-                LOG_ERROR("Accept failed");
+                LOG_SYS_ERROR("Accept failed");
                 continue;
 			}
 			LOG_DEBUG("Socket " << clientSocket << " accepted");
@@ -112,7 +112,7 @@ void PollManager::poller() {
                     buffer[i] = 0;
                 readValue = read(clientSocket, buffer, BUFFER_SIZE);
                 if (readValue < 0) {
-                    LOG_ERROR("Read failed");
+                    LOG_SYS_ERROR("Read failed");
                     continue;
                 }
                 requestString += buffer;
@@ -177,7 +177,7 @@ void PollManager::setRequestHandled(HttpRequest *request) {
             delete it->first;
 			return;
 		} else
-			LOG_ERROR("Request not found");
+			LOG_SYS_ERROR("Request not found");
 	}
 }
 

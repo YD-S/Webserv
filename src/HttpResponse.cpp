@@ -125,10 +125,10 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
     if (request.getMethod() == "GET"){
         for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
 			std::string combinedPath = (it)->getRoot() + request.getPath();
-			LOG_ERROR(combinedPath);
+			LOG_SYS_ERROR(combinedPath);
 				if (combinedPath.at(combinedPath.length() - 1) == '/')
 					combinedPath = combinedPath.substr(1);
-			// LOG_ERROR(combinedPath);
+			// LOG_SYS_ERROR(combinedPath);
 				// if (startsWith((it).getRoot(), request.getPath())){
 				if (!(*it).hasMethod("GET"))
 					return 401;
@@ -192,16 +192,16 @@ bool    HttpResponse::isCGI(std::string &path){
 }
 
 void    HttpResponse::build(HttpRequest &request, ServerConfig &server){ // Need CGI, ContentType header.
-    LOG_ERROR("STARTS HERE");
+    LOG_SYS_ERROR("STARTS HERE");
     request.printHttpRequest();
-    LOG_ERROR("ENDS HERE");
+    LOG_SYS_ERROR("ENDS HERE");
     setVersion("HTTP/1.1");
     setStatus(findStatus(request, server));
     //if (isCGI(request.getPath()))
     //    _body = CGI();
-    LOG_ERROR("STARTS HERE");
+    LOG_SYS_ERROR("STARTS HERE");
     printAll();
-    LOG_ERROR("ENDS HERE");
+    LOG_SYS_ERROR("ENDS HERE");
 }
 
 void HttpResponse::printAll() const {

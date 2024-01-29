@@ -30,12 +30,12 @@ std::string fileValidate::getConfigFile(){
 
 void	fileValidate::validate_config_file(std::ifstream& file){
     if (is_dir(this->_config_file)) {
-        LOG_ERROR("config file is a directory");
+        LOG_SYS_ERROR("config file is a directory");
         exit (EXIT_FAILURE);
     }
 	file.open(this->_config_file.c_str());
 	if (!file.is_open()) {
-		LOG_ERROR("Error opening config file: " << this->_config_file);
+		LOG_SYS_ERROR("Error opening config file: " << this->_config_file);
 		file.close();
 		exit (EXIT_FAILURE);
 	}
@@ -50,7 +50,7 @@ void fileValidate::check_extension(std::string config_file){
 		extension = config_file.substr(pos + 1);
 	}
 	if (extension != "conf"){
-		LOG_ERROR("Config file extension is not .conf");
+		LOG_SYS_ERROR("Config file extension is not .conf");
 		exit (EXIT_FAILURE);
 	}
 }

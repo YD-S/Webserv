@@ -28,9 +28,9 @@
 
 // Log
 #if DEBUG <= 3
-    #define LOG_ERROR(msg) std::cerr << RED << "[ERROR] " << msg << ": " << errno << " " << strerror(errno) << RESET << std::endl
+    #define LOG_SYS_ERROR(msg) std::cerr << RED << "[ERROR] " << msg << ": " << errno << " " << strerror(errno) << RESET << std::endl
 #else
-    #define LOG_ERROR(msg)
+    #define LOG_SYS_ERROR(msg)
 #endif
 
 #if DEBUG <= 2

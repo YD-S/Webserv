@@ -49,7 +49,7 @@ void LocationConfig::setDirectoryListingEnabled(const std::string &boolean){
 	else if (boolean == "off")
 		this->_directoryListingEnabled = false;
 	else
-		LOG_ERROR("directoryListingEnabled has unkown bool type " + boolean);
+		LOG_SYS_ERROR("directoryListingEnabled has unkown bool type " + boolean);
 }
 
 void LocationConfig::setCgiEnabled(const std::string &boolean){
@@ -58,7 +58,7 @@ void LocationConfig::setCgiEnabled(const std::string &boolean){
 	else if (boolean == "off")
 		this->_cgiEnabled = false;
 	else
-		LOG_ERROR("cgiEnabled has unkown bool type " + boolean);
+		LOG_SYS_ERROR("cgiEnabled has unkown bool type " + boolean);
 }
 
 void LocationConfig::setUploadEnabled(const std::string &boolean){
@@ -67,7 +67,7 @@ void LocationConfig::setUploadEnabled(const std::string &boolean){
 	else if (boolean == "off")
 		this->_uploadEnabled = false;
 	else
-		LOG_ERROR("uploadEnabled has unkown bool type " + boolean);
+		LOG_SYS_ERROR("uploadEnabled has unkown bool type " + boolean);
 }
 
 void LocationConfig::setPath(const std::string &path) {

@@ -23,7 +23,7 @@ A simple web server written in C++.
     - `2`: Warning messages
     - `3`: Error messages
 
-- `LOG_ERROR`: Log error messages.
+- `LOG_SYS_ERROR`: Log error messages.
 - `LOG_WARNING`: Log warning messages.
 - `LOG_INFO`: Log info messages.
 - `LOG_DEBUG`: Log debug messages.

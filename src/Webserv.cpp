@@ -12,11 +12,10 @@ void Webserv::parseConfig(std::string path) {
     parse = ParseConfig(path);
 	parse.parseConfig();
 	if (parse.getServers().empty())
-			LOG_ERROR("NO SERVER >:(");
+			LOG_SYS_ERROR("NO SERVER >:(");
 	const std::vector<LocationConfig>& locations = (*(parse.getServers().begin())).getLocations();
 	if (locations.empty())
-			LOG_ERROR("NO LOCATIONS >:("); // TODO: even if there are no locations, we should still be able to serve files from the root
-//	parse.printAll();
+			LOG_SYS_ERROR("NO LOCATIONS >:("); // TODO: even if there are no locations, we should still be able to serve files from the root
 }
 
 void Webserv::run() {
@@ -66,7 +65,7 @@ HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const Se
 		return handleWithLocation(request, longestPrefixMatch);
 	}
     errno = ENOENT;
-    LOG_ERROR("No location found for path " << request->getPath());
+    LOG_SYS_ERROR("No location found for path " << request->getPath());
     HttpResponse *tmp = new HttpResponse();
     tmp
         ->setStatus(HttpStatus::IM_A_TEAPOT)
@@ -111,7 +110,7 @@ const ServerConfig *Webserv::getServerConfigByFd(int fd) {
         }
     }
     errno = 0;
-    LOG_ERROR("No server config found for fd " << fd);
+    LOG_SYS_ERROR("No server config found for fd " << fd);
     return NULL;
 }
 
