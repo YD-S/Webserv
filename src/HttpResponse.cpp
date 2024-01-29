@@ -28,24 +28,24 @@ HttpResponse::~HttpResponse() {
 
 }
 
-HttpResponse HttpResponse::setVersion(const std::string &_version) {
+HttpResponse *HttpResponse::setVersion(const std::string &_version) {
     this->_version = _version;
-    return *this;
+    return this;
 }
 
-HttpResponse HttpResponse::setStatus(int _status) {
+HttpResponse *HttpResponse::setStatus(int _status) {
     this->_status = _status;
-    return *this;
+    return this;
 }
 
-HttpResponse HttpResponse::setHeader(const std::string &key, const std::string &value) {
+HttpResponse *HttpResponse::setHeader(const std::string &key, const std::string &value) {
     this->_headers.insert(std::make_pair(key, value));
-    return *this;
+    return this;
 }
 
-HttpResponse HttpResponse::setBody(const std::string &_body) {
+HttpResponse *HttpResponse::setBody(const std::string &_body) {
     this->_body = _body;
-    return *this;
+    return this;
 }
 
 const std::string &HttpResponse::getVersion() const {

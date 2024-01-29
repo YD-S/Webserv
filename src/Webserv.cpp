@@ -57,9 +57,9 @@ HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const Se
     HttpResponse *tmp = new HttpResponse();
     tmp
         ->setStatus(HttpStatus::IM_A_TEAPOT)
-        .setHeader("Server", "webserv")
-        .setHeader("Content-Type", "text/html")
-        .setBody("<html><body><h1>I'm a teapot</h1></body></html>");
+        ->setHeader("Server", "webserv")
+        ->setHeader("Content-Type", "text/html")
+        ->setBody("<html><body><h1>I'm a teapot</h1></body></html>");
     return tmp;
 }
 
@@ -68,9 +68,9 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
     HttpResponse *response = new HttpResponse();
     response
             ->setStatus(HttpStatus::OK)
-            .setHeader("Server", "webserv")
-            .setHeader("Content-Type", "text/html")
-            .setBody("<html><body><h1>Hello, world!</h1><p>" + to_string(rand()) + "</p></body></html>");
+            ->setHeader("Server", "webserv")
+            ->setHeader("Content-Type", "text/html")
+            ->setBody("<html><body><h1>Hello, world!</h1><p>" + to_string(rand()) + "</p></body></html>");
     return response;
 }
 
