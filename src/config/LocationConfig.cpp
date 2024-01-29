@@ -189,3 +189,45 @@ bool LocationConfig::hasMethod(std::string method) const{
 	}
 	return false;
 }
+
+std::string LocationConfig::toString() {
+	std::string result = "";
+	result += "path: " + _path + "\n";
+	result += "root: " + _root + "\n";
+	result += "indexes: ";
+	for (std::vector<std::string>::const_iterator it = _indexes.begin(); it != _indexes.end(); ++it) {
+		result += *it + " ";
+	}
+	result += "\n";
+	result += "methods: ";
+	for (std::vector<std::string>::const_iterator it = _methods.begin(); it != _methods.end(); ++it) {
+		result += *it + " ";
+	}
+	result += "\n";
+	result += "directoryListingEnabled: " + to_string(_directoryListingEnabled) + "\n";
+	result += "directoryResponseFile: " + _directoryResponseFile + "\n";
+	result += "cgiEnabled: " + to_string(_cgiEnabled) + "\n";
+	result += "uploadEnabled: " + to_string(_uploadEnabled) + "\n";
+	result += "uploadPath: " + _uploadPath + "\n";
+	result += "cgi: ";
+	for (std::vector<std::pair<std::string, std::string> >::const_iterator it = _cgi.begin(); it != _cgi.end(); ++it) {
+		result += it->first + " " + it->second + " ";
+	}
+	result += "\n";
+	result += "errorPages: ";
+	for (std::vector<std::pair<int, std::string> >::const_iterator it = _errorPages.begin(); it != _errorPages.end(); ++it) {
+		result += to_string(it->first) + " " + it->second + " ";
+	}
+	result += "\n";
+	result += "clientMaxBodySize: " + to_string(_clientMaxBodySize) + "\n";
+	result += "redirect: " + _redirect + "\n";
+	return result;
+}
+
+std::string LocationConfig::getErrorPage(const int statusCode) {
+	for (std::vector<std::pair<int, std::string> >::const_iterator it = _errorPages.begin(); it != _errorPages.end(); ++it) {
+		if (it->first == statusCode)
+			return it->second;
+	}
+	return "";
+}

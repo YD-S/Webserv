@@ -32,7 +32,13 @@ public:
 
     const ServerConfig *getServerConfigByFd(int fd);
 
-	void setErrorResponse(HttpResponse *response, int statusCode);
+	void setErrorResponse(HttpResponse *response, int statusCode, LocationConfig *config);
+
+	bool checkRequestMethod(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
+
+	void setDefaultResponse(HttpResponse *response, LocationConfig *config);
+
+	HttpResponse *generateAutoIndex(const HttpRequest *request, const LocationConfig *config);
 };
 
 

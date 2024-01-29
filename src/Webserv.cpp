@@ -72,23 +72,41 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
     LOG_DEBUG("Handling request with location " << config->getPath());
     HttpResponse *response = new HttpResponse();
 
-	const std::vector<std::string>& methods = config->getMethods();
-	if (!methods.empty()) {
-		bool methodFound = false;
-		for (std::vector<std::string>::const_iterator it = methods.begin(); it != methods.end(); ++it) {
-			if (*it == request->getMethod()) {
-				methodFound = true;
-				break;
-			}
-		}
-		if (!methodFound) {
-			LOG_ERROR("Method " << request->getMethod() << " not allowed");
-			setErrorResponse(response, HttpStatus::METHOD_NOT_ALLOWED);
-			return response;
-		}
+	if (!checkRequestMethod(request, config, response))
+		return response;
+
+	if (!config->getRedirect().empty()) {
+		LOG_DEBUG("Redirect enabled");
 	}
 
-    return response;
+	if ((request->getMethod() == "GET" || request->getMethod() == "POST") && config->isCgiEnabled()) {
+		LOG_DEBUG("Running CGI");
+	}
+
+	if (request->getMethod() == "POST" && config->isUploadEnabled()) {
+		LOG_DEBUG("Upload enabled");
+	}
+
+	if (request->getMethod() == "GET" && config->isAutoIndexEnabled() && request->getPath().at(request->getPath().length() - 1) == '/'){
+		LOG_DEBUG("Autoindex enabled");
+		return generateAutoIndex(request, config);
+	}
+
+	setDefaultResponse(response, const_cast<LocationConfig *>(config));
+
+	return response;
+}
+
+bool Webserv::checkRequestMethod(const HttpRequest *request, const LocationConfig *config, HttpResponse *response) {
+	const std::vector<std::string>& methods = config->getMethods();
+	if (!methods.empty()) {
+		if (!config->hasMethod(request->getMethod())) {
+			LOG_ERROR("Method " << request->getMethod() << " not allowed");
+			setErrorResponse(response, HttpStatus::METHOD_NOT_ALLOWED, const_cast<LocationConfig *>(config));
+			return false;
+		}
+	}
+	return true;
 }
 
 Webserv::Webserv(const Webserv &other) {
@@ -119,11 +137,78 @@ const ServerConfig *Webserv::getServerConfigByFd(int fd) {
     return NULL;
 }
 
-void Webserv::setErrorResponse(HttpResponse *response, const int statusCode) {
+void Webserv::setErrorResponse(HttpResponse *response, const int statusCode, LocationConfig *config) {
+	std::string body = "<html><body><h1>" + to_string(statusCode) + " " + std::string(HttpStatus::getReasonString(statusCode)) + "</h1></body></html>";
+	if (!config->getErrorPage(statusCode).empty()) {
+		LOG_DEBUG("Error page found for status code " << statusCode);
+		std::string errorPagePath = config->getErrorPage(statusCode);
+		std::ifstream errorPageFile(errorPagePath.c_str());
+		if (errorPageFile) {
+			body.clear();
+			while (errorPageFile.good()) {
+				std::string line;
+				std::getline(errorPageFile, line);
+				body += line;
+			}
+			errorPageFile.close();
+		} else {
+			LOG_SYS_ERROR("Error opening error page file " << errorPagePath);
+		}
+	}
 	response
 		->setStatus(statusCode)
 		->setHeader("Server", "webserv")
 		->setHeader("Content-Type", "text/html")
-		->setBody("<html><body><h1>" + to_string(statusCode) + " " + std::string(HttpStatus::getReasonString(statusCode)) + "</h1></body></html>");
+		->setBody(body);
+}
+
+void Webserv::setDefaultResponse(HttpResponse *response, LocationConfig *config) {
+
+	std::string locationString = config->toString();
+
+	std::string body = "<html><body><h1>Default response</h1>";
+
+	body += "<h2>Random number (refresh test)</h2>";
+	body += "<pre>" + to_string(rand()) + "</pre>";
+
+	body += "<h2>Location</h2>";
+	body += "<pre>" + locationString + "</pre>";
+
+	body += "</body></html>";
+
+	response
+		->setStatus(HttpStatus::OK)
+		->setHeader("Server", "webserv")
+		->setHeader("Content-Type", "text/html")
+		->setBody(body);
+}
+
+HttpResponse *Webserv::generateAutoIndex(const HttpRequest *request, const LocationConfig *config) {
+	HttpResponse *response = new HttpResponse();
+	response
+		->setStatus(HttpStatus::OK)
+		->setHeader("Server", "webserv")
+		->setHeader("Content-Type", "text/html");
+
+	std::string body = "<html><body><h1>Index of " + request->getPath() + "</h1>";
+
+	std::string path = config->getRoot() + request->getPath();
+	DIR *dir = opendir(path.c_str());
+	if (dir == NULL) {
+		LOG_SYS_ERROR("Error opening directory " << path);
+		setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
+		return response;
+	}
+
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != NULL) {
+		body += "<a href=\"" + request->getPath() + entry->d_name + "\">" + entry->d_name + "</a><br>";
+	}
+
+	body += "</body></html>";
+
+	response->setBody(body);
+
+	return response;
 }
 

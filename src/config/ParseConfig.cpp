@@ -291,7 +291,7 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 		else if (it->first == "cgi")
 		{
 			if (it->second.size() != 2){
-				LOG_SYS_ERROR("Cgi syntax error. Needs 2 arguments: extension, path");
+				LOG_ERROR("Cgi syntax error. Needs 2 arguments: extension, path");
 				exit(1);
 			}
 			std::vector <std::string>::iterator iter = it->second.begin();
@@ -327,13 +327,13 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 		{
 			int code = 0;
 			if (it->second.size() != 2){
-				LOG_SYS_ERROR("error_page syntax error. Needs 2 arguments: extension, path");
+				LOG_ERROR("error_page syntax error. Needs 2 arguments: extension, path");
 				exit(1);
 			}
 			std::vector <std::string>::iterator iter = it->second.begin();
 			try {
 				code = ft_stoi(*iter);
-			} catch (std::exception &e) { LOG_SYS_ERROR("Error code not valid!"); exit(1); }
+			} catch (std::exception &e) { LOG_ERROR("Error code not valid!"); exit(1); }
 			iter = it->second.erase(iter);
 			location.addErrorPage(code, *iter);
 		}
@@ -343,7 +343,7 @@ void    ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vect
 			std::vector <std::string>::iterator iter = it->second.begin();
 			try {
 				size = ft_stoul(*iter);
-			} catch (std::exception &e) { LOG_SYS_ERROR("Max body size not valid!"); exit(1); }
+			} catch (std::exception &e) { LOG_ERROR("Max body size not valid!"); exit(1); }
 			location.setClientMaxBodySize(size);
 			iter = it->second.erase(iter);
 			if (!it->second.empty())
@@ -361,16 +361,16 @@ void ParseConfig::separateHostPort(ServerConfig &server, const std::string& inpu
 
     if (colonPos != std::string::npos) {
 		if (input.substr(0, colonPos).empty()){
-			LOG_SYS_ERROR("host not specified!");
+			LOG_ERROR("host not specified!");
 			exit(1);
 		}
 		if (input.substr(colonPos + 1).empty()){
-			LOG_SYS_ERROR("port not specified!");
+			LOG_ERROR("port not specified!");
 			exit(1);
 		}
         server.setHostPort(input.substr(0, colonPos), ft_stoi(input.substr(colonPos + 1)));
     } else {
-        LOG_SYS_ERROR("listen syntax error!");
+        LOG_ERROR("listen syntax error!");
 		exit(1);
     }
 }
@@ -465,7 +465,7 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 		else if (it->first == "cgi")
 		{
 			if (it->second.size() != 2){
-				LOG_SYS_ERROR("Cgi syntax error. Needs 2 arguments: extension, path");
+				LOG_ERROR("Cgi syntax error. Needs 2 arguments: extension, path");
 				exit(1);
 			}
 			std::vector <std::string>::iterator iter = it->second.begin();
@@ -501,13 +501,13 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 		{
 			int code = 0;
 			if (it->second.size() != 2){
-				LOG_SYS_ERROR("error_page syntax error. Needs 2 arguments: extension, path");
+				LOG_ERROR("error_page syntax error. Needs 2 arguments: extension, path");
 				exit(1);
 			}
 			std::vector <std::string>::iterator iter = it->second.begin();
 			try {
 				code = ft_stoi(*iter);
-			} catch (std::exception &e) { LOG_SYS_ERROR("Error code not valid!"); exit(1); }
+			} catch (std::exception &e) { LOG_ERROR("Error code not valid!"); exit(1); }
 			iter = it->second.erase(iter);
 			defaultLocation.addErrorPage(code, *iter);
 		}
@@ -517,7 +517,7 @@ void    ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector <
 			std::vector <std::string>::iterator iter = it->second.begin();
 			try {
 				size = ft_stoul(*iter);
-			} catch (std::exception &e) { LOG_SYS_ERROR("Max body size not valid!"); exit(1); }
+			} catch (std::exception &e) { LOG_ERROR("Max body size not valid!"); exit(1); }
 			defaultLocation.setClientMaxBodySize(size);
 			iter = it->second.erase(iter);
 			if (!it->second.empty())

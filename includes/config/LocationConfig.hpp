@@ -106,6 +106,10 @@ public:
     void clearIndex();
 
     bool hasMethod(std::string method) const;
+
+	std::string toString();
+
+	std::string getErrorPage(const int statusCode);
 };
 
 
