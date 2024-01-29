@@ -153,6 +153,7 @@ void Webserv::setErrorResponse(HttpResponse *response, const int statusCode, Loc
 			errorPageFile.close();
 		} else {
 			LOG_SYS_ERROR("Error opening error page file " << errorPagePath);
+			LOG_WARNING("Using default error page");
 		}
 	}
 	response
