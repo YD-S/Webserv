@@ -119,5 +119,5 @@ void exit_handler(int status) {
 		close(serverSockets[i].first);
 		LOG_DEBUG("Socket " << serverSockets[i].first << " closed");
 	}
-	exit_handler(status);
+	exit(status);
 }
