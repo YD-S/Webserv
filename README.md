@@ -59,8 +59,8 @@ Here is an example:
 
 ```cpp
 ServerConfig config = ServerConfig()
-        .addListen(8080) // listen <port>
-        .addListen("localhost", 8081) // listen <host>:<port>
+        .addListen(8080) // listen <_port>
+        .addListen("localhost", 8081) // listen <host>:<_port>
         .setServerName("localhost") // server_name
         .setDefaultLocation(LocationConfig() // server level location config
                 .addIndex("index.html") // index
@@ -96,7 +96,7 @@ ServerConfig config = ServerConfig()
 
 ### Request builder
 
-The request class can be built using a builder pattern.
+The _request class can be built using a builder pattern.
 Here is an example:
 
 ```cpp

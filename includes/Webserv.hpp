@@ -21,19 +21,19 @@ private:
 
 	HttpResponse *handleWithLocation(const HttpRequest *request, const LocationConfig *config);
 
-	const ServerConfig *getServerConfigByFd(int fd);
+	static const ServerConfig *getServerConfigByFd(int fd);
 
-	void setErrorResponse(HttpResponse *response, const int statusCode, LocationConfig *config);
+	static void setErrorResponse(HttpResponse *response, const int statusCode, LocationConfig *config);
 
 	bool checkRequestMethod(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 
-	void setDefaultResponse(HttpResponse *response, LocationConfig *config);
+	static void setDefaultResponse(HttpResponse *response, LocationConfig *config);
 
 	HttpResponse *generateAutoIndex(const HttpRequest *request, const LocationConfig *config);
 
 	HttpResponse *getFile(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 
-	std::string getDirPath(const HttpRequest *request, const LocationConfig *config) const;
+	static std::string getDirPath(const HttpRequest *request, const LocationConfig *config) ;
 
 public:
 	Webserv();
@@ -46,7 +46,7 @@ public:
 
 	void run();
 
-	void parseConfig(std::string path);
+	void parseConfig(const std::string& path);
 
 	HttpResponse * getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 };

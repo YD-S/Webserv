@@ -17,11 +17,11 @@
 
 class Client {
 private:
-	std::string port;
-	std::string request;
-	int ip;
-	int fd;
-	struct sockaddr_in addr;
+	std::string _port;
+	std::string _request;
+	int _ip;
+	int _fd;
+	struct sockaddr_in _addr;
 	Client();
 
 public:

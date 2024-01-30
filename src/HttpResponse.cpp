@@ -28,13 +28,13 @@ HttpResponse::~HttpResponse() {
 
 }
 
-HttpResponse *HttpResponse::setVersion(const std::string &_version) {
-    this->_version = _version;
+HttpResponse *HttpResponse::setVersion(const std::string &version) {
+    this->_version = version;
     return this;
 }
 
-HttpResponse *HttpResponse::setStatus(int _status) {
-    this->_status = _status;
+HttpResponse *HttpResponse::setStatus(int status) {
+    this->_status = status;
     return this;
 }
 
@@ -138,10 +138,10 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
 				if (combinedPath.size() == 1)
 					return 200; // Assuming this is the intended behavior for path size 1
 
-				int _status = fileExists(combinedPath);
-				if (_status == 1)
+				int status = fileExists(combinedPath);
+				if (status == 1)
 					return 200;
-				else if (!_status)
+				else if (!status)
 					return 404;
 				else
 					return 403;

@@ -108,8 +108,8 @@ void PollManager::poller() {
             char buffer[BUFFER_SIZE] = {0};
             int readValue = 0;
             do {
-                for (int i = 0; i < BUFFER_SIZE; i++)
-                    buffer[i] = 0;
+                for (int j = 0; j < BUFFER_SIZE; j++)
+                    buffer[j] = 0;
                 readValue = read(clientSocket, buffer, BUFFER_SIZE);
                 if (readValue < 0) {
                     LOG_SYS_ERROR("Read failed");

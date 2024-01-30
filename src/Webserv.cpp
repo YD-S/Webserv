@@ -9,7 +9,7 @@ Webserv::Webserv() {
 	LOG_INFO("Webserv created");
 }
 
-void Webserv::parseConfig(std::string path) {
+void Webserv::parseConfig(const std::string& path) {
 	parse = ParseConfig(path);
 	parse.parseConfig();
 	if (parse.getServers().empty())
@@ -273,7 +273,7 @@ HttpResponse *Webserv::generateAutoIndex(const HttpRequest *request, const Locat
 	return response;
 }
 
-std::string Webserv::getDirPath(const HttpRequest *request, const LocationConfig *config) const {
+std::string Webserv::getDirPath(const HttpRequest *request, const LocationConfig *config) {
 	std::string rootPath = config->getRoot();
 	if (rootPath.at(rootPath.length() - 1) != '/')
 		rootPath += "/";
