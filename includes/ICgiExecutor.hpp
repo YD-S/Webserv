@@ -18,12 +18,14 @@ private:
 protected:
 	std::string _cgiResult;
 
+	const LocationConfig *_config;
+
 	char **envp;
 
 public:
 	ICgiExecutor();
 
-	ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp);
+	ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp, const LocationConfig *location);
 
 	virtual ~ICgiExecutor() = 0;
 
@@ -34,6 +36,7 @@ public:
 	const std::string &getCgiName() const;
 
 	void setCgiName(const std::string &cgiName);
+
 
 #if DEBUG == 0
 
@@ -47,6 +50,8 @@ public:
 	 * @param response HttpResponse object reference to be filled with CGI response
 	 */
 	virtual void executeCgi(HttpRequest *request, std::string *response, std::string scriptPath) = 0;
+
+
 };
 
 

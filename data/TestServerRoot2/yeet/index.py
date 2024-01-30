@@ -17,7 +17,5 @@ res = [statusLine,
     body
 ]
 response = CRLF.join(res) + CRLF + CRLF
-with open(f"{os.path.dirname(__file__)}/output.txt", "w") as f:
-    f.write(response)
 
 print(response, end="")

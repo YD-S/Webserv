@@ -10,6 +10,7 @@
 #include "macros.h"
 #include "utils.hpp"
 #include "../../includes/cgi/BinCgiExecutor.hpp"
+#include "Webserv.hpp"
 
 
 void BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std::string scriptPath) {
@@ -92,9 +93,12 @@ char **BinCgiExecutor::buildEnvp(HttpRequest *request) {
 	std::vector<std::string> envp_vector = std::vector<std::string>();
 	envp_vector.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	envp_vector.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	envp_vector.push_back("SERVER_SOFTWARE=Webserv/1.0");
+	envp_vector.push_back("SERVER_NAME=" + request->getHeaders().at("Host"));
 	envp_vector.push_back("REDIRECT_STATUS=200");
 	envp_vector.push_back("REQUEST_METHOD=" + request->getMethod());
-	envp_vector.push_back("SCRIPT_FILENAME=" + request->getPath());
+	envp_vector.push_back("SCRIPT_NAME=" + request->getPath());
+	envp_vector.push_back("PATH_TRANSLATED=" + Webserv::getDirPath(request, _config));
 	envp_vector.push_back("BODY=" + request->getBody());
 
 	// Other environment variables
@@ -164,9 +168,9 @@ char **BinCgiExecutor::buildArgs(HttpRequest *request, const std::string& script
 BinCgiExecutor::~BinCgiExecutor() {
 }
 
-BinCgiExecutor::BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp) : ICgiExecutor(
+BinCgiExecutor::BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp, const LocationConfig *config) : ICgiExecutor(
 		cgiPath,
-		cgiName, envp) {
+		cgiName, envp, config) {
 
 }
 

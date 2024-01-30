@@ -34,7 +34,7 @@ void Webserv::run(char **envp) {
 					 it3 != cgis.end(); ++it3) {
 					std::string extension = it3->first;
 					std::string path = it3->second;
-					ICgiExecutor *cgiExecutor = new BinCgiExecutor(path, extension, envp);
+					ICgiExecutor *cgiExecutor = new BinCgiExecutor(path, extension, envp, &(*it2));
 					cgiExecutors[extension] = cgiExecutor;
 				}
 			}

@@ -44,6 +44,14 @@ HttpRequest *HttpRequest::setVersion(const std::string &version) {
 }
 
 HttpRequest *HttpRequest::setHeader(const std::string &key, const std::string &value) {
+	// format the header key to be capitalized and separated by dashes
+	std::string formattedKey;
+	for (std::string::const_iterator it = key.begin(); it != key.end(); ++it) {
+		if (it == key.begin() || *(it - 1) == '-')
+			formattedKey += (char)toupper(*it);
+		else
+			formattedKey += *it;
+	}
 	_headers.insert(std::make_pair(key, value));
 	return this;
 }

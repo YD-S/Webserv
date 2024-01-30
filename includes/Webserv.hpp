@@ -36,8 +36,6 @@ private:
 
 	HttpResponse *getFile(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 
-	static std::string getDirPath(const HttpRequest *request, const LocationConfig *config);
-
 public:
 	Webserv();
 
@@ -54,6 +52,8 @@ public:
 	HttpResponse *getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 
 	HttpResponse *handleWithCGI(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
+
+	static std::string getDirPath(const HttpRequest *request, const LocationConfig *config);
 };
 
 

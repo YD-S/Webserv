@@ -4,7 +4,7 @@
 
 #include "ICgiExecutor.hpp"
 
-ICgiExecutor::ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp) {
+ICgiExecutor::ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp, const LocationConfig *config) : _config(config) {
 	this->_cgiPath = cgiPath;
 	this->_cgiName = cgiName;
 	this->envp = envp;
