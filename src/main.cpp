@@ -7,14 +7,8 @@
 std::vector<std::pair<int, const ServerConfig *> > serverSockets;
 std::vector<Client> clients;
 
-void ft_handle_sigint(int signal) {
-	(void) signal;
-	LOG_INFO("Stopping webserv...");
-	for (unsigned long i = 0; i < serverSockets.size(); i++) {
-		close(serverSockets[i].first);
-		LOG_INFO("Socket " << serverSockets[i].first << " closed");
-	}
-	exit(0);
+void ft_handle_sigint(unused int signal) {
+	exit_handler();
 }
 
 int main(int argc, char *argv[], char **envp) {

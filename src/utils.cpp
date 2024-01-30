@@ -1,6 +1,7 @@
 #include <fstream>
 #include <vector>
 #include "utils.hpp"
+#include "PollManager/PollManager.hpp"
 
 
 bool is_dir(const std::string &path) {
@@ -54,7 +55,7 @@ size_t ft_stoul(const std::string &str) {
 
 void ft_error(const std::string &msg, int errorCode) {
 	LOG_SYS_ERROR(msg);
-	exit(errorCode);
+	exit_handler(errorCode);
 }
 
 std::string ft_socket_to_string(struct sockaddr_in addr) {
@@ -110,4 +111,13 @@ std::string trim(const std::string &str) {
 	}
 	std::string::size_type last = str.find_last_not_of(' ');
 	return str.substr(first, (last - first + 1));
+}
+
+void exit_handler(int status) {
+	LOG_INFO("Stopping webserv...");
+	for (unsigned long i = 0; i < serverSockets.size(); i++) {
+		close(serverSockets[i].first);
+		LOG_DEBUG("Socket " << serverSockets[i].first << " closed");
+	}
+	exit_handler(status);
 }
