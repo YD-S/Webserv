@@ -271,7 +271,7 @@ void ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vector<
 			iter = it->second.erase(iter);
 			if (!it->second.empty())
 				LOG_WARNING("directory_response_file has more than one value. Setting only the first one.");
-		} else if (it->first == "cgiEnabled") {
+		} else if (it->first == "cgi_enabled") {
 			std::vector<std::string>::iterator iter = it->second.begin();
 			location.setCgiEnabled(*iter);
 			iter = it->second.erase(iter);
@@ -424,7 +424,7 @@ void ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector<std:
 			iter = it->second.erase(iter);
 			if (!it->second.empty())
 				LOG_WARNING("directory_response_file has more than one value. Setting only the first one.");
-		} else if (it->first == "cgiEnabled") {
+		} else if (it->first == "cgi_enabled") {
 			std::vector<std::string>::iterator iter = it->second.begin();
 			defaultLocation.setCgiEnabled(*iter);
 			iter = it->second.erase(iter);
