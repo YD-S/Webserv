@@ -9,15 +9,11 @@ Webserv::Webserv() {
 	LOG_INFO("Webserv created");
 }
 
-void Webserv::parseConfig(std::string path) {
+void Webserv::parseConfig(const std::string& path) {
 	parse = ParseConfig(path);
 	parse.parseConfig();
 	if (parse.getServers().empty())
-		LOG_SYS_ERROR("NO SERVER >:(");
-	const std::vector<LocationConfig> &locations = (*(parse.getServers().begin())).getLocations();
-	if (locations.empty())
-		LOG_SYS_ERROR(
-				"NO LOCATIONS >:("); // TODO: even if there are no locations, we should still be able to serve files from the root
+		LOG_SYS_ERROR("NO SERVER :(\t");
 }
 
 void Webserv::run() {
@@ -25,6 +21,18 @@ void Webserv::run() {
 	pollManager.binder(parse.getServers());
 	std::vector<std::pair<HttpResponse *, Client> > responses;
 	std::vector<std::pair<HttpRequest *, Client> > requests;
+//
+//	std::string teststr =	"HTTP/1.1 200 NOT FOUND\r\n"
+//							 "Content-Type: text/html\r\n"
+//							 "Server: ExampleServer\r\n"
+//							 "Date: Sun, 30 Jan 2024 12:00:00 GMT\r\n"
+//							 "\r\n"
+//							 "<html>\n<body>\n<h1>Hello, World!</h1>\n<p>This is a sample HTTP response.</p>\n</body>\n</html>";
+//
+//
+//	HttpResponse *testresponse = new HttpResponse();
+//	testresponse->StringToResponse(teststr);
+//	testresponse->printAll();
 
 	while (1) {
 		pollManager.poller();
@@ -261,7 +269,7 @@ HttpResponse *Webserv::generateAutoIndex(const HttpRequest *request, const Locat
 	return response;
 }
 
-std::string Webserv::getDirPath(const HttpRequest *request, const LocationConfig *config) const {
+std::string Webserv::getDirPath(const HttpRequest *request, const LocationConfig *config) {
 	std::string rootPath = config->getRoot();
 	if (rootPath.at(rootPath.length() - 1) != '/')
 		rootPath += "/";
@@ -302,7 +310,7 @@ HttpResponse *Webserv::getFile(const HttpRequest *request, const LocationConfig 
 					file.get(c);
 					binaryData.push_back(c);
 				}
-				response->setBody(binaryData);
+				//response->setBody(binaryData);
 			}
 			file.close();
 		}

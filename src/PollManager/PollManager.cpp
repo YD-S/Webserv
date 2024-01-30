@@ -108,8 +108,8 @@ void PollManager::poller() {
             char buffer[BUFFER_SIZE] = {0};
             int readValue = 0;
             do {
-                for (int i = 0; i < BUFFER_SIZE; i++)
-                    buffer[i] = 0;
+                for (int j = 0; j < BUFFER_SIZE; j++)
+                    buffer[j] = 0;
                 readValue = read(clientSocket, buffer, BUFFER_SIZE);
                 if (readValue < 0) {
                     LOG_SYS_ERROR("Read failed");
@@ -123,6 +123,13 @@ void PollManager::poller() {
             request->setFd(serverSockets[i].first);
 			request->parse(requestString);
 			_requests.push_back(std::make_pair(request, client));
+
+			std::string testresponsestring = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>It works!</h1></body></html>\r\n";
+
+			HttpResponse *testresponse = new HttpResponse();
+			testresponse->StringToResponse(testresponsestring);
+			testresponse->printAll();
+
             LOG_DEBUG("Request received from socket " << clientSocket);
 		}
 	}

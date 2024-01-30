@@ -79,6 +79,8 @@ public:
 
     void setFd(int fd);
 
+	static std::string trim(const std::string& str);
+
 };
 
 
