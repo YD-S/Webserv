@@ -33,19 +33,19 @@ public:
     HttpRequest& operator=(const HttpRequest& other);
     ~HttpRequest();
 
-    HttpRequest parse(std::string request);
+    HttpRequest *parse(std::string request);
 
-    HttpRequest setMethod(const std::string &method);
+    HttpRequest *setMethod(const std::string &method);
 
-    HttpRequest setPath(const std::string &path);
+    HttpRequest *setPath(const std::string &path);
 
-    HttpRequest setVersion(const std::string &versionM);
+    HttpRequest *setVersion(const std::string &versionM);
 
-    HttpRequest addHeader(const std::string &key, const std::string &value);
+    HttpRequest *addHeader(const std::string &key, const std::string &value);
 
-    HttpRequest addParam(const std::string &key, const std::string &value);
+    HttpRequest *addParam(const std::string &key, const std::string &value);
 
-    const HttpRequest &setBody(const std::string &body);
+    const HttpRequest *setBody(const std::string &body);
 
     const std::string &getMethod() const;
 

@@ -52,7 +52,7 @@ size_t ft_stoul(const std::string& str) {
 
 void    ft_error(std::string msg, int errorCode)
 {
-	LOG_ERROR(msg);
+	LOG_SYS_ERROR(msg);
 	exit(errorCode);
 }
 

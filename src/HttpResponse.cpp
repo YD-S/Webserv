@@ -28,24 +28,24 @@ HttpResponse::~HttpResponse() {
 
 }
 
-HttpResponse HttpResponse::setVersion(const std::string &_version) {
+HttpResponse *HttpResponse::setVersion(const std::string &_version) {
     this->_version = _version;
-    return *this;
+    return this;
 }
 
-HttpResponse HttpResponse::setStatus(int _status) {
+HttpResponse *HttpResponse::setStatus(int _status) {
     this->_status = _status;
-    return *this;
+    return this;
 }
 
-HttpResponse HttpResponse::setHeader(const std::string &key, const std::string &value) {
+HttpResponse *HttpResponse::setHeader(const std::string &key, const std::string &value) {
     this->_headers.insert(std::make_pair(key, value));
-    return *this;
+    return this;
 }
 
-HttpResponse HttpResponse::setBody(const std::string &_body) {
+HttpResponse *HttpResponse::setBody(const std::string &_body) {
     this->_body = _body;
-    return *this;
+    return this;
 }
 
 const std::string &HttpResponse::getVersion() const {
@@ -125,10 +125,10 @@ int HttpResponse::findStatus(HttpRequest &request, ServerConfig &config){
     if (request.getMethod() == "GET"){
         for (std::vector<LocationConfig>::const_iterator it = config.getLocations().begin(); it != config.getLocations().end(); ++it){
 			std::string combinedPath = (it)->getRoot() + request.getPath();
-			LOG_ERROR(combinedPath);
+			LOG_SYS_ERROR(combinedPath);
 				if (combinedPath.at(combinedPath.length() - 1) == '/')
 					combinedPath = combinedPath.substr(1);
-			// LOG_ERROR(combinedPath);
+			// LOG_SYS_ERROR(combinedPath);
 				// if (startsWith((it).getRoot(), request.getPath())){
 				if (!(*it).hasMethod("GET"))
 					return 401;
@@ -192,16 +192,16 @@ bool    HttpResponse::isCGI(std::string &path){
 }
 
 void    HttpResponse::build(HttpRequest &request, ServerConfig &server){ // Need CGI, ContentType header.
-    LOG_ERROR("STARTS HERE");
+    LOG_SYS_ERROR("STARTS HERE");
     request.printHttpRequest();
-    LOG_ERROR("ENDS HERE");
+    LOG_SYS_ERROR("ENDS HERE");
     setVersion("HTTP/1.1");
     setStatus(findStatus(request, server));
     //if (isCGI(request.getPath()))
     //    _body = CGI();
-    LOG_ERROR("STARTS HERE");
+    LOG_SYS_ERROR("STARTS HERE");
     printAll();
-    LOG_ERROR("ENDS HERE");
+    LOG_SYS_ERROR("ENDS HERE");
 }
 
 void HttpResponse::printAll() const {

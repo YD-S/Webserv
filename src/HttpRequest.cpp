@@ -26,32 +26,31 @@ HttpRequest &HttpRequest::operator=(const HttpRequest &other) {
 }
 
 HttpRequest::~HttpRequest() {
-	LOG_ERROR("HttpRequest destroyed");
 }
 
-HttpRequest HttpRequest::setMethod(const std::string &method) {
+HttpRequest *HttpRequest::setMethod(const std::string &method) {
     this->_method = method;
-    return *this;
+    return this;
 }
 
-HttpRequest HttpRequest::setPath(const std::string &path) {
+HttpRequest *HttpRequest::setPath(const std::string &path) {
     this->_path = path;
-    return *this;
+    return this;
 }
 
-HttpRequest HttpRequest::setVersion(const std::string &version) {
+HttpRequest *HttpRequest::setVersion(const std::string &version) {
     this->_version = version;
-    return *this;
+    return this;
 }
 
-HttpRequest HttpRequest::addHeader(const std::string &key, const std::string &value) {
+HttpRequest *HttpRequest::addHeader(const std::string &key, const std::string &value) {
     _headers.insert(std::make_pair(key, value));
-    return *this;
+    return this;
 }
 
-const HttpRequest &HttpRequest::setBody(const std::string &_body) {
+const HttpRequest *HttpRequest::setBody(const std::string &_body) {
     this->_body = _body;
-    return *this;
+    return this;
 }
 
 const std::string &HttpRequest::getMethod() const {
@@ -104,9 +103,9 @@ const std::map<std::string, std::string> &HttpRequest::getParams() const {
     return _params;
 }
 
-HttpRequest HttpRequest::addParam(const std::string &key, const std::string &value) {
+HttpRequest *HttpRequest::addParam(const std::string &key, const std::string &value) {
     _params.insert(std::make_pair(key, value));
-    return *this;
+    return this;
 }
 
 const std::string &HttpRequest::getHeader(const std::string &key) const {
@@ -199,7 +198,7 @@ void HttpRequest::printHttpRequest() const {
         std::cout << "Body: " << _body << std::endl;
     }
 
-HttpRequest HttpRequest::parse(std::string request){
+HttpRequest *HttpRequest::parse(std::string request){
     std::istringstream stream(request);
     std::string line;
 
@@ -223,8 +222,6 @@ HttpRequest HttpRequest::parse(std::string request){
             std::string value = trim(line.substr(colonPos + 1));
 
             this->addHeader(header, value);
-            // Print the parsed header and value
-//            std::cout << "Header: '" << header << "', Value: '" << value << "'" << std::endl;
         } else {
             if (_method == "POST")
                 parsePostParams(stream);
@@ -234,8 +231,7 @@ HttpRequest HttpRequest::parse(std::string request){
                 ft_error("Unkown method!", 1);
         }
     }
-//    printHttpRequest();
-    return *this;
+    return this;
 }
 
 int HttpRequest::getFd() const {

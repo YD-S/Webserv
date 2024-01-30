@@ -16,6 +16,7 @@
 class LocationConfig {
 
 private:
+
     std::string _path;
     std::string _root;
     std::vector<std::string> _indexes;
@@ -42,6 +43,8 @@ public:
     LocationConfig(const LocationConfig& other);
     LocationConfig& operator=(const LocationConfig& other);
     ~LocationConfig();
+
+	void setDefaultConfig(LocationConfig *defaultLocation);
 
     void addIndex(const std::string& index);
 
@@ -73,7 +76,7 @@ public:
 
     void addErrorPage(const int &code, const std::string &path);
 
-    void setClientMaxBodySize(const size_t size);
+    void setClientMaxBodySize(size_t size);
 
     void setRedirect(const std::string &redirect);
 
@@ -106,6 +109,10 @@ public:
     void clearIndex();
 
     bool hasMethod(std::string method) const;
+
+	std::string toString();
+
+	std::string getErrorPage(int statusCode);
 };
 
 

@@ -143,7 +143,7 @@ void    ParseConfig::parseConfig() {
 		ft_error("No servers declared!", 1);
 	for (; it != _servers.end(); ++it)
 	{
-		if ((*it).getDefaultLocation().getRoot().empty())
+		if ((*it).getDefaultLocation()->getRoot().empty())
 			ft_error("No default root declared!", 1);
 		else if ((*it).getListen().empty())
 			ft_error("No default listen declared!", 1);
@@ -604,9 +604,9 @@ void ParseConfig::printAll()
 		std::cout << std::endl;
 
         // Print Default Location
-        const LocationConfig& defaultLocation = server.getDefaultLocation();
+        const LocationConfig *defaultLocation = server.getDefaultLocation();
         std::cout << "Default Location:" << std::endl;
-		printLocation(defaultLocation);
+		printLocation(*defaultLocation);
 
         // Print Locations
         const std::vector<LocationConfig>& locations = server.getLocations();

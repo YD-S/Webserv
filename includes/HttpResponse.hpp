@@ -30,13 +30,13 @@ public:
     HttpResponse& operator=(const HttpResponse& other);
     ~HttpResponse();
 
-    HttpResponse setVersion(const std::string &version);
+    HttpResponse *setVersion(const std::string &version);
 
-    HttpResponse setStatus(int status);
+    HttpResponse *setStatus(int status);
 
-    HttpResponse setHeader(const std::string& key, const std::string& value);
+    HttpResponse *setHeader(const std::string& key, const std::string& value);
 
-    HttpResponse setBody(const std::string &body);
+    HttpResponse *setBody(const std::string &body);
 
     const std::string &getVersion() const;
 

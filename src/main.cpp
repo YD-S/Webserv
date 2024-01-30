@@ -19,6 +19,7 @@ void ft_handle_sigint(int signal) {
 
 int main(int argc, char *argv[]) {
     signal(SIGINT, ft_handle_sigint);
+    signal(SIGTERM, ft_handle_sigint);
     Webserv webserv;
     LOG_INFO("Starting webserv...");
 	if (argc == 1)

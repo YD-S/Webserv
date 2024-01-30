@@ -26,11 +26,19 @@ public:
 
     void parseConfig(std::string path);
 
-    const HttpResponse handleRequest(const HttpRequest *request, const ServerConfig *config);
+    HttpResponse * handleRequest(const HttpRequest *request, const ServerConfig *config);
 
-    const HttpResponse handleWithLocation(const HttpRequest *request, const LocationConfig *config);
+    HttpResponse * handleWithLocation(const HttpRequest *request, const LocationConfig *config);
 
     const ServerConfig *getServerConfigByFd(int fd);
+
+	void setErrorResponse(HttpResponse *response, int statusCode, LocationConfig *config);
+
+	bool checkRequestMethod(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
+
+	void setDefaultResponse(HttpResponse *response, LocationConfig *config);
+
+	HttpResponse *generateAutoIndex(const HttpRequest *request, const LocationConfig *config);
 };
 
 

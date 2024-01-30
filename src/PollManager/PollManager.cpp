@@ -4,12 +4,10 @@
 
 #include "PollManager/PollManager.hpp"
 
-PollManager::PollManager() {
-	LOG_WARNING("PollManager created");
+PollManager::PollManager() : clientSocket(), clientData() {
 }
 
 PollManager::~PollManager() {
-	LOG_WARNING("PollManager destroyed");
 }
 
 PollManager::PollManager(const PollManager &src) {
@@ -28,7 +26,7 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig){
 		int j = socket(AF_INET, SOCK_STREAM, 0);
 		if(j < 0)
 		{
-			LOG_ERROR("Socket creation failed");
+			LOG_SYS_ERROR("Socket creation failed");
 			kill(getpid(), SIGINT);
 		}
 		serverSockets.push_back(std::make_pair(j, &serversConfig[i]));
@@ -51,13 +49,14 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig){
 
 void PollManager::binder(const std::vector<ServerConfig> &servers) {
 	if(_servers.size() != serverSockets.size()) {
-		LOG_ERROR("Servers and sockets size mismatch");
+		LOG_SYS_ERROR("Servers and sockets size mismatch");
 		kill(getpid(), SIGINT);
 	}
+	LOG_DEBUG("Binding " << _servers.size() << " servers");
 	for (unsigned long i = 0; i < _servers.size(); i++) {
 		if (bind(serverSockets[i].first, (struct sockaddr *)&_servers[i], sizeof(struct sockaddr_in)) == -1)
 		{
-			LOG_ERROR("Bind failed");
+			LOG_SYS_ERROR("Bind failed");
 			kill(getpid(), SIGINT);
 		}
 	}
@@ -66,7 +65,7 @@ void PollManager::binder(const std::vector<ServerConfig> &servers) {
 	for(unsigned long i = 0; i < serverSockets.size(); i++){
 		if (listen(serverSockets[i].first, 25) < 0)
 		{
-			LOG_ERROR("Listen failed");
+			LOG_SYS_ERROR("Listen failed");
             kill(getpid(), SIGINT);
 		}
 
@@ -92,7 +91,7 @@ void PollManager::poller() {
 
     timeval timeout = {0, 0};
 	if (select(max_fd + 1, &read_fd, &write_fd, &error_fd, &timeout) < 0) {
-        LOG_ERROR("Select failed");
+        LOG_SYS_ERROR("Select failed");
     }
 	for(unsigned long i = 0; i < serverSockets.size(); i++){
 		if(FD_ISSET(serverSockets[i].first, &read_fd)){
@@ -100,7 +99,7 @@ void PollManager::poller() {
             clientSocket = accept(serverSockets[i].first, (struct sockaddr *)&clientData, &sizeClient);
 			if (clientSocket < 0)
 			{
-                LOG_ERROR("Accept failed");
+                LOG_SYS_ERROR("Accept failed");
                 continue;
 			}
 			LOG_DEBUG("Socket " << clientSocket << " accepted");
@@ -113,18 +112,16 @@ void PollManager::poller() {
                     buffer[i] = 0;
                 readValue = read(clientSocket, buffer, BUFFER_SIZE);
                 if (readValue < 0) {
-                    LOG_ERROR("Read failed");
+                    LOG_SYS_ERROR("Read failed");
                     continue;
                 }
                 requestString += buffer;
             } while (readValue == BUFFER_SIZE);
 			Client client = Client(clientSocket, clientData);
-			FD_SET(clientSocket, &read_fd);
-			FD_SET(clientSocket, &write_fd);
 			clients.push_back(client);
-			HttpRequest request;
-            request.setFd(serverSockets[i].first);
-			request.parse(requestString);
+			HttpRequest *request = new HttpRequest();
+            request->setFd(serverSockets[i].first);
+			request->parse(requestString);
 			_requests.push_back(std::make_pair(request, client));
             LOG_DEBUG("Request received from socket " << clientSocket);
 		}
@@ -132,16 +129,16 @@ void PollManager::poller() {
 
     std::vector<const HttpResponse *> responsesSent;
     for (unsigned long i = 0; i < _responses.size(); i++) {
-        HttpResponse *response = &_responses[i].first;
+        HttpResponse *response = _responses[i].first;
         if (!response)
             continue;
         Client *client = &_responses[i].second;
         if (!FD_ISSET(client->getFd(), &write_fd))
             continue;
-        responsesSent.push_back(response);
-        std::string responseString = response->toRawString();
+        std::string responseString = response->toPrintableString();
         send(client->getFd(), responseString.c_str(), responseString.length(), 0);
         LOG_DEBUG("Response sent to socket " << client->getFd());
+        responsesSent.push_back(response);
         close(client->getFd());
         // Delete the connection from the clients vector
         for (unsigned long j = 0; j < clients.size(); j++) {
@@ -154,35 +151,37 @@ void PollManager::poller() {
     // This can probably be optimized
     for (unsigned long i = 0; i < responsesSent.size(); i++) {
         for (unsigned long j = 0; j < _responses.size(); j++) {
-            if (&_responses[j].first == responsesSent[i]) {
+            if (_responses[j].first == responsesSent[i]) {
                 _responses.erase(_responses.begin() + j);
+                delete responsesSent[i];
                 break;
             }
         }
     }
 }
 
-std::vector<std::pair<HttpRequest, Client> > PollManager::getRequests() {
+std::vector<std::pair<HttpRequest *, Client> > PollManager::getRequests() {
 	return _requests;
 }
 
-void PollManager::setResponses(std::vector<std::pair<HttpResponse, Client> > responses) {
-	for (std::vector<std::pair<HttpResponse, Client> >::iterator it = responses.begin(); it != responses.end(); ++it) {
+void PollManager::setResponses(std::vector<std::pair<HttpResponse *, Client> > responses) {
+	for (std::vector<std::pair<HttpResponse *, Client> >::iterator it = responses.begin(); it != responses.end(); ++it) {
 		_responses.push_back(std::make_pair(it->first, it->second));
 	}
 }
 
 void PollManager::setRequestHandled(HttpRequest *request) {
-    for (std::vector<std::pair<HttpRequest, Client> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
-		if (&it->first == request) {
+    for (std::vector<std::pair<HttpRequest *, Client> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
+		if (it->first == request) {
 			_requests.erase(it);
+            delete it->first;
 			return;
 		} else
-			LOG_ERROR("Request not found");
+			LOG_SYS_ERROR("Request not found");
 	}
 }
 
-std::vector<std::pair<HttpResponse, Client> > PollManager::getResponses() {
+std::vector<std::pair<HttpResponse *, Client> > PollManager::getResponses() {
     return _responses;
 }
 

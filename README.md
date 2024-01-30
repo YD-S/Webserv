@@ -23,7 +23,7 @@ A simple web server written in C++.
     - `2`: Warning messages
     - `3`: Error messages
 
-- `LOG_ERROR`: Log error messages.
+- `LOG_SYS_ERROR`: Log error messages.
 - `LOG_WARNING`: Log warning messages.
 - `LOG_INFO`: Log info messages.
 - `LOG_DEBUG`: Log debug messages.
@@ -100,15 +100,15 @@ The request class can be built using a builder pattern.
 Here is an example:
 
 ```cpp
-HttpRequest req = HttpRequest()
-        .setMethod("POST")
-        .setPath("/index.html")
-        .setVersion("HTTP/1.1")
-        .setHeader("Content-Type", MimeTypes::getType("html"))
-        .setHeader("Content-Length", "12")
-        .addParam("param1", "value")
-        .addParam("param2", "434")
-        .setBody("Hello World!");
+HttpRequest *req = new HttpRequest()
+        ->setMethod("POST")
+        ->setPath("/index.html")
+        ->setVersion("HTTP/1.1")
+        ->setHeader("Content-Type", MimeTypes::getType("html"))
+        ->setHeader("Content-Length", "12")
+        ->addParam("param1", "value")
+        ->addParam("param2", "434")
+        ->setBody("Hello World!");
 ```
 
 ### Response builder
@@ -117,12 +117,12 @@ The response class can be built using a builder pattern.
 Here is an example:
 
 ```cpp
-HttpResponse response = HttpResponse()
-        .setVersion("HTTP/1.1")
-        .setStatus(HttpStatus::OK)
-        .setHeader("Content-Type", MimeTypes::getType("html"))
-        .setHeader("Content-Length", "12")
-        .setBody("Hello World!");
+HttpResponse *response = new HttpResponse()
+        ->setVersion("HTTP/1.1")
+        ->setStatus(HttpStatus::OK)
+        ->setHeader("Content-Type", MimeTypes::getType("html"))
+        ->setHeader("Content-Length", "12")
+        ->setBody("Hello World!");
 ```
 
 ### Build
