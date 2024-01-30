@@ -43,7 +43,7 @@ HttpRequest *HttpRequest::setVersion(const std::string &version) {
     return this;
 }
 
-HttpRequest *HttpRequest::addHeader(const std::string &key, const std::string &value) {
+HttpRequest *HttpRequest::setHeader(const std::string &key, const std::string &value) {
     _headers.insert(std::make_pair(key, value));
     return this;
 }
@@ -70,7 +70,7 @@ const std::map<std::string, std::string> &HttpRequest::getHeaders() const {
     return _headers;
 }
 
-const std::string &HttpRequest::getBody() const {
+std::string HttpRequest::getBody() const {
     return _body;
 }
 
@@ -108,11 +108,16 @@ HttpRequest *HttpRequest::addParam(const std::string &key, const std::string &va
     return this;
 }
 
-const std::string &HttpRequest::getHeader(const std::string &key) const {
+std::string HttpRequest::getHeader(const std::string &key) const {
+	// TODO: make this case insensitive
+	if (_headers.find(key) == _headers.end()) {
+		LOG_ERROR("Header " << key << " not found");
+		return "";
+	}
     return _headers.find(key)->second;
 }
 
-const std::string &HttpRequest::getParam(const std::string &key) const {
+std::string HttpRequest::getParam(const std::string &key) const {
     return _params.find(key)->second;
 }
 
@@ -221,7 +226,7 @@ HttpRequest *HttpRequest::parse(std::string request){
             std::string header = trim(line.substr(0, colonPos));
             std::string value = trim(line.substr(colonPos + 1));
 
-            this->addHeader(header, value);
+			this->setHeader(header, value);
         } else {
             if (_method == "POST")
                 parsePostParams(stream);

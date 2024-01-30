@@ -16,51 +16,48 @@
 
 class HttpResponse {
 private:
-    std::string _version;
-    int _status;
+	std::string _version;
+	int _status;
 
-    std::map<std::string, std::string> _headers;
+	std::map<std::string, std::string> _headers;
 
-    std::string _body;
+	std::vector<char> _body;
 
 public:
 
-    HttpResponse();
-    HttpResponse(const HttpResponse& other);
-    HttpResponse& operator=(const HttpResponse& other);
-    ~HttpResponse();
+	HttpResponse();
 
-    HttpResponse *setVersion(const std::string &version);
+	HttpResponse(const HttpResponse &other);
 
-    HttpResponse *setStatus(int status);
+	HttpResponse &operator=(const HttpResponse &other);
 
-    HttpResponse *setHeader(const std::string& key, const std::string& value);
+	~HttpResponse();
 
-    HttpResponse *setBody(const std::string &body);
+	HttpResponse *setVersion(const std::string &version);
 
-    const std::string &getVersion() const;
+	HttpResponse *setStatus(int status);
 
-    int getStatus() const;
+	HttpResponse *setHeader(const std::string &key, const std::string &value);
 
-    const std::map<std::string, std::string> &getHeaders() const;
+	HttpResponse *setBody(const std::string &body);
 
-    const std::string &getBody() const;
+	HttpResponse *setBody(const std::vector<char> &_body);
 
-    std::string toRawString() const;
+	const std::string &getVersion() const;
 
-    std::string toPrintableString();
+	int getStatus() const;
 
-    int findStatus(HttpRequest &request, ServerConfig &config);
+	const std::map<std::string, std::string> &getHeaders() const;
 
-    void    getContentType();
+	const std::vector<char> &getBody() const;
 
-    void    build(HttpRequest &request, ServerConfig &server);
+	std::string toRawString() const;
 
-    bool    isCGI(std::string &path);
+	void getContentType();
 
-    int fileExists(std::string filename);
+	bool isCGI(std::string &path);
 
-    void printAll() const;
+	void printAll() const;
 };
 
 

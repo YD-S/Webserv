@@ -41,7 +41,7 @@ public:
 
     HttpRequest *setVersion(const std::string &versionM);
 
-    HttpRequest *addHeader(const std::string &key, const std::string &value);
+    HttpRequest *setHeader(const std::string &key, const std::string &value);
 
     HttpRequest *addParam(const std::string &key, const std::string &value);
 
@@ -55,13 +55,13 @@ public:
 
     const std::map<std::string, std::string> &getHeaders() const;
 
-    const std::string &getHeader(const std::string &key) const;
+    std::string getHeader(const std::string &key) const;
 
     const std::map<std::string, std::string> &getParams() const;
 
-    const std::string &getParam(const std::string &key) const;
+    std::string getParam(const std::string &key) const;
 
-    const std::string &getBody() const;
+    std::string getBody() const;
 
     std::string toRawString() const;
 
