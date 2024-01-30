@@ -91,10 +91,6 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 		LOG_DEBUG("Running CGI");
 	}
 
-	if (request->getMethod() == "POST" && config->isUploadEnabled()) {
-		LOG_DEBUG("Upload enabled");
-	}
-
 	if (request->getMethod() == "GET" && config->isAutoIndexEnabled() &&
 		request->getPath().at(request->getPath().length() - 1) == '/') {
 		LOG_DEBUG("Autoindex enabled");
@@ -108,6 +104,8 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 		}
 		return getFile(request, config, response);
 	}
+
+	LOG_WARNING("Using default response");
 	setDefaultResponse(response, const_cast<LocationConfig *>(config));
 
 	return response;
@@ -160,7 +158,14 @@ void Webserv::setErrorResponse(HttpResponse *response, const int statusCode, Loc
 			"</h1></body></html>";
 	if (!config->getErrorPage(statusCode).empty()) {
 		LOG_DEBUG("Error page found for status code " << statusCode);
-		std::string errorPagePath = config->getErrorPage(statusCode);
+
+		std::string errorPagePath = config->getRoot();
+		if (errorPagePath.at(errorPagePath.length() - 1) != '/')
+			errorPagePath += "/";
+		std::string errorPage = config->getErrorPage(statusCode);
+		if (errorPage.at(0) == '/')
+			errorPage = errorPage.substr(1);
+		errorPagePath += errorPage;
 		std::ifstream errorPageFile(errorPagePath.c_str());
 		if (errorPageFile) {
 			body.clear();
@@ -317,9 +322,10 @@ HttpResponse *Webserv::getFile(const HttpRequest *request, const LocationConfig 
 	return response;
 }
 
-HttpResponse * Webserv::getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response) {
+HttpResponse *Webserv::getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response) {
 	// Try each index in order
-	for (std::vector<std::string>::const_iterator it = config->getIndexes().begin(); it != config->getIndexes().end(); ++it) {
+	for (std::vector<std::string>::const_iterator it = config->getIndexes().begin();
+		 it != config->getIndexes().end(); ++it) {
 		std::string path = getDirPath(request, config);
 		if (path.at(path.length() - 1) != '/')
 			path += "/";
@@ -345,4 +351,3 @@ HttpResponse * Webserv::getIndex(HttpRequest *request, const LocationConfig *con
 	setErrorResponse(response, HttpStatus::NOT_FOUND, const_cast<LocationConfig *>(config));
 	return response;
 }
-

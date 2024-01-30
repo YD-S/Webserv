@@ -8,6 +8,8 @@
 
 #include "config/ParseConfig.hpp"
 #include "PollManager/PollManager.hpp"
+#include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 
 class Webserv {
 private:
@@ -21,7 +23,7 @@ private:
 
 	const ServerConfig *getServerConfigByFd(int fd);
 
-	void setErrorResponse(HttpResponse *response, int statusCode, LocationConfig *config);
+	void setErrorResponse(HttpResponse *response, const int statusCode, LocationConfig *config);
 
 	bool checkRequestMethod(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 
