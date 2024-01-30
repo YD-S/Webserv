@@ -21,36 +21,36 @@
 #define RESET "\033[0m"
 
 #ifndef DEBUG
-    #define DEBUG 3
+#define DEBUG 3
 #endif
 
 #define ERRNO ()
 
 // Log
 #if DEBUG <= 3
-    #define LOG_SYS_ERROR(msg) std::cerr << RED << "[ERROR] " << msg << ": " << errno << " " << strerror(errno) << RESET << std::endl
-    #define LOG_ERROR(msg) std::cerr << RED << "[ERROR] " << msg << RESET << std::endl
+#define LOG_SYS_ERROR(msg) std::cerr << RED << "[ERROR] " << msg << ": " << errno << " " << strerror(errno) << RESET << std::endl
+#define LOG_ERROR(msg) std::cerr << RED << "[ERROR] " << msg << RESET << std::endl
 #else
-    #define LOG_SYS_ERROR(msg)
-    #define LOG_ERROR(msg)
+#define LOG_SYS_ERROR(msg)
+#define LOG_ERROR(msg)
 #endif
 
 #if DEBUG <= 2
-    #define LOG_WARNING(msg) std::cerr << YELLOW << "[WARNING] " << msg << RESET << std::endl
+#define LOG_WARNING(msg) std::cerr << YELLOW << "[WARNING] " << msg << RESET << std::endl
 #else
-    #define LOG_WARNING(msg)
+#define LOG_WARNING(msg)
 #endif
 
 #if DEBUG <= 1
-    #define LOG_INFO(msg) std::cout << GREEN << "[INFO] " << msg << RESET << std::endl
+#define LOG_INFO(msg) std::cout << GREEN << "[INFO] " << msg << RESET << std::endl
 #else
-    #define LOG_INFO(msg)
+#define LOG_INFO(msg)
 #endif
 
 #if DEBUG <= 0
-    #define LOG_DEBUG(msg) std::cout << WHITE << "[DEBUG] " << msg << RESET << std::endl
+#define LOG_DEBUG(msg) std::cout << WHITE << "[DEBUG] " << msg << RESET << std::endl
 #else
-    #define LOG_DEBUG(msg)
+#define LOG_DEBUG(msg)
 #endif
 
 

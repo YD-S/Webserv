@@ -36,14 +36,14 @@ size_t ft_stoul(const std::string &str);
 
 std::string pathToFilename(const std::string &path);
 
-void ft_error(const std::string& msg, int errorCode);
+void ft_error(const std::string &msg, int errorCode);
 
 std::string ft_socket_to_string(struct sockaddr_in addr);
 
 std::string intToInAddr(unsigned long ip);
 
-int fileExists(const std::string& path);
+int fileExists(const std::string &path);
 
-bool isBinaryFile(const std::string& path);
+bool isBinaryFile(const std::string &path);
 
 #endif //WEBSERV_UTILS_HPP

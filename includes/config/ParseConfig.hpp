@@ -21,31 +21,48 @@
 class ParseConfig {
 
 private:
-    std::vector<ServerConfig> _servers;
-    std::string _path;
+	std::vector<ServerConfig> _servers;
+	std::string _path;
 
 public:
 
-    ParseConfig();
-    ParseConfig(const std::string& path);
-    ParseConfig(const ParseConfig& other);
-    ParseConfig& operator=(const ParseConfig& other);
-    ~ParseConfig();
+	ParseConfig();
 
-    bool isDelimiter(char c);
-	LocationConfig parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it, std::vector<std::pair<std::string, std::string> > &config);
-	void	validate_braces(std::ifstream &file);
+	ParseConfig(const std::string &path);
+
+	ParseConfig(const ParseConfig &other);
+
+	ParseConfig &operator=(const ParseConfig &other);
+
+	~ParseConfig();
+
+	bool isDelimiter(char c);
+
+	LocationConfig parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it,
+								 std::vector<std::pair<std::string, std::string> > &config);
+
+	void validate_braces(std::ifstream &file);
+
 	std::vector<std::pair<std::string, std::string> > processFile();
-	void    parseConfig();
-    void    mainSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables, ServerConfig& server);
-    void    LocationSetter(std::vector<std::pair<std::string, std::vector <std::string> > >& variables, LocationConfig &location);
-    void    printTempVariables(std::vector<std::pair<std::string, std::vector <std::string> > > variables);
-    std::string extractAndRemoveFirst(std::vector<std::string>& values);
-    void separateHostPort(ServerConfig &server, const std::string& input);
-    void printLocation(const LocationConfig& location);
-    void printAll();
 
-    std::vector<ServerConfig>& getServers();
+	void parseConfig();
+
+	void mainSetter(std::vector<std::pair<std::string, std::vector<std::string> > > &variables, ServerConfig &server);
+
+	void LocationSetter(std::vector<std::pair<std::string, std::vector<std::string> > > &variables,
+						LocationConfig &location);
+
+	void printTempVariables(std::vector<std::pair<std::string, std::vector<std::string> > > variables);
+
+	std::string extractAndRemoveFirst(std::vector<std::string> &values);
+
+	void separateHostPort(ServerConfig &server, const std::string &input);
+
+	void printLocation(const LocationConfig &location);
+
+	void printAll();
+
+	std::vector<ServerConfig> &getServers();
 };
 
 

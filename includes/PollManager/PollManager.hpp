@@ -57,17 +57,26 @@ private:
 
 public:
 	PollManager();
+
 	~PollManager();
+
 	PollManager(const PollManager &src);
+
 	PollManager &operator=(const PollManager &src);
+
 	void socketConfig(const std::vector<ServerConfig> &serversConfig);
+
 	void binder(const std::vector<ServerConfig> &servers);
+
 	void poller();
 
 	std::vector<std::pair<HttpRequest *, Client> > getRequests();
-    void setResponses(std::vector<std::pair<HttpResponse *, Client> > responses);
-    void setRequestHandled(HttpRequest *request);
-    std::vector<std::pair<HttpResponse *, Client> > getResponses();
+
+	void setResponses(std::vector<std::pair<HttpResponse *, Client> > responses);
+
+	void setRequestHandled(HttpRequest *request);
+
+	std::vector<std::pair<HttpResponse *, Client> > getResponses();
 };
 
 #endif //WEBSERV_POLLMANAGER_HPP

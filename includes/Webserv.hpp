@@ -33,7 +33,7 @@ private:
 
 	HttpResponse *getFile(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 
-	static std::string getDirPath(const HttpRequest *request, const LocationConfig *config) ;
+	static std::string getDirPath(const HttpRequest *request, const LocationConfig *config);
 
 public:
 	Webserv();
@@ -46,9 +46,9 @@ public:
 
 	void run();
 
-	void parseConfig(const std::string& path);
+	void parseConfig(const std::string &path);
 
-	HttpResponse * getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response);
+	HttpResponse *getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 };
 
 

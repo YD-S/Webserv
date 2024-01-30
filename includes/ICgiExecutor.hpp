@@ -12,35 +12,41 @@
 class ICgiExecutor {
 
 private:
-    std::string _cgiPath;
-    std::string _cgiName;
+	std::string _cgiPath;
+	std::string _cgiName;
 
 protected:
-    std::string _cgiResult;
+	std::string _cgiResult;
 
-    char **envp;
+	char **envp;
 
 public:
-    ICgiExecutor();
-    ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp);
-    virtual ~ICgiExecutor() = 0;
+	ICgiExecutor();
 
-    const std::string &getCgiPath() const;
+	ICgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp);
 
-    void setCgiPath(const std::string &cgiPath);
+	virtual ~ICgiExecutor() = 0;
 
-    const std::string &getCgiName() const;
+	const std::string &getCgiPath() const;
 
-    void setCgiName(const std::string &cgiName);
+	void setCgiPath(const std::string &cgiPath);
+
+	const std::string &getCgiName() const;
+
+	void setCgiName(const std::string &cgiName);
+
 #if DEBUG == 0
-    const std::string &getCgiResult() const;
+
+	const std::string &getCgiResult() const;
+
 #endif
-    /**
-     * Passes a request to the CGI and returns the response via parameter
-     * @param request HttpRequest object reference to be passed to CGI
-     * @param response HttpResponse object reference to be filled with CGI response
-     */
-    virtual void executeCgi(HttpRequest &request, std::string &response) = 0;
+
+	/**
+	 * Passes a request to the CGI and returns the response via parameter
+	 * @param request HttpRequest object reference to be passed to CGI
+	 * @param response HttpResponse object reference to be filled with CGI response
+	 */
+	virtual void executeCgi(HttpRequest &request, std::string &response) = 0;
 };
 
 

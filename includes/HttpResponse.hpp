@@ -16,57 +16,60 @@
 
 class HttpResponse {
 private:
-    std::string _version;
-    int _status;
+	std::string _version;
+	int _status;
 
-    std::map<std::string, std::string> _headers;
+	std::map<std::string, std::string> _headers;
 
-    std::string _body;
+	std::string _body;
 
 public:
 
-    HttpResponse();
-    HttpResponse(const HttpResponse& other);
-    HttpResponse& operator=(const HttpResponse& other);
-    ~HttpResponse();
+	HttpResponse();
 
-    HttpResponse *setVersion(const std::string &version);
+	HttpResponse(const HttpResponse &other);
 
-    HttpResponse *setStatus(int status);
+	HttpResponse &operator=(const HttpResponse &other);
 
-    HttpResponse *setHeader(const std::string& key, const std::string& value);
+	~HttpResponse();
 
-    HttpResponse *setBody(const std::string &body);
+	HttpResponse *setVersion(const std::string &version);
 
-    const std::string &getVersion() const;
+	HttpResponse *setStatus(int status);
 
-    int getStatus() const;
+	HttpResponse *setHeader(const std::string &key, const std::string &value);
 
-    const std::map<std::string, std::string> &getHeaders() const;
+	HttpResponse *setBody(const std::string &body);
 
-    const std::string &getBody() const;
+	const std::string &getVersion() const;
 
-    std::string toRawString() const;
+	int getStatus() const;
 
-    std::string toPrintableString();
+	const std::map<std::string, std::string> &getHeaders() const;
 
-    int findStatus(HttpRequest &request, ServerConfig &config);
+	const std::string &getBody() const;
 
-    void    getContentType();
+	std::string toRawString() const;
 
-    void    build(HttpRequest &request, ServerConfig &server);
+	std::string toPrintableString();
 
-    static bool    isCGI(std::string &path);
+	int findStatus(HttpRequest &request, ServerConfig &config);
 
-    int fileExists(std::string filename);
+	void getContentType();
 
-    void printAll() const;
+	void build(HttpRequest &request, ServerConfig &server);
+
+	static bool isCGI(std::string &path);
+
+	int fileExists(std::string filename);
+
+	void printAll() const;
 
 	void StringToResponse(std::string const str);
 
-	void parseStatusLine(const std::string& statusLine);
+	void parseStatusLine(const std::string &statusLine);
 
-	void parseHeader(const std::string& headerLine);
+	void parseHeader(const std::string &headerLine);
 };
 
 

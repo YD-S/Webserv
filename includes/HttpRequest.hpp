@@ -15,71 +15,74 @@
 class HttpRequest {
 
 private:
-    std::string _method;
-    std::string _path;
-    std::string _version;
+	std::string _method;
+	std::string _path;
+	std::string _version;
 
-    std::map<std::string, std::string> _params;
-    std::map<std::string, std::string> _headers;
+	std::map<std::string, std::string> _params;
+	std::map<std::string, std::string> _headers;
 
-    std::string _body;
+	std::string _body;
 
-    int _serverFd;
+	int _serverFd;
 
 public:
 
-    HttpRequest();
-    HttpRequest(const HttpRequest& other);
-    HttpRequest& operator=(const HttpRequest& other);
-    ~HttpRequest();
+	HttpRequest();
 
-    HttpRequest *parse(std::string request);
+	HttpRequest(const HttpRequest &other);
 
-    HttpRequest *setMethod(const std::string &method);
+	HttpRequest &operator=(const HttpRequest &other);
 
-    HttpRequest *setPath(const std::string &path);
+	~HttpRequest();
 
-    HttpRequest *setVersion(const std::string &versionM);
+	HttpRequest *parse(std::string request);
 
-    HttpRequest *setHeader(const std::string &key, const std::string &value);
+	HttpRequest *setMethod(const std::string &method);
 
-    HttpRequest *addParam(const std::string &key, const std::string &value);
+	HttpRequest *setPath(const std::string &path);
 
-    const HttpRequest *setBody(const std::string &body);
+	HttpRequest *setVersion(const std::string &versionM);
 
-    const std::string &getMethod() const;
+	HttpRequest *setHeader(const std::string &key, const std::string &value);
 
-    const std::string &getPath() const;
+	HttpRequest *addParam(const std::string &key, const std::string &value);
 
-    const std::string &getVersion() const;
+	const HttpRequest *setBody(const std::string &body);
 
-    const std::map<std::string, std::string> &getHeaders() const;
+	const std::string &getMethod() const;
 
-    std::string getHeader(const std::string &key) const;
+	const std::string &getPath() const;
 
-    const std::map<std::string, std::string> &getParams() const;
+	const std::string &getVersion() const;
 
-    std::string getParam(const std::string &key) const;
+	const std::map<std::string, std::string> &getHeaders() const;
 
-    std::string getBody() const;
+	std::string getHeader(const std::string &key) const;
 
-    std::string toRawString() const;
+	const std::map<std::string, std::string> &getParams() const;
 
-    std::string toPrintableString() const;
+	std::string getParam(const std::string &key) const;
 
-    std::string getQueryString() const;
-    
-    void parseGetParams(const std::string &path_string);
-    
-    void parsePostParams(std::istringstream &stream);
+	std::string getBody() const;
 
-    void printHttpRequest() const;
+	std::string toRawString() const;
 
-    int getFd() const;
+	std::string toPrintableString() const;
 
-    void setFd(int fd);
+	std::string getQueryString() const;
 
-	static std::string trim(const std::string& str);
+	void parseGetParams(const std::string &path_string);
+
+	void parsePostParams(std::istringstream &stream);
+
+	void printHttpRequest() const;
+
+	int getFd() const;
+
+	void setFd(int fd);
+
+	static std::string trim(const std::string &str);
 
 };
 

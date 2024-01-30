@@ -52,7 +52,7 @@ size_t ft_stoul(const std::string &str) {
 }
 
 
-void ft_error(const std::string& msg, int errorCode) {
+void ft_error(const std::string &msg, int errorCode) {
 	LOG_SYS_ERROR(msg);
 	exit(errorCode);
 }
@@ -69,7 +69,7 @@ std::string intToInAddr(unsigned long ip) {
 	return inet_ntoa(addr);
 }
 
-int fileExists(const std::string& path) {
+int fileExists(const std::string &path) {
 	// If the file exists return 1
 	// If the file does not exist return 0
 	// If the file exists but is not accessible return -1
@@ -86,7 +86,7 @@ int fileExists(const std::string& path) {
 	}
 }
 
-bool isBinaryFile(const std::string& path) {
+bool isBinaryFile(const std::string &path) {
 	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
 	if (!file.is_open()) {
 		LOG_SYS_ERROR("Error opening file: " << path);

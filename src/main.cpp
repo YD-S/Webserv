@@ -8,7 +8,7 @@ std::vector<std::pair<int, const ServerConfig *> > serverSockets;
 std::vector<Client> clients;
 
 void ft_handle_sigint(int signal) {
-	(void)signal;
+	(void) signal;
 	LOG_INFO("Stopping webserv...");
 	for (unsigned long i = 0; i < serverSockets.size(); i++) {
 		close(serverSockets[i].first);
@@ -18,14 +18,14 @@ void ft_handle_sigint(int signal) {
 }
 
 int main(int argc, char *argv[]) {
-    signal(SIGINT, ft_handle_sigint);
-    signal(SIGTERM, ft_handle_sigint);
-    Webserv webserv;
-    LOG_INFO("Starting webserv...");
+	signal(SIGINT, ft_handle_sigint);
+	signal(SIGTERM, ft_handle_sigint);
+	Webserv webserv;
+	LOG_INFO("Starting webserv...");
 	if (argc == 1)
 		webserv.parseConfig("configs/default.conf");
 	else if (argc == 2)
-        webserv.parseConfig(argv[1]);
-    webserv.run();
+		webserv.parseConfig(argv[1]);
+	webserv.run();
 	return 0;
 }

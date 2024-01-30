@@ -11,24 +11,24 @@
 class BinCgiExecutor : public ICgiExecutor {
 
 private:
-    char **buildEnvp(HttpRequest &request);
+	char **buildEnvp(HttpRequest &request);
 
-    char **buildArgs(HttpRequest &request);
+	char **buildArgs(HttpRequest &request);
 
-    static void destroyCstrp(char **cstrp);
+	static void destroyCstrp(char **cstrp);
 
 public:
-    BinCgiExecutor();
+	BinCgiExecutor();
 
-    BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp);
+	BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp);
 
-    void executeCgi(HttpRequest &request, std::string &response);
+	void executeCgi(HttpRequest &request, std::string &response);
 
-    ~BinCgiExecutor();
+	~BinCgiExecutor();
 
-    static std::string convertToEnvVar(const std::string &header);
+	static std::string convertToEnvVar(const std::string &header);
 
-    std::string postProcessCgiResult();
+	std::string postProcessCgiResult();
 };
 
 

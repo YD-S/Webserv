@@ -11,8 +11,6 @@ public:
 	static const char *getExtension(const char *type, int skip = 0);
 	static std::string getExtension(const std::string &type, int skip = 0);
 
-	static bool isBinary(std::string extension);
-
 private:
 	struct entry {
 		const char* fileExtension;
@@ -20,8 +18,6 @@ private:
 	};
 	static MimeTypes::entry types[347];
 	static int strcmpi(const char *s1, const char *s2);
-
-	static bool isBinary(const char *type);
 };
 
 #endif //WEBSERV_MIMETYPES_HPP
