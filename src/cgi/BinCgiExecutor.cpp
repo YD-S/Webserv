@@ -82,8 +82,6 @@ void BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 
 		*response = postProcessCgiResult();
 	}
-
-
 }
 
 char **BinCgiExecutor::buildEnvp(HttpRequest *request) {

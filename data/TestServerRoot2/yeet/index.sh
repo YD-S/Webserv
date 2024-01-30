@@ -1,7 +1,7 @@
 
 # Echo raw HTTP response
 
-echo -e 'HTTP/1.1 200 OK\r'
+echo -e 'Status: 200\r'
 echo -e 'Content-Type: text/html\r'
 echo -e 'Content-Length: 84\r'
 echo -e '\r'

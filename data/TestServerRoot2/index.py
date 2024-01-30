@@ -3,7 +3,7 @@
 import os
 
 CRLF = "\r\n"
-statusLine = "HTTP/1.1 200 OK"
+statusLine = "Status: 200"
 
 body = "<html><body><h1>Python 3 CGI Test</h1><p>yeet</p></body></html>"
 headers = {

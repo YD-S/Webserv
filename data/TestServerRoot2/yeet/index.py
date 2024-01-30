@@ -2,26 +2,21 @@
 
 import os
 
-response = ""
-
-def p(*args, **kwargs):
-    global response
-    response += " ".join(args) + "\r\n"
-
-status = "200 OK"
+CRLF = "\r\n"
+statusLine = "Status: 200"
 
 body = "<html><body><h1>Python 3 CGI Test</h1><p>yeet</p></body></html>"
 headers = {
-    "Content-type": "text/html",
-    "Content-length": str(len(body))
+    "Content-Type": "text/html",
+    "Content-Length": str(len(body))
 }
 
-p(f"HTTP/1.1 {status}")
-for k, v in headers.items():
-    p(f"{k}: {v}")
-p()
-p(body)
-p()
+res = [statusLine,
+    *[f"{k}: {v}" for k, v in headers.items()],
+    "",
+    body
+]
+response = CRLF.join(res) + CRLF + CRLF
 with open(f"{os.path.dirname(__file__)}/output.txt", "w") as f:
     f.write(response)
 
