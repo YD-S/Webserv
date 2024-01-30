@@ -91,42 +91,49 @@ HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const Se
 }
 
 HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unused const LocationConfig *config) {
-	LOG_DEBUG("Handling request with location " << config->getPath());
-	HttpResponse *response = new HttpResponse();
-	response->setHeader("Server", "webserv");
+	try {
+		LOG_DEBUG("Handling request with location " << config->getPath());
+		HttpResponse *response = new HttpResponse();
+		response->setHeader("Server", "webserv");
 
-	if (!checkRequestMethod(request, config, response))
-		return response;
+		if (!checkRequestMethod(request, config, response))
+			return response;
 
-	if (!config->getRedirect().empty()) {
-		LOG_DEBUG("Redirect enabled");
-	}
-	if ((request->getMethod() == "GET" || request->getMethod() == "POST") &&
-		config->isCgiEnabled() &&
-		!is_dir(getDirPath(request, config))
-			) {
-		LOG_DEBUG("Using CGI");
-		return handleWithCGI(request, config, response);
-	}
-
-	if (request->getMethod() == "GET" && config->isAutoIndexEnabled() &&
-		request->getPath().at(request->getPath().length() - 1) == '/') {
-		LOG_DEBUG("Autoindex enabled");
-		return generateAutoIndex(request, config);
-	}
-
-	if (request->getMethod() == "GET") {
-		LOG_DEBUG("GET request");
-		if (is_dir(getDirPath(request, config)) && !config->getIndexes().empty()) {
-			return getIndex(const_cast<HttpRequest *>(request), config, response);
+		if (!config->getRedirect().empty()) {
+			LOG_DEBUG("Redirect enabled");
 		}
-		return getFile(request, config, response);
+		if ((request->getMethod() == "GET" || request->getMethod() == "POST") &&
+			config->isCgiEnabled() &&
+			!is_dir(getDirPath(request, config))
+				) {
+			LOG_DEBUG("Using CGI");
+			return handleWithCGI(request, config, response);
+		}
+
+		if (request->getMethod() == "GET" && config->isAutoIndexEnabled() &&
+			request->getPath().at(request->getPath().length() - 1) == '/') {
+			LOG_DEBUG("Autoindex enabled");
+			return generateAutoIndex(request, config);
+		}
+
+		if (request->getMethod() == "GET") {
+			LOG_DEBUG("GET request");
+			if (is_dir(getDirPath(request, config)) && !config->getIndexes().empty()) {
+				return getIndex(const_cast<HttpRequest *>(request), config, response);
+			}
+			return getFile(request, config, response);
+		}
+
+		LOG_WARNING("Using default response");
+		setDefaultResponse(response, const_cast<LocationConfig *>(config));
+
+		return response;
+	} catch (std::exception &e) {
+		LOG_SYS_ERROR("Error handling request: " << e.what());
+		HttpResponse *response = new HttpResponse();
+		setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
+		return response;
 	}
-
-	LOG_WARNING("Using default response");
-	setDefaultResponse(response, const_cast<LocationConfig *>(config));
-
-	return response;
 }
 
 HttpResponse *Webserv::handleWithCGI(const HttpRequest *request, const LocationConfig *config, HttpResponse *response) {
@@ -146,7 +153,10 @@ HttpResponse *Webserv::handleWithCGI(const HttpRequest *request, const LocationC
 	LOG_DEBUG("Executing CGI");
 	delete response;
 	response = new HttpResponse();
-	cgiExecutor->executeCgi(const_cast<HttpRequest *>(request), &responseString, getDirPath(request, config));
+	if (!cgiExecutor->executeCgi(const_cast<HttpRequest *>(request), &responseString, getDirPath(request, config))){
+		setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
+		return response;
+	}
 	response->fromString(responseString);
 	response->setHeader("Server", "webserv");
 	return response;

@@ -22,7 +22,7 @@ public:
 
 	BinCgiExecutor(const std::string &cgiPath, const std::string &cgiName, char **envp, const LocationConfig *config);
 
-	void executeCgi(HttpRequest *request, std::string *response, std::string scriptPath);
+	bool executeCgi(HttpRequest *request, std::string *response, std::string scriptPath);
 
 	~BinCgiExecutor();
 

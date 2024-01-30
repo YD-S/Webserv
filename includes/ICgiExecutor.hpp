@@ -49,7 +49,7 @@ public:
 	 * @param request HttpRequest object reference to be passed to CGI
 	 * @param response HttpResponse object reference to be filled with CGI response
 	 */
-	virtual void executeCgi(HttpRequest *request, std::string *response, std::string scriptPath) = 0;
+	virtual bool executeCgi(HttpRequest *request, std::string *response, std::string scriptPath) = 0;
 
 
 };

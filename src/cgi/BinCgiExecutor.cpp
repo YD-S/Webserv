@@ -13,7 +13,7 @@
 #include "Webserv.hpp"
 
 
-void BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std::string scriptPath) {
+bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std::string scriptPath) {
 
 	// Create a pipe to communicate with the CGI
 	// We need to write the request body to the pipe and read the response from the pipe,
@@ -49,13 +49,13 @@ void BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 
 		// Execute the CGI
 		execve(this->getCgiPath().c_str(), args, envp_);
-
+		return false;
 		// If we get here, execve failed
-		throw std::runtime_error("Failed to execute php-cgi");
 	}
 		// Parent process
 	else {
 		// Write the request body to the pipe
+		LOG_DEBUG("Writing to pipe: " << request->getBody());
 		if (write(request_pipe[1], request->getBody().c_str(), request->getBody().size()) == -1) {
 			throw std::runtime_error("Failed to write to pipe");
 		}
@@ -66,6 +66,10 @@ void BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		// Wait for the child process to finish
 		int status;
 		waitpid(pid, &status, 0);
+		if (WEXITSTATUS(status) != 0) {
+			LOG_ERROR("CGI exited with status " << WEXITSTATUS(status));
+			return false;
+		}
 
 		// Read the response from the CGI
 		char buffer[1024];
@@ -83,6 +87,7 @@ void BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 
 		*response = postProcessCgiResult();
 	}
+	return true;
 }
 
 char **BinCgiExecutor::buildEnvp(HttpRequest *request) {
@@ -108,14 +113,15 @@ char **BinCgiExecutor::buildEnvp(HttpRequest *request) {
 		envp_vector.push_back("CONTENT_TYPE=" + request->getHeaders().at("Content-Type"));
 	}
 
-	// Add headers to the environment variables
-	for (std::map<std::string, std::string>::const_iterator it = request->getHeaders().begin();
-		 it != request->getHeaders().end(); ++it) {
-		envp_vector.push_back(convertToEnvVar(it->first) + "=" + it->second);
-	}
 	// Check required headers like Content-Length and add them if they are missing
 	if (request->getHeaders().find("Content-Length") == request->getHeaders().end()) {
 		envp_vector.push_back("CONTENT_LENGTH=" + to_string(request->getBody().size()));
+	}
+
+	// Add all headers to the environment variables with the HTTP_ prefix
+	for (std::map<std::string, std::string>::const_iterator it = request->getHeaders().begin();
+		 it != request->getHeaders().end(); ++it) {
+		envp_vector.push_back("HTTP_" + convertToEnvVar(it->first) + "=" + it->second);
 	}
 
 	// Add the system environment variables to the environment pointer array
