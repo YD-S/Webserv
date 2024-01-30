@@ -13,11 +13,7 @@ void Webserv::parseConfig(const std::string& path) {
 	parse = ParseConfig(path);
 	parse.parseConfig();
 	if (parse.getServers().empty())
-		LOG_SYS_ERROR("NO SERVER >:(");
-	const std::vector<LocationConfig> &locations = (*(parse.getServers().begin())).getLocations();
-	if (locations.empty())
-		LOG_SYS_ERROR(
-				"NO LOCATIONS >:("); // TODO: even if there are no locations, we should still be able to serve files from the root
+		LOG_SYS_ERROR("NO SERVER :(\t");
 }
 
 void Webserv::run() {

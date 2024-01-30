@@ -227,7 +227,7 @@ void HttpResponse::parseStatusLine(const std::string& statusLine) {
 		std::string status = statusLine.substr(firstSpacePos + 1, secondSpacePos - firstSpacePos - 1);
 		std::string reason = statusLine.substr(secondSpacePos + 1);
 		this->setVersion(version);
-		this->setStatus(std::stoi(status));
+		this->setStatus(ft_stoi(status));
 	}
 }
 
