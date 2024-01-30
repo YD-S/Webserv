@@ -2,8 +2,8 @@
 // Created by kolterdyx on 18/01/24.
 //
 
-#include <pwd.h>
 #include "Webserv.hpp"
+#include "MimeTypes.hpp"
 
 Webserv::Webserv() {
 	LOG_INFO("Webserv created");
@@ -78,6 +78,7 @@ HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const Se
 HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unused const LocationConfig *config) {
 	LOG_DEBUG("Handling request with location " << config->getPath());
 	HttpResponse *response = new HttpResponse();
+	response->setHeader("Server", "webserv");
 
 	if (!checkRequestMethod(request, config, response))
 		return response;
@@ -100,6 +101,13 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 		return generateAutoIndex(request, config);
 	}
 
+	if (request->getMethod() == "GET") {
+		LOG_DEBUG("GET request");
+		if (is_dir(getDirPath(request, config)) && !config->getIndexes().empty()) {
+			return getIndex(const_cast<HttpRequest *>(request), config, response);
+		}
+		return getFile(request, config, response);
+	}
 	setDefaultResponse(response, const_cast<LocationConfig *>(config));
 
 	return response;
@@ -169,7 +177,6 @@ void Webserv::setErrorResponse(HttpResponse *response, const int statusCode, Loc
 	}
 	response
 			->setStatus(statusCode)
-			->setHeader("Server", "webserv")
 			->setHeader("Content-Type", "text/html")
 			->setBody(body);
 }
@@ -190,7 +197,6 @@ void Webserv::setDefaultResponse(HttpResponse *response, LocationConfig *config)
 
 	response
 			->setStatus(HttpStatus::OK)
-			->setHeader("Server", "webserv")
 			->setHeader("Content-Type", "text/html")
 			->setBody(body);
 }
@@ -199,15 +205,12 @@ HttpResponse *Webserv::generateAutoIndex(const HttpRequest *request, const Locat
 	HttpResponse *response = new HttpResponse();
 	response
 			->setStatus(HttpStatus::OK)
-			->setHeader("Server", "webserv")
 			->setHeader("Content-Type", "text/html");
 
-	std::string body = "<html><head><style>th { font-size: larger; font-weight: bold; text-align: left; }</style></head><body><h1>Index of " + request->getPath() + "</h1>";
-	std::string rootPath = config->getRoot();
-	if (rootPath.at(rootPath.length() - 1) != '/')
-		rootPath += "/";
-	// subtract prefix from path
-	std::string path = rootPath + request->getPath().substr(config->getPath().length());
+	std::string body =
+			"<html><head><style>th { font-size: larger; font-weight: bold; text-align: left; }</style></head><body><h1>Index of " +
+			request->getPath() + "</h1>";
+	std::string path = getDirPath(request, config);
 	DIR *dir = opendir(path.c_str());
 	if (dir == NULL) {
 		LOG_SYS_ERROR("Error opening directory " << path);
@@ -250,6 +253,77 @@ HttpResponse *Webserv::generateAutoIndex(const HttpRequest *request, const Locat
 
 	response->setBody(body);
 
+	return response;
+}
+
+std::string Webserv::getDirPath(const HttpRequest *request, const LocationConfig *config) const {
+	std::string rootPath = config->getRoot();
+	if (rootPath.at(rootPath.length() - 1) != '/')
+		rootPath += "/";
+	// subtract prefix from path
+	std::string path = rootPath + request->getPath().substr(config->getPath().length());
+	return path;
+}
+
+HttpResponse *Webserv::getFile(const HttpRequest *request, const LocationConfig *config, HttpResponse *response) {
+	std::string path = getDirPath(request, config);
+	std::string extension;
+	size_t pos = path.find_last_of('.');
+	if (pos != std::string::npos) {
+		extension = path.substr(pos + 1);
+	}
+	LOG_DEBUG("Path: " << path);
+	int fileExists = response->fileExists(path);
+	if (fileExists == 0) {
+		LOG_ERROR("File " << path << " not found");
+		setErrorResponse(response, HttpStatus::NOT_FOUND, const_cast<LocationConfig *>(config));
+		return response;
+	} else if (fileExists < 0) {
+		LOG_SYS_ERROR("Error opening file " << path);
+		setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
+		return response;
+	}
+	response->setHeader("Content-Type", MimeTypes::getType(extension));
+	response->setStatus(HttpStatus::OK);
+	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
+	std::string body;
+	if (file != NULL) {
+		if (file.good()) {
+			std::getline(file, body, '\0');
+		}
+		file.close();
+	}
+	response->setBody(body);
+
+	return response;
+}
+
+HttpResponse * Webserv::getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response) {
+	// Try each index in order
+	for (std::vector<std::string>::const_iterator it = config->getIndexes().begin(); it != config->getIndexes().end(); ++it) {
+		std::string path = getDirPath(request, config);
+		if (path.at(path.length() - 1) != '/')
+			path += "/";
+		path += *it;
+		LOG_DEBUG("Trying index " << path);
+		int fileExists = response->fileExists(path);
+		if (fileExists == 0) {
+			LOG_WARNING("Index " << path << " not found");
+			continue;
+		} else if (fileExists < 0) {
+			LOG_SYS_ERROR("Error opening index " << path);
+			setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
+			return response;
+		}
+		LOG_DEBUG("Index " << path << " found");
+		std::string requestPath = request->getPath();
+		if (requestPath.at(requestPath.length() - 1) != '/')
+			requestPath += "/";
+		request->setPath(requestPath + *it);
+		return getFile(request, config, response);
+	}
+	LOG_ERROR("No index found");
+	setErrorResponse(response, HttpStatus::NOT_FOUND, const_cast<LocationConfig *>(config));
 	return response;
 }
 

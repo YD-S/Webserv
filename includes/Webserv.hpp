@@ -11,26 +11,15 @@
 
 class Webserv {
 private:
-    ParseConfig parse;
+	ParseConfig parse;
+
 	PollManager pollManager;
-//    bool running;
 
-public:
-    Webserv();
-    Webserv(const Webserv& other);
-    Webserv& operator=(const Webserv& other);
+	HttpResponse *handleRequest(const HttpRequest *request, const ServerConfig *config);
 
-    ~Webserv();
+	HttpResponse *handleWithLocation(const HttpRequest *request, const LocationConfig *config);
 
-    void run();
-
-    void parseConfig(std::string path);
-
-    HttpResponse * handleRequest(const HttpRequest *request, const ServerConfig *config);
-
-    HttpResponse * handleWithLocation(const HttpRequest *request, const LocationConfig *config);
-
-    const ServerConfig *getServerConfigByFd(int fd);
+	const ServerConfig *getServerConfigByFd(int fd);
 
 	void setErrorResponse(HttpResponse *response, int statusCode, LocationConfig *config);
 
@@ -39,6 +28,25 @@ public:
 	void setDefaultResponse(HttpResponse *response, LocationConfig *config);
 
 	HttpResponse *generateAutoIndex(const HttpRequest *request, const LocationConfig *config);
+
+	HttpResponse *getFile(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
+
+	std::string getDirPath(const HttpRequest *request, const LocationConfig *config) const;
+
+public:
+	Webserv();
+
+	Webserv(const Webserv &other);
+
+	Webserv &operator=(const Webserv &other);
+
+	~Webserv();
+
+	void run();
+
+	void parseConfig(std::string path);
+
+	HttpResponse * getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 };
 
 

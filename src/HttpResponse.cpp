@@ -44,6 +44,7 @@ HttpResponse *HttpResponse::setHeader(const std::string &key, const std::string 
 }
 
 HttpResponse *HttpResponse::setBody(const std::string &_body) {
+	this->setHeader("Content-length", to_string(_body.length()));
     this->_body = _body;
     return this;
 }
