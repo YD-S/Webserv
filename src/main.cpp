@@ -8,7 +8,7 @@ std::vector<std::pair<int, const ServerConfig *> > serverSockets;
 std::vector<Client> clients;
 
 void ft_handle_sigint(unused int signal) {
-	exit_handler();
+	exit_handler(0);
 }
 
 int main(int argc, char *argv[], char **envp) {
