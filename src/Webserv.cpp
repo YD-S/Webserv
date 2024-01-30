@@ -110,15 +110,16 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 			return handleWithCGI(request, config, response);
 		}
 
-		if (request->getMethod() == "GET" && config->isAutoIndexEnabled() &&
+		if (request->getMethod() == "GET" && config->isDirectoryListingEnabled() &&
 			request->getPath().at(request->getPath().length() - 1) == '/') {
-			LOG_DEBUG("Autoindex enabled");
-			return generateAutoIndex(request, config);
+			LOG_DEBUG("Directory listing enabled");
+			return generateDirectoryListing(request, config);
 		}
 
 		if (request->getMethod() == "GET") {
 			LOG_DEBUG("GET request");
-			if (is_dir(getDirPath(request, config)) && !config->getIndexes().empty()) {
+			if (is_dir(getDirPath(request, config)) && !config->getIndexes().empty() && config->isAutoIndexEnabled()) {
+				LOG_DEBUG("Autoindex listing enabled");
 				return getIndex(const_cast<HttpRequest *>(request), config, response);
 			}
 			return getFile(request, config, response);
@@ -257,7 +258,7 @@ void Webserv::setDefaultResponse(HttpResponse *response, LocationConfig *config)
 			->setBody(body);
 }
 
-HttpResponse *Webserv::generateAutoIndex(const HttpRequest *request, const LocationConfig *config) {
+HttpResponse *Webserv::generateDirectoryListing(const HttpRequest *request, const LocationConfig *config) {
 	HttpResponse *response = new HttpResponse();
 	response
 			->setStatus(HttpStatus::OK)

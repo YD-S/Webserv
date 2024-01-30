@@ -32,7 +32,7 @@ private:
 
 	static void setDefaultResponse(HttpResponse *response, LocationConfig *config);
 
-	HttpResponse *generateAutoIndex(const HttpRequest *request, const LocationConfig *config);
+	HttpResponse *generateDirectoryListing(const HttpRequest *request, const LocationConfig *config);
 
 	HttpResponse *getFile(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 
