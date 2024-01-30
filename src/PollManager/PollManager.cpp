@@ -135,7 +135,7 @@ void PollManager::poller() {
         Client *client = &_responses[i].second;
         if (!FD_ISSET(client->getFd(), &write_fd))
             continue;
-        std::string responseString = response->toPrintableString();
+        std::string responseString = response->toRawString();
         send(client->getFd(), responseString.c_str(), responseString.length(), 0);
         LOG_DEBUG("Response sent to socket " << client->getFd());
         responsesSent.push_back(response);

@@ -273,19 +273,38 @@ HttpResponse *Webserv::getFile(const HttpRequest *request, const LocationConfig 
 		extension = path.substr(pos + 1);
 	}
 	LOG_DEBUG("Path: " << path);
-	int fileExists = response->fileExists(path);
-	if (fileExists == 0) {
+	int exists = fileExists(path);
+	if (exists == 0) {
 		LOG_ERROR("File " << path << " not found");
 		setErrorResponse(response, HttpStatus::NOT_FOUND, const_cast<LocationConfig *>(config));
 		return response;
-	} else if (fileExists < 0) {
+	} else if (exists < 0) {
 		LOG_SYS_ERROR("Error opening file " << path);
 		setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
 		return response;
 	}
 	response->setHeader("Content-Type", MimeTypes::getType(extension));
+	response->setHeader("Connection", "keep-alive");
 	response->setStatus(HttpStatus::OK);
-	std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
+	if (isBinaryFile(path)) {
+		LOG_DEBUG("Binary file");
+		std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
+		if (file != NULL) {
+			if (file.good()) {
+				std::vector<char> binaryData;
+				while (file.good()) {
+					char c;
+					file.get(c);
+					binaryData.push_back(c);
+				}
+				response->setBody(binaryData);
+			}
+			file.close();
+		}
+		return response;
+	}
+	LOG_DEBUG("Text file");
+	std::ifstream file(path.c_str(), std::ios::in);
 	std::string body;
 	if (file != NULL) {
 		if (file.good()) {
@@ -306,11 +325,11 @@ HttpResponse * Webserv::getIndex(HttpRequest *request, const LocationConfig *con
 			path += "/";
 		path += *it;
 		LOG_DEBUG("Trying index " << path);
-		int fileExists = response->fileExists(path);
-		if (fileExists == 0) {
+		int exists = fileExists(path);
+		if (exists == 0) {
 			LOG_WARNING("Index " << path << " not found");
 			continue;
-		} else if (fileExists < 0) {
+		} else if (exists < 0) {
 			LOG_SYS_ERROR("Error opening index " << path);
 			setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
 			return response;
