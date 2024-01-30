@@ -10,12 +10,15 @@
 #include "PollManager/PollManager.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include "ICgiExecutor.hpp"
 
 class Webserv {
 private:
 	ParseConfig parse;
 
 	PollManager pollManager;
+
+	std::map<std::string, ICgiExecutor *> cgiExecutors;
 
 	HttpResponse *handleRequest(const HttpRequest *request, const ServerConfig *config);
 
@@ -44,11 +47,13 @@ public:
 
 	~Webserv();
 
-	void run();
+	void run(char **envp);
 
 	void parseConfig(const std::string &path);
 
 	HttpResponse *getIndex(HttpRequest *request, const LocationConfig *config, HttpResponse *response);
+
+	HttpResponse *handleWithCGI(const HttpRequest *request, const LocationConfig *config, HttpResponse *response);
 };
 
 

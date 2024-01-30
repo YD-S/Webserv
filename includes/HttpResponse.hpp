@@ -51,25 +51,13 @@ public:
 
 	std::string toRawString() const;
 
-	std::string toPrintableString();
+	std::string toPrintableString() const;
 
-	int findStatus(HttpRequest &request, ServerConfig &config);
+	void fromString(const std::string &str);
 
-	void getContentType();
+	void parseStatusLine(std::string statusLine);
 
-	void build(HttpRequest &request, ServerConfig &server);
-
-	static bool isCGI(std::string &path);
-
-	int fileExists(std::string filename);
-
-	void printAll() const;
-
-	void StringToResponse(std::string const str);
-
-	void parseStatusLine(const std::string &statusLine);
-
-	void parseHeader(const std::string &headerLine);
+	void parseHeader(std::string headerLine);
 };
 
 

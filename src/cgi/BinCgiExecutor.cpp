@@ -12,7 +12,7 @@
 #include "../../includes/cgi/BinCgiExecutor.hpp"
 
 
-void BinCgiExecutor::executeCgi(HttpRequest &request, std::string &response) {
+void BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std::string scriptPath) {
 
 	// Create a pipe to communicate with the CGI
 	// We need to write the request body to the pipe and read the response from the pipe,
@@ -27,7 +27,7 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, std::string &response) {
 	char **envp_ = buildEnvp(request);
 
 	// Build the arguments
-	char **args = buildArgs(request);
+	char **args = buildArgs(request, scriptPath);
 
 	// Fork the process
 	pid_t pid = fork();
@@ -55,7 +55,7 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, std::string &response) {
 		// Parent process
 	else {
 		// Write the request body to the pipe
-		if (write(request_pipe[1], request.getBody().c_str(), request.getBody().size()) == -1) {
+		if (write(request_pipe[1], request->getBody().c_str(), request->getBody().size()) == -1) {
 			throw std::runtime_error("Failed to write to pipe");
 		}
 
@@ -80,42 +80,45 @@ void BinCgiExecutor::executeCgi(HttpRequest &request, std::string &response) {
 		destroyCstrp(envp_);
 		destroyCstrp(args);
 
-		response = postProcessCgiResult();
+		*response = postProcessCgiResult();
 	}
 
 
 }
 
-char **BinCgiExecutor::buildEnvp(HttpRequest &request) {
+char **BinCgiExecutor::buildEnvp(HttpRequest *request) {
+	if (!envp) {
+		throw std::runtime_error("Environment pointer array is NULL");
+	}
 	// Build the environment variables
 	std::vector<std::string> envp_vector = std::vector<std::string>();
 	envp_vector.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	envp_vector.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	envp_vector.push_back("REDIRECT_STATUS=200");
-	envp_vector.push_back("REQUEST_METHOD=" + request.getMethod());
-	envp_vector.push_back("SCRIPT_FILENAME=" + request.getPath());
-	envp_vector.push_back("BODY=" + request.getBody());
+	envp_vector.push_back("REQUEST_METHOD=" + request->getMethod());
+	envp_vector.push_back("SCRIPT_FILENAME=" + request->getPath());
+	envp_vector.push_back("BODY=" + request->getBody());
 
 	// Other environment variables
-	if (request.getMethod() == "GET") {
-		envp_vector.push_back("QUERY_STRING=" + request.getQueryString());
-	} else if (request.getMethod() == "POST") {
-		envp_vector.push_back("CONTENT_TYPE=" + request.getHeaders().at("Content-Type"));
+	if (request->getMethod() == "GET") {
+		envp_vector.push_back("QUERY_STRING=" + request->getQueryString());
+	} else if (request->getMethod() == "POST") {
+		envp_vector.push_back("CONTENT_TYPE=" + request->getHeaders().at("Content-Type"));
 	}
 
 	// Add headers to the environment variables
-	for (std::map<std::string, std::string>::const_iterator it = request.getHeaders().begin();
-		 it != request.getHeaders().end(); ++it) {
+	for (std::map<std::string, std::string>::const_iterator it = request->getHeaders().begin();
+		 it != request->getHeaders().end(); ++it) {
 		envp_vector.push_back(convertToEnvVar(it->first) + "=" + it->second);
 	}
 	// Check required headers like Content-Length and add them if they are missing
-	if (request.getHeaders().find("Content-Length") == request.getHeaders().end()) {
-		envp_vector.push_back("CONTENT_LENGTH=" + to_string(request.getBody().size()));
+	if (request->getHeaders().find("Content-Length") == request->getHeaders().end()) {
+		envp_vector.push_back("CONTENT_LENGTH=" + to_string(request->getBody().size()));
 	}
 
 	// Add the system environment variables to the environment pointer array
-	for (char **env = envp; *env != NULL; ++env) {
-		envp_vector.push_back(*env);
+	for (int i=0; envp && envp[i]; i++) {
+		envp_vector.push_back(std::string(envp[i]));
 	}
 
 	// Add the environment variables to the environment pointer array
@@ -135,16 +138,16 @@ void BinCgiExecutor::destroyCstrp(char **cstrp) {
 	delete[] cstrp;
 }
 
-char **BinCgiExecutor::buildArgs(unused HttpRequest &request) {
+char **BinCgiExecutor::buildArgs(HttpRequest *request, const std::string& scriptPath) {
 	// The first argument (omitting the argv[0] executable name) is the file requested
 	std::vector<std::string> args_vector = std::vector<std::string>();
 	args_vector.push_back(this->getCgiPath()); // argv[0]
-	args_vector.push_back(request.getPath()); // argv[1]
+	args_vector.push_back(scriptPath); // argv[1]
 	// Add the query parameters to the argument vector
-	if (request.getParams().size() > 0) {
+	if (request->getParams().size() > 0) {
 		args_vector.push_back("?");
-		for (std::map<std::string, std::string>::const_iterator it = request.getParams().begin();
-			 it != request.getParams().end(); ++it) {
+		for (std::map<std::string, std::string>::const_iterator it = request->getParams().begin();
+			 it != request->getParams().end(); ++it) {
 			args_vector.push_back(it->first + "=" + it->second);
 		}
 		args_vector[args_vector.size() - 1] = "&";
@@ -170,7 +173,7 @@ BinCgiExecutor::BinCgiExecutor(const std::string &cgiPath, const std::string &cg
 }
 
 BinCgiExecutor::BinCgiExecutor() {
-
+	envp = NULL;
 }
 
 std::string BinCgiExecutor::convertToEnvVar(const std::string &header) {

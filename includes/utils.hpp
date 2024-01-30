@@ -46,4 +46,6 @@ int fileExists(const std::string &path);
 
 bool isBinaryFile(const std::string &path);
 
+std::string trim(const std::string &str);
+
 #endif //WEBSERV_UTILS_HPP

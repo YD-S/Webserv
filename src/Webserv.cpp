@@ -4,6 +4,7 @@
 
 #include "Webserv.hpp"
 #include "MimeTypes.hpp"
+#include "cgi/BinCgiExecutor.hpp"
 
 Webserv::Webserv() {
 	LOG_INFO("Webserv created");
@@ -16,11 +17,29 @@ void Webserv::parseConfig(const std::string &path) {
 		LOG_SYS_ERROR("NO SERVER :(\t");
 }
 
-void Webserv::run() {
+void Webserv::run(char **envp) {
 	pollManager.socketConfig(parse.getServers());
 	pollManager.binder(parse.getServers());
 	std::vector<std::pair<HttpResponse *, Client> > responses;
 	std::vector<std::pair<HttpRequest *, Client> > requests;
+
+	// for each config, find all the cgi configs and create a cgi executor for each
+	for (std::vector<ServerConfig>::const_iterator it = parse.getServers().begin();
+		 it != parse.getServers().end(); ++it) {
+		for (std::vector<LocationConfig>::const_iterator it2 = it->getLocations().begin();
+			 it2 != it->getLocations().end(); ++it2) {
+			if (it2->isCgiEnabled()) {
+				std::vector<std::pair<std::string, std::string> > cgis = it2->getCgi();
+				for (std::vector<std::pair<std::string, std::string> >::const_iterator it3 = cgis.begin();
+					 it3 != cgis.end(); ++it3) {
+					std::string extension = it3->first;
+					std::string path = it3->second;
+					ICgiExecutor *cgiExecutor = new BinCgiExecutor(path, extension, envp);
+					cgiExecutors[extension] = cgiExecutor;
+				}
+			}
+		}
+	}
 
 	while (1) {
 		pollManager.poller();
@@ -82,9 +101,12 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 	if (!config->getRedirect().empty()) {
 		LOG_DEBUG("Redirect enabled");
 	}
-
-	if ((request->getMethod() == "GET" || request->getMethod() == "POST") && config->isCgiEnabled()) {
-		LOG_DEBUG("Running CGI");
+	if ((request->getMethod() == "GET" || request->getMethod() == "POST") &&
+		config->isCgiEnabled() &&
+		!is_dir(getDirPath(request, config))
+			) {
+		LOG_DEBUG("Using CGI");
+		return handleWithCGI(request, config, response);
 	}
 
 	if (request->getMethod() == "GET" && config->isAutoIndexEnabled() &&
@@ -104,6 +126,29 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 	LOG_WARNING("Using default response");
 	setDefaultResponse(response, const_cast<LocationConfig *>(config));
 
+	return response;
+}
+
+HttpResponse *Webserv::handleWithCGI(const HttpRequest *request, const LocationConfig *config, HttpResponse *response) {
+	std::string extension;
+	size_t pos = request->getPath().find_last_of('.');
+	if (pos != std::string::npos) {
+		extension = request->getPath().substr(pos);
+	}
+	ICgiExecutor *cgiExecutor;
+	try {
+		cgiExecutor = cgiExecutors.at(extension);
+	} catch (std::out_of_range &e) {
+		LOG_DEBUG("No CGI executor found for extension " << extension);
+		return getFile(request, config, response);
+	}
+	std::string responseString;
+	LOG_DEBUG("Executing CGI");
+	delete response;
+	response = new HttpResponse();
+	cgiExecutor->executeCgi(const_cast<HttpRequest *>(request), &responseString, getDirPath(request, config));
+	response->fromString(responseString);
+	response->setHeader("Server", "webserv");
 	return response;
 }
 
@@ -329,7 +374,7 @@ HttpResponse *Webserv::getIndex(HttpRequest *request, const LocationConfig *conf
 		LOG_DEBUG("Trying index " << path);
 		int exists = fileExists(path);
 		if (exists == 0) {
-			LOG_WARNING("Index " << path << " not found");
+			LOG_DEBUG("Index " << path << " not found");
 			continue;
 		} else if (exists < 0) {
 			LOG_SYS_ERROR("Error opening index " << path);
@@ -341,6 +386,8 @@ HttpResponse *Webserv::getIndex(HttpRequest *request, const LocationConfig *conf
 		if (requestPath.at(requestPath.length() - 1) != '/')
 			requestPath += "/";
 		request->setPath(requestPath + *it);
+		if (config->isCgiEnabled())
+			return handleWithCGI(request, config, response);
 		return getFile(request, config, response);
 	}
 	LOG_ERROR("No index found");

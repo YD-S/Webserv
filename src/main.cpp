@@ -17,7 +17,7 @@ void ft_handle_sigint(int signal) {
 	exit(0);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[], char **envp) {
 	signal(SIGINT, ft_handle_sigint);
 	signal(SIGTERM, ft_handle_sigint);
 	Webserv webserv;
@@ -26,6 +26,6 @@ int main(int argc, char *argv[]) {
 		webserv.parseConfig("configs/default.conf");
 	else if (argc == 2)
 		webserv.parseConfig(argv[1]);
-	webserv.run();
+	webserv.run(envp);
 	return 0;
 }
