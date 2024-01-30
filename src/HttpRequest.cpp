@@ -130,7 +130,7 @@ std::string HttpRequest::getQueryString() const {
     return queryString;
 }
 
-static std::string trim(const std::string& str) {
+std::string HttpRequest::trim(const std::string& str) {
     std::size_t first = str.find_first_not_of(" \t\r");
     if (first == std::string::npos)
         return "";

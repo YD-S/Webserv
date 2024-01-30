@@ -16,48 +16,57 @@
 
 class HttpResponse {
 private:
-	std::string _version;
-	int _status;
+    std::string _version;
+    int _status;
 
-	std::map<std::string, std::string> _headers;
+    std::map<std::string, std::string> _headers;
 
-	std::vector<char> _body;
+    std::string _body;
 
 public:
 
-	HttpResponse();
+    HttpResponse();
+    HttpResponse(const HttpResponse& other);
+    HttpResponse& operator=(const HttpResponse& other);
+    ~HttpResponse();
 
-	HttpResponse(const HttpResponse &other);
+    HttpResponse *setVersion(const std::string &version);
 
-	HttpResponse &operator=(const HttpResponse &other);
+    HttpResponse *setStatus(int status);
 
-	~HttpResponse();
+    HttpResponse *setHeader(const std::string& key, const std::string& value);
 
-	HttpResponse *setVersion(const std::string &version);
+    HttpResponse *setBody(const std::string &body);
 
-	HttpResponse *setStatus(int status);
+    const std::string &getVersion() const;
 
-	HttpResponse *setHeader(const std::string &key, const std::string &value);
+    int getStatus() const;
 
-	HttpResponse *setBody(const std::string &body);
+    const std::map<std::string, std::string> &getHeaders() const;
 
-	HttpResponse *setBody(const std::vector<char> &_body);
+    const std::string &getBody() const;
 
-	const std::string &getVersion() const;
+    std::string toRawString() const;
 
-	int getStatus() const;
+    std::string toPrintableString();
 
-	const std::map<std::string, std::string> &getHeaders() const;
+    int findStatus(HttpRequest &request, ServerConfig &config);
 
-	const std::vector<char> &getBody() const;
+    void    getContentType();
 
-	std::string toRawString() const;
+    void    build(HttpRequest &request, ServerConfig &server);
 
-	void getContentType();
+    bool    isCGI(std::string &path);
 
-	bool isCGI(std::string &path);
+    int fileExists(std::string filename);
 
-	void printAll() const;
+    void printAll() const;
+
+	void StringToResponse(std::string const str);
+
+	void parseStatusLine(const std::string& statusLine);
+
+	void parseHeader(const std::string& headerLine);
 };
 
 

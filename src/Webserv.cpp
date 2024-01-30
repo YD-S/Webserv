@@ -25,6 +25,18 @@ void Webserv::run() {
 	pollManager.binder(parse.getServers());
 	std::vector<std::pair<HttpResponse *, Client> > responses;
 	std::vector<std::pair<HttpRequest *, Client> > requests;
+//
+//	std::string teststr =	"HTTP/1.1 200 NOT FOUND\r\n"
+//							 "Content-Type: text/html\r\n"
+//							 "Server: ExampleServer\r\n"
+//							 "Date: Sun, 30 Jan 2024 12:00:00 GMT\r\n"
+//							 "\r\n"
+//							 "<html>\n<body>\n<h1>Hello, World!</h1>\n<p>This is a sample HTTP response.</p>\n</body>\n</html>";
+//
+//
+//	HttpResponse *testresponse = new HttpResponse();
+//	testresponse->StringToResponse(teststr);
+//	testresponse->printAll();
 
 	while (1) {
 		pollManager.poller();
@@ -302,7 +314,7 @@ HttpResponse *Webserv::getFile(const HttpRequest *request, const LocationConfig 
 					file.get(c);
 					binaryData.push_back(c);
 				}
-				response->setBody(binaryData);
+				//response->setBody(binaryData);
 			}
 			file.close();
 		}

@@ -123,6 +123,13 @@ void PollManager::poller() {
             request->setFd(serverSockets[i].first);
 			request->parse(requestString);
 			_requests.push_back(std::make_pair(request, client));
+
+			std::string testresponsestring = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<html><body><h1>It works!</h1></body></html>\r\n";
+
+			HttpResponse *testresponse = new HttpResponse();
+			testresponse->StringToResponse(testresponsestring);
+			testresponse->printAll();
+
             LOG_DEBUG("Request received from socket " << clientSocket);
 		}
 	}
