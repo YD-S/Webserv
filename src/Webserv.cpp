@@ -348,13 +348,13 @@ HttpResponse *Webserv::getFile(const HttpRequest *request, const LocationConfig 
 		std::ifstream file(path.c_str(), std::ios::in | std::ios::binary);
 		if (file != NULL) {
 			if (file.good()) {
-				std::vector<char> binaryData;
+				std::string binaryData;
 				while (file.good()) {
 					char c;
 					file.get(c);
-					binaryData.push_back(c);
+					binaryData += c;
 				}
-				//response->setBody(binaryData);
+				response->setBody(binaryData);
 			}
 			file.close();
 		}
