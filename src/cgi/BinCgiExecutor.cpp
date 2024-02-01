@@ -2,15 +2,7 @@
 // Created by kolterdyx on 31/10/23.
 //
 
-#include <stdexcept>
-#include <unistd.h>
-#include <cstring>
-#include <sys/wait.h>
 #include "cgi/BinCgiExecutor.hpp"
-#include "macros.h"
-#include "utils.hpp"
-#include "../../includes/cgi/BinCgiExecutor.hpp"
-#include "Webserv.hpp"
 
 
 bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std::string scriptPath) {
@@ -59,18 +51,43 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		if (write(request_pipe[1], request->getBody().c_str(), request->getBody().size()) == -1) {
 			throw std::runtime_error("Failed to write to pipe");
 		}
-
 		// Close the write end of the pipe
 		close(response_pipe[1]);
+
+		// Use epoll_wait to wait for the child process to write to the pipe
+		int epoll_fd = epoll_create(1);
+		if (epoll_fd == -1) {
+			throw std::runtime_error("Failed to create epoll");
+		}
+		struct epoll_event event;
+		event.events = EPOLLIN;
+		event.data.fd = response_pipe[0];
+		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, response_pipe[0], &event) == -1) {
+			throw std::runtime_error("Failed to add pipe to epoll");
+		}
+		struct epoll_event events[1];
+
+		int num_events = epoll_wait(epoll_fd, events, 1, 1000 * TIMEOUT_SEC);
+		if (num_events == -1) {
+			throw std::runtime_error("Failed to wait for pipe");
+		}
+		bool timeout = false;
+		if (num_events == 0) {
+			LOG_ERROR("Timeout waiting for CGI response");
+			timeout = true;
+			kill(pid, SIGKILL);
+		}
 
 		// Wait for the child process to finish
 		int status;
 		waitpid(pid, &status, 0);
+		if (timeout) {
+			return false;
+		}
 		if (WEXITSTATUS(status) != 0) {
 			LOG_ERROR("CGI exited with status " << WEXITSTATUS(status));
 			return false;
 		}
-
 		// Read the response from the CGI
 		char buffer[1024];
 		_cgiResult = "";

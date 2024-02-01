@@ -7,6 +7,17 @@
 
 
 #include "ICgiExecutor.hpp"
+#include <stdexcept>
+#include <unistd.h>
+#include <cstring>
+#include <sys/wait.h>
+#include "macros.h"
+#include "utils.hpp"
+#include "Webserv.hpp"
+#include <sys/types.h>
+#include <sys/epoll.h>
+
+#define TIMEOUT_SEC 30
 
 class BinCgiExecutor : public ICgiExecutor {
 
