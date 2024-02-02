@@ -111,6 +111,12 @@ public:
 
 	void clearIndex();
 
+    void clearMethods();
+
+    void clearCgi();
+
+    void clearErrorPages();
+
 	bool hasMethod(std::string method) const;
 
 	std::string toString();

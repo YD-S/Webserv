@@ -44,7 +44,6 @@ LocationConfig &LocationConfig::operator=(const LocationConfig &other) {
 }
 
 LocationConfig::~LocationConfig() {
-
 }
 
 void LocationConfig::setDirectoryListingEnabled(const std::string &boolean) {
@@ -186,6 +185,10 @@ void LocationConfig::clearIndex() {
 	_indexes.clear();
 }
 
+void    LocationConfig::clearMethods() {
+    _methods.clear();
+}
+
 bool LocationConfig::hasMethod(std::string method) const {
 	for (std::vector<std::string>::const_iterator it = _methods.begin(); it != _methods.end(); ++it) {
 		if (method == *it)
@@ -273,4 +276,12 @@ void LocationConfig::setDefaultConfig(LocationConfig *defaultLocation) {
 		_clientMaxBodySize = defaultLocation->_clientMaxBodySize;
 	if (_redirect.empty())
 		_redirect = defaultLocation->getRedirect();
+}
+
+void LocationConfig::clearCgi() {
+    _cgi.clear();
+}
+
+void LocationConfig::clearErrorPages() {
+    _errorPages.clear();
 }

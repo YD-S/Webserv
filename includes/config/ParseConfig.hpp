@@ -39,7 +39,10 @@ public:
 	bool isDelimiter(char c);
 
 	LocationConfig parseLocation(std::vector<std::pair<std::string, std::string> >::iterator &it,
-								 std::vector<std::pair<std::string, std::string> > &config);
+								 std::vector<std::pair<std::string, std::string> > &config, const LocationConfig *defaultLocation);
+
+    void prepareLocation(std::vector<std::pair<std::string, std::vector<std::string> > > &variables,
+                         LocationConfig &location);
 
 	void validate_braces(std::ifstream &file);
 
@@ -51,6 +54,10 @@ public:
 
 	void LocationSetter(std::vector<std::pair<std::string, std::vector<std::string> > > &variables,
 						LocationConfig &location);
+
+    void LocationConfCopy(std::vector<std::pair<std::string, std::string> >::iterator &it,
+                                   std::vector<std::pair<std::string, std::string> > &config,
+                                   std::vector<std::pair<std::string, std::string> > &configCopy);
 
 	void printTempVariables(std::vector<std::pair<std::string, std::vector<std::string> > > variables);
 
