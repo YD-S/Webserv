@@ -102,6 +102,7 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 
 		if (!config->getRedirect().empty()) {
 			LOG_DEBUG("Redirect enabled");
+			return response->setStatus(HttpStatus::MOVED_PERMANENTLY)->setHeader("Location", config->getRedirect());
 		}
 		if ((request->getMethod() == "GET" || request->getMethod() == "POST") &&
 			config->isCgiEnabled() &&
