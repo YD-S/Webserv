@@ -126,10 +126,18 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 			}
 			return getFile(request, config, response);
 		}
-
+		if (request->getMethod() == "DELETE") {
+			LOG_DEBUG("DELETE request");
+			std::string path = getDirPath(request, config);
+			if (remove(path.c_str()) != 0) {
+				LOG_SYS_ERROR("Error deleting file " << path);
+				setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
+				return response;
+			}
+			return response->setStatus(HttpStatus::NO_CONTENT);
+		}
 		LOG_WARNING("Using default response");
 		setDefaultResponse(response, const_cast<LocationConfig *>(config));
-
 		return response;
 	} catch (std::exception &e) {
 		LOG_SYS_ERROR("Error handling request: " << e.what());
