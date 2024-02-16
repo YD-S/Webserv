@@ -126,6 +126,28 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 			}
 			return getFile(request, config, response);
 		}
+
+        if (request->getMethod() == "POST") {
+            LOG_DEBUG("POST request");
+            std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append(request->getPath()).c_str(), std::ios::binary);
+            LOG_ERROR("POST: " << getDirPath(request, config));
+            if (file.is_open())
+            {
+                std::string body = request->getBody();
+                std::string::size_type pos = 0;
+                while ((pos = body.find("\r\n", pos)) != std::string::npos) {
+                    body.replace(pos, 2, "\n");
+                    pos += 1;
+                }
+                file << body;
+                file.close();
+                response->setStatus(HttpStatus::CREATED);
+            }
+            else
+                response->setStatus(409);
+            return getFile(request, config, response);
+        }
+
 		if (request->getMethod() == "DELETE") {
 			LOG_DEBUG("DELETE request");
 			std::string path = getDirPath(request, config);

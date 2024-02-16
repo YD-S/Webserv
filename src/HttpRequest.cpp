@@ -235,9 +235,7 @@ HttpRequest *HttpRequest::parse(std::string request) {
 
 			this->setHeader(header, value);
 		} else {
-			if (_method == "POST")
-				parsePostParams(stream);
-			else if (_method == "GET" || _method == "DELETE")
+            if (_method == "GET" || _method == "DELETE" || _method == "POST")
 				std::getline(stream, _body, '\0');
 			else
 				ft_error("Unkown method!", 1);
