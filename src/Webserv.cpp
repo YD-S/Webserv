@@ -61,7 +61,7 @@ void Webserv::run(char **envp) {
 }
 
 HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const ServerConfig *config) {
-	if (config->getLocations().empty()) {
+    if (config->getLocations().empty()) {
 		return handleWithLocation(request, config->getDefaultLocation());
 	}
 	// Exact match
@@ -97,6 +97,12 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 		HttpResponse *response = new HttpResponse();
 		response->setHeader("Server", "webserv");
 
+        if (request->isInvalid(const_cast<LocationConfig *>(config))) {
+            LOG_ERROR("Invalid request");
+            setErrorResponse(response, request->isInvalid(const_cast<LocationConfig *>(config)), const_cast<LocationConfig *>(config));
+            return response;
+        }
+
 		if (!checkRequestMethod(request, config, response))
 			return response;
 
@@ -129,23 +135,22 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 
         if (request->getMethod() == "POST") {
             LOG_DEBUG("POST request");
-            std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append(request->getPath()).c_str(), std::ios::binary);
-            LOG_ERROR("POST: " << getDirPath(request, config));
+            std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("File-Name")).c_str(), std::ios::binary);
+            LOG_DEBUG("Upload path: " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("File-Name")));
             if (file.is_open())
             {
-                std::string body = request->getBody();
-                std::string::size_type pos = 0;
-                while ((pos = body.find("\r\n", pos)) != std::string::npos) {
-                    body.replace(pos, 2, "\n");
-                    pos += 1;
-                }
-                file << body;
+                response->setHeader("Connection", "keep-alive");
+
+                file.write(request->getBody().c_str(), request->getBody().size());
                 file.close();
-                response->setStatus(HttpStatus::CREATED);
+                response->setStatus(HttpStatus::OK);
             }
             else
+            {
+                LOG_SYS_ERROR("Error opening file while POST " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("File-Name")));
                 response->setStatus(409);
-            return getFile(request, config, response);
+            }
+            return response;
         }
 
 		if (request->getMethod() == "DELETE") {
@@ -159,7 +164,7 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 			return response->setStatus(HttpStatus::NO_CONTENT);
 		}
 		LOG_WARNING("Using default response");
-		setDefaultResponse(response, const_cast<LocationConfig *>(config));
+        setDefaultResponse(response, const_cast<LocationConfig *>(config));
 		return response;
 	} catch (std::exception &e) {
 		LOG_SYS_ERROR("Error handling request: " << e.what());

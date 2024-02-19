@@ -122,6 +122,8 @@ public:
 	std::string toString();
 
 	std::string getErrorPage(int statusCode);
+
+    size_t getClientMaxBodySize() const;
 };
 
 
