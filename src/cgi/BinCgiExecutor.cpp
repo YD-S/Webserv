@@ -58,6 +58,13 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 #if __APPLE__
 
 		struct kevent ev = {};
+		EV_SET(&ev, response_pipe[0], EVFILT_READ, EV_ADD, 0, 0, NULL);
+		struct timespec timeout = {TIMEOUT_SEC, 0};
+		int kq = kqueue();
+		if (kq == -1) {
+			LOG_ERROR("Failed to create kqueue");
+		}
+		int num_events = kevent(kq, &ev, 1, &ev, 1, &timeout);
 
 #elif __linux__
 		// Use epoll_wait to wait for the child process to write to the pipe
@@ -74,6 +81,8 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		struct epoll_event events[1];
 
 		int num_events = epoll_wait(epoll_fd, events, 1, 1000 * TIMEOUT_SEC);
+#endif
+
 		if (num_events == -1) {
 			LOG_ERROR("Failed to wait for pipe");
 		}
@@ -82,8 +91,6 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 			timeout = true;
 			kill(pid, SIGKILL);
 		}
-#endif
-
 		// Wait for the child process to finish
 		int status;
 		waitpid(pid, &status, 0);
