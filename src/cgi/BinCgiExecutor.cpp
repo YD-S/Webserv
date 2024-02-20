@@ -13,7 +13,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	int request_pipe[2];
 	int response_pipe[2];
 	if (pipe(request_pipe) == -1 || pipe(response_pipe) == -1) {
-		throw std::runtime_error("Failed to create pipe");
+		LOG_ERROR("Failed to create pipe");
 	}
 
 	// Build the environment variables
@@ -25,18 +25,18 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	// Fork the process
 	pid_t pid = fork();
 	if (pid == -1) {
-		throw std::runtime_error("Failed to fork");
+		LOG_ERROR("Failed to fork");
 	}
 	// Child process
 	if (pid == 0) {
 		// Duplicate the write end of the response_pipe to stdout
 		if (dup2(response_pipe[1], STDOUT_FILENO) == -1) {
-			throw std::runtime_error("Failed to duplicate STDOUT_FILENO pipe");
+			LOG_ERROR("Failed to duplicate STDOUT_FILENO pipe");
 		}
 
 		// Duplicate the read end of the request_pipe to stdin
 		if (dup2(request_pipe[0], STDIN_FILENO) == -1) {
-			throw std::runtime_error("Failed to duplicate STDIN_FILENO pipe");
+			LOG_ERROR("Failed to duplicate STDIN_FILENO pipe");
 		}
 
 		// Execute the CGI
@@ -49,7 +49,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		// Write the request body to the pipe
 		LOG_DEBUG("Writing to pipe: " << request->getBody());
 		if (write(request_pipe[1], request->getBody().c_str(), request->getBody().size()) == -1) {
-			throw std::runtime_error("Failed to write to pipe");
+			LOG_ERROR("Failed to write to pipe");
 		}
 		// Close the write end of the pipe
 		close(response_pipe[1]);
@@ -57,19 +57,19 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		// Use epoll_wait to wait for the child process to write to the pipe
 		int epoll_fd = epoll_create(1);
 		if (epoll_fd == -1) {
-			throw std::runtime_error("Failed to create epoll");
+			LOG_ERROR("Failed to create epoll");
 		}
-		struct epoll_event event;
+		struct epoll_event event = {};
 		event.events = EPOLLIN;
 		event.data.fd = response_pipe[0];
 		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, response_pipe[0], &event) == -1) {
-			throw std::runtime_error("Failed to add pipe to epoll");
+			LOG_ERROR("Failed to add pipe to epoll");
 		}
 		struct epoll_event events[1];
 
 		int num_events = epoll_wait(epoll_fd, events, 1, 1000 * TIMEOUT_SEC);
 		if (num_events == -1) {
-			throw std::runtime_error("Failed to wait for pipe");
+			LOG_ERROR("Failed to wait for pipe");
 		}
 		bool timeout = false;
 		if (num_events == 0) {
