@@ -24,7 +24,6 @@ private:
     std::map<std::string, std::string> _headers;
 
     std::string _body;
-    size_t _bodySize;
 
     int _serverFd;
 public:

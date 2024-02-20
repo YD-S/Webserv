@@ -59,12 +59,12 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 
 		struct kevent ev = {};
 		EV_SET(&ev, response_pipe[0], EVFILT_READ, EV_ADD, 0, 0, NULL);
-		struct timespec timeout = {TIMEOUT_SEC, 0};
+		struct timespec timeout_s = {TIMEOUT_SEC, 0};
 		int kq = kqueue();
 		if (kq == -1) {
 			LOG_ERROR("Failed to create kqueue");
 		}
-		int num_events = kevent(kq, &ev, 1, &ev, 1, &timeout);
+		int num_events = kevent(kq, &ev, 1, &ev, 1, &timeout_s);
 
 #elif __linux__
 		// Use epoll_wait to wait for the child process to write to the pipe
