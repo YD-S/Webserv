@@ -251,7 +251,7 @@ HttpRequest *HttpRequest::parse(std::string &request) {
             if (colonPos != std::string::npos) {
                 // Extract header and value
                 std::string header = stringToLower(trim(line.substr(0, colonPos)));
-                std::string value = stringToLower(trim(line.substr(colonPos + 1)));
+                std::string value = trim(line.substr(colonPos + 1));
 
                 this->setHeader(header, value);
             } else if (line == "\r") {
@@ -268,7 +268,7 @@ HttpRequest *HttpRequest::parse(std::string &request) {
                     size_t filenameStart = _body.find("filename=\"") + 10; // Length of "filename=\""
                     size_t filenameEnd = _body.find("\"", filenameStart);
                     std::string myValue = _body.substr(filenameStart, filenameEnd - filenameStart);
-                    std::string myKey = "File-Name";
+                    std::string myKey = "file-name";
                     this->setHeader(myKey, myValue);
                     _body.clear();
                 }
