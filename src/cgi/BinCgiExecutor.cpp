@@ -54,6 +54,12 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		// Close the write end of the pipe
 		close(response_pipe[1]);
 
+		bool timeout = false;
+#if __APPLE__
+
+		struct kevent ev = {};
+
+#elif __linux__
 		// Use epoll_wait to wait for the child process to write to the pipe
 		int epoll_fd = epoll_create(1);
 		if (epoll_fd == -1) {
@@ -71,12 +77,12 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		if (num_events == -1) {
 			LOG_ERROR("Failed to wait for pipe");
 		}
-		bool timeout = false;
 		if (num_events == 0) {
 			LOG_ERROR("Timeout waiting for CGI response");
 			timeout = true;
 			kill(pid, SIGKILL);
 		}
+#endif
 
 		// Wait for the child process to finish
 		int status;

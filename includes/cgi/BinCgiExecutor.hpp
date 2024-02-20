@@ -15,7 +15,11 @@
 #include "utils.hpp"
 #include "Webserv.hpp"
 #include <sys/types.h>
-#include <sys/epoll.h>
+#if __APPLE__
+	#include <sys/event.h>
+#elif __linux__
+	#include <sys/epoll.h>
+#endif
 
 #define TIMEOUT_SEC 30
 
