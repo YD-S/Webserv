@@ -41,8 +41,8 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig) {
             else
                 server.sin_addr.s_addr = inet_addr(serversConfig[i].getListen()[j].first.c_str());
             server.sin_port = htons(serversConfig[i].getListen()[j].second);
+			_servers.push_back(server);
         }
-        _servers.push_back(server);
     }
 }
 
