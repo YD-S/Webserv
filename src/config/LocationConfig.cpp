@@ -242,7 +242,6 @@ std::string LocationConfig::getErrorPage(const int statusCode) {
 }
 
 void LocationConfig::setDefaultConfig(LocationConfig *defaultLocation) {
-	// TODO: check if booleans like autoindex are defined so they can be inherited or overwritten
 	if (_root.empty())
 		_root = defaultLocation->getRoot();
 	if (_indexes.empty())
@@ -284,4 +283,8 @@ void LocationConfig::clearCgi() {
 
 void LocationConfig::clearErrorPages() {
     _errorPages.clear();
+}
+
+size_t LocationConfig::getClientMaxBodySize() const {
+    return _clientMaxBodySize;
 }

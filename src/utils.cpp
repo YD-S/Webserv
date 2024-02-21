@@ -113,6 +113,14 @@ std::string trim(const std::string &str) {
 	return str.substr(first, (last - first + 1));
 }
 
+std::string stringToLower(const std::string &str) {
+    std::string lowerStr = str;
+    for (std::string::iterator it = lowerStr.begin(); it != lowerStr.end(); ++it) {
+        *it = (char)tolower(*it);
+    }
+    return lowerStr;
+}
+
 void exit_handler(int status) {
 	LOG_INFO("Stopping webserv...");
 	for (unsigned long i = 0; i < serverSockets.size(); i++) {

@@ -48,6 +48,8 @@ bool isBinaryFile(const std::string &path);
 
 std::string trim(const std::string &str);
 
+std::string stringToLower(const std::string &str);
+
 void exit_handler(int status);
 
 #endif //WEBSERV_UTILS_HPP
