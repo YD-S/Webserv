@@ -29,6 +29,7 @@
 #include <utility>
 #include <string>
 #include <stack>
+#include <cstring>
 #include "HttpResponse.hpp"
 #include "HttpRequest.hpp"
 #include "HttpStatus.hpp"
@@ -37,7 +38,7 @@
 extern std::vector<std::pair<int, const ServerConfig *> > serverSockets;
 extern std::vector<Client> clients;
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 4096
 
 #define FILL_SET(vector, fd, set, max) \
     for (unsigned int i=0; i < vector.size(); i++) { \

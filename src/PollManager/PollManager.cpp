@@ -1,7 +1,15 @@
 //
 // Created by Yash on 19/12/23.
 //
-
+#include <iostream>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <cerrno>
+#include <cstring>
 #include "PollManager/PollManager.hpp"
 
 PollManager::PollManager() : clientSocket(), clientData() {
@@ -28,6 +36,12 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig) {
             LOG_SYS_ERROR("Socket creation failed");
             kill(getpid(), SIGINT);
         }
+        int reuse = 1;
+        setsockopt(j, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)); // Reuse the port
+        struct timeval timeout;
+        timeout.tv_sec = 0; // 5 seconds timeout
+        timeout.tv_usec = 30000; // Make it only for POST requests as it affects the benchmark
+        setsockopt(j, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout)); // timeout for recv
         serverSockets.push_back(std::make_pair(j, &serversConfig[i]));
     }
     for (unsigned long i = 0; i < serversConfig.size(); ++i) {
@@ -103,25 +117,59 @@ void PollManager::poller() {
 
             std::string requestString;
             char buffer[BUFFER_SIZE] = {0};
-            int readValue = 0;
+            ssize_t readValue = 0;
+            int timesreadValue = 0;
+            //long byteRead = 0;
+            long totalBytesReceived = 0;
+            long bytesLeftToReceive = 0;
+            std::string temp;
+            std::string header;
+            char *headerHasEnded = 0;
+            HttpRequest *request = new HttpRequest();
             do {
-                for (int j = 0; j < BUFFER_SIZE; j++)
+                for (int j = 0; j < BUFFER_SIZE; ++j)
                     buffer[j] = 0;
-                readValue = read(clientSocket, buffer, BUFFER_SIZE);
+                std::cout << "Reading from socket " << clientSocket << ". Iteration number " << timesreadValue++ << ". ";
+                std::cout << "Bytes left to read: " << bytesLeftToReceive << std::endl;
+                while (!headerHasEnded) {
+                    for (int j = 0; j < BUFFER_SIZE; ++j)
+                        buffer[j] = 0;
+                    readValue = read(clientSocket, buffer, BUFFER_SIZE);
+                    temp.append(buffer);
+                    headerHasEnded = std::strstr(buffer, "\r\n\r\n");
+                    if (headerHasEnded)
+                    {
+                        headerHasEnded += 4;
+                        header = temp.substr(0, headerHasEnded - buffer);
+                        request->parseHeader(header);
+                        requestString = temp.substr(headerHasEnded - buffer);
+                        totalBytesReceived += requestString.size();
+                        if (!bytesLeftToReceive)
+                        {
+                            std::string temp2 = request->getHeader("content-length");
+                            if (!temp2.empty())
+                                bytesLeftToReceive = ft_stoul(request->getHeader("content-length")) - requestString.size();
+                        }
+                    }
+
+                }
+                readValue = recv(clientSocket, buffer, BUFFER_SIZE, MSG_WAITALL);
+                //byteRead += readValue;
                 if (readValue < 0) {
                     LOG_SYS_ERROR("Read failed");
                     continue;
                 }
                 requestString.append(buffer, readValue);
-            } while (readValue == BUFFER_SIZE);
-            std::ofstream file("tmae.jpg", std::ios::binary);
+                totalBytesReceived += readValue;
+                bytesLeftToReceive -= readValue;
+            } while (readValue > 0);
 
-            file.write(requestString.c_str(), requestString.size());
+
             Client client = Client(clientSocket, clientData);
             clients.push_back(client);
-            HttpRequest *request = new HttpRequest();
             request->setFd(serverSockets[i].first);
-            request->parse(requestString);
+            LOG_WARNING(requestString.size());
+            request->parseBody(requestString);
             _requests.push_back(std::make_pair(request, client));
 
             LOG_DEBUG("Request received from socket " << clientSocket);

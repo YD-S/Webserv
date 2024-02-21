@@ -384,7 +384,7 @@ void ParseConfig::LocationSetter(std::vector<std::pair<std::string, std::vector<
             iter = it->second.erase(iter);
             location.addErrorPage(code, *iter);
         } else if (it->first == "clientMaxBodySize") {
-            int size = 0;
+            size_t size = 0;
             std::vector<std::string>::iterator iter = it->second.begin();
             try {
                 size = ft_stoul(*iter);
@@ -544,7 +544,7 @@ void ParseConfig::mainSetter(std::vector<std::pair<std::string, std::vector<std:
             iter = it->second.erase(iter);
             defaultLocation.addErrorPage(code, *iter);
         } else if (it->first == "clientMaxBodySize") {
-            int size = 0;
+            size_t size = 0;
             std::vector<std::string>::iterator iter = it->second.begin();
             try {
                 size = ft_stoul(*iter);

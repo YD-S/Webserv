@@ -36,8 +36,6 @@ public:
 
     ~HttpRequest();
 
-    HttpRequest *parse(std::string &request);
-
     HttpRequest *setMethod(const std::string &method);
 
     HttpRequest *setPath(const std::string &path);
@@ -85,6 +83,10 @@ public:
     static std::string trim(const std::string &str);
 
     int isInvalid(const LocationConfig *location) const;
+
+    HttpRequest *parseHeader(std::string &request);
+
+    HttpRequest *parseBody(std::string &request);
 };
 
 

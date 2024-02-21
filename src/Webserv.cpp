@@ -94,7 +94,7 @@ HttpResponse *Webserv::handleRequest(const HttpRequest *request, unused const Se
 HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unused const LocationConfig *config) {
 	try {
 		LOG_DEBUG("Handling request with location " << config->getPath());
-		HttpResponse *response = new HttpResponse();
+		HttpResponse *response = new HttpResponse(); // leaks memory
 		response->setHeader("Server", "webserv");
 
         if (request->isInvalid(const_cast<LocationConfig *>(config))) {
@@ -305,7 +305,7 @@ HttpResponse *Webserv::generateDirectoryListing(const HttpRequest *request, cons
 			"<html><head><style>th { font-size: larger; font-weight: bold; text-align: left; }</style></head><body><h1>Index of " +
 			request->getPath() + "</h1>";
 	std::string path = getDirPath(request, config);
-	DIR *dir = opendir(path.c_str());
+	DIR *dir = opendir(path.c_str()); // Leaks memory
 	if (dir == NULL) {
 		LOG_SYS_ERROR("Error opening directory " << path);
 		setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
