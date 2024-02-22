@@ -226,7 +226,8 @@ int HttpRequest::isInvalid(const LocationConfig *location) const{
 }
 
 
-HttpRequest *HttpRequest::parse(std::string &request) {
+HttpRequest *HttpRequest::parseHeader(std::string &request)
+{
     std::istringstream stream(request, std::ios::binary);
     std::string line;
 
@@ -240,11 +241,7 @@ HttpRequest *HttpRequest::parse(std::string &request) {
     if (_method == "GET")
         parseGetParams(_path);
 
-    bool headersComplete = false; // Flag to indicate if headers are complete
-    bool isFile = false;
-
     while (std::getline(stream, line, '\n')) {
-        if (!headersComplete) {
             // Find the position of the colon in the line
             std::size_t colonPos = line.find(':');
 
@@ -254,31 +251,51 @@ HttpRequest *HttpRequest::parse(std::string &request) {
                 std::string value = trim(line.substr(colonPos + 1));
 
                 this->setHeader(header, value);
-            } else if (line == "\r") {
-                // Empty line indicates end of headers
-                headersComplete = true;
             }
-        } else {
-            // After headers, the remaining data is the body
-            if (line == "\r" && !isFile)
-            {
-                if (_body.find("Content-Disposition: form-data;") != std::string::npos &&
-                        _body.find("filename=\"") != std::string::npos) {
-                    // Extract the filename from the Content-Disposition header
-                    size_t filenameStart = _body.find("filename=\"") + 10; // Length of "filename=\""
-                    size_t filenameEnd = _body.find("\"", filenameStart);
-                    std::string myValue = _body.substr(filenameStart, filenameEnd - filenameStart);
-                    std::string myKey = "file-name";
-                    this->setHeader(myKey, myValue);
-                    _body.clear();
-                }
-                continue;
-            }
-            _body.append(line);
-            _body.append("\n"); // Append newline as it's removed by std::getline
-        }
     }
-    printHttpRequest();
+    return this;
+}
+
+HttpRequest *HttpRequest::parseBody(std::string &request) {
+    std::istringstream stream(request, std::ios::binary);
+    std::string line;
+
+    std::getline(stream, line, '\n');
+
+    std::string temp;
+
+    bool isFile = false;
+
+    while (std::getline(stream, line, '\n')) {
+        if (line == "\r" && !isFile)
+        {
+            if (_body.find("Content-Disposition: form-data;") != std::string::npos &&
+                    _body.find("filename=\"") != std::string::npos) {
+                // Extract the filename from the Content-Disposition header
+                size_t filenameStart = _body.find("filename=\"") + 10; // Length of "filename=\""
+                size_t filenameEnd = _body.find("\"", filenameStart);
+                std::string myValue = _body.substr(filenameStart, filenameEnd - filenameStart);
+                std::string myKey = "file-name";
+                this->setHeader(myKey, myValue);
+                _body.clear();
+            }
+            continue;
+        }
+        _body.append(line);
+        _body.append("\n"); // Append newline as it's removed by std::getline
+    }
+/*    std::string fileBoundary = getHeader("content-type");
+    if (fileBoundary.find("boundary=") != std::string::npos) {
+        size_t boundaryStart = fileBoundary.find("boundary=") + 9; // Length of "boundary="
+        std::string boundary = fileBoundary.substr(boundaryStart);
+        LOG_ERROR(fileBoundary);
+        LOG_ERROR(_body.substr(_body.find_last_of("\n") + 1));
+        LOG_ERROR(boundary);
+        if (_body.find(boundary) != std::string::npos) {
+            _body.erase(_body.find_last_of(boundary));
+        }
+    }*/
+
     return this;
 }
 
