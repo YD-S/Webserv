@@ -121,7 +121,7 @@ std::string HttpRequest::getHeader(const std::string &key) const {
         LOG_ERROR("Header " << key << " not found");
         return "";
     }
-    return _headers.find(key)->second;
+    return _headers.find(stringToLower(key))->second;
 }
 
 std::string HttpRequest::getParam(const std::string &key) const {

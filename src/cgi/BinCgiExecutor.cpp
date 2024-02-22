@@ -129,7 +129,7 @@ char **BinCgiExecutor::buildEnvp(HttpRequest *request) {
 	envp_vector.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	envp_vector.push_back("SERVER_PROTOCOL=HTTP/1.1");
 	envp_vector.push_back("SERVER_SOFTWARE=Webserv/1.0");
-	envp_vector.push_back("SERVER_NAME=" + request->getHeaders().at("Host"));
+	envp_vector.push_back("SERVER_NAME=" + request->getHeader("Host"));
 	envp_vector.push_back("REDIRECT_STATUS=200");
 	envp_vector.push_back("REQUEST_METHOD=" + request->getMethod());
 	envp_vector.push_back("SCRIPT_NAME=" + request->getPath());
@@ -140,7 +140,7 @@ char **BinCgiExecutor::buildEnvp(HttpRequest *request) {
 	if (request->getMethod() == "GET") {
 		envp_vector.push_back("QUERY_STRING=" + request->getQueryString());
 	} else if (request->getMethod() == "POST") {
-		envp_vector.push_back("CONTENT_TYPE=" + request->getHeaders().at("Content-Type"));
+		envp_vector.push_back("CONTENT_TYPE=" + request->getHeader("Content-Type"));
 	}
 
 	// Check required headers like Content-Length and add them if they are missing

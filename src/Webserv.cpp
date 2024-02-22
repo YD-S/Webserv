@@ -167,7 +167,7 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
         setDefaultResponse(response, const_cast<LocationConfig *>(config));
 		return response;
 	} catch (std::exception &e) {
-		LOG_SYS_ERROR("Error handling request: " << e.what());
+		LOG_ERROR("Error handling request: " << e.what());
 		HttpResponse *response = new HttpResponse();
 		setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
 		return response;
