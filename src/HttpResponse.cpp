@@ -39,7 +39,7 @@ HttpResponse *HttpResponse::setStatus(int status) {
 }
 
 HttpResponse *HttpResponse::setHeader(const std::string &key, const std::string &value) {
-	this->_headers.insert(std::make_pair(key, value));
+	this->_headers.insert(std::make_pair(stringToLower(key), value));
 	return this;
 }
 
@@ -127,7 +127,7 @@ void HttpResponse::parseHeader(std::string headerLine) {
 	if (colonPos != std::string::npos) {
 		std::string key = headerLine.substr(0, colonPos);
 		std::string value = trim(headerLine.substr(colonPos + 1));
-		_headers[key] = value;
+		setHeader(key, value);
 	}
 }
 
