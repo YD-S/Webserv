@@ -31,12 +31,14 @@ class Response:
 
 request = Request(os.environ)
 
+body = str(request)
 
 response = Response(
     200,
     {
-        'Content-Type': 'text/plain'
+        'Content-Type': 'text/plain',
+        'Content-Length': len(body)
     },
-    str(request)
+    body
 )
 response.send()
