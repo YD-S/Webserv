@@ -44,15 +44,7 @@ HttpRequest *HttpRequest::setVersion(const std::string &version) {
 }
 
 HttpRequest *HttpRequest::setHeader(const std::string &key, const std::string &value) {
-    // format the header key to be capitalized and separated by dashes
-    std::string formattedKey;
-    for (std::string::const_iterator it = key.begin(); it != key.end(); ++it) {
-        if (it == key.begin() || *(it - 1) == '-')
-            formattedKey += (char)toupper(*it);
-        else
-            formattedKey += *it;
-    }
-    _headers.insert(std::make_pair(key, value));
+    _headers.insert(std::make_pair(stringToLower(key), value));
     return this;
 }
 
@@ -146,22 +138,7 @@ std::string HttpRequest::trim(const std::string &str) {
     return str.substr(first, last - first + 1);
 }
 
-void HttpRequest::parsePostParams(std::istringstream &stream) {
-    std::string param;
-
-    while (std::getline(stream, param, '&')) {
-        // Split each parameter into key and value
-        size_t equal_pos = param.find('=');
-        if (equal_pos != std::string::npos) {
-            std::string key = param.substr(0, equal_pos);
-            std::string value = param.substr(equal_pos + 1);
-            _params[key] = value;
-        } else
-            _body.append(param);
-    }
-}
-
-void HttpRequest::parseGetParams(const std::string &path_string) {
+void HttpRequest::parseParams(const std::string &path_string) {
 
     // Find the position of the '?' character
 
@@ -238,8 +215,7 @@ HttpRequest *HttpRequest::parseHeader(std::string &request)
 
     requestLineStream >> _method >> _path >> _version;
 
-    if (_method == "GET")
-        parseGetParams(_path);
+	parseParams(_path);
 
     while (std::getline(stream, line, '\n')) {
             // Find the position of the colon in the line
@@ -257,45 +233,7 @@ HttpRequest *HttpRequest::parseHeader(std::string &request)
 }
 
 HttpRequest *HttpRequest::parseBody(std::string &request) {
-    std::istringstream stream(request, std::ios::binary);
-    std::string line;
-
-    std::getline(stream, line, '\n');
-
-    std::string temp;
-
-    bool isFile = false;
-
-    while (std::getline(stream, line, '\n')) {
-        if (line == "\r" && !isFile)
-        {
-            if (_body.find("Content-Disposition: form-data;") != std::string::npos &&
-                    _body.find("filename=\"") != std::string::npos) {
-                // Extract the filename from the Content-Disposition header
-                size_t filenameStart = _body.find("filename=\"") + 10; // Length of "filename=\""
-                size_t filenameEnd = _body.find("\"", filenameStart);
-                std::string myValue = _body.substr(filenameStart, filenameEnd - filenameStart);
-                std::string myKey = "file-name";
-                this->setHeader(myKey, myValue);
-                _body.clear();
-            }
-            continue;
-        }
-        _body.append(line);
-        _body.append("\n"); // Append newline as it's removed by std::getline
-    }
-/*    std::string fileBoundary = getHeader("content-type");
-    if (fileBoundary.find("boundary=") != std::string::npos) {
-        size_t boundaryStart = fileBoundary.find("boundary=") + 9; // Length of "boundary="
-        std::string boundary = fileBoundary.substr(boundaryStart);
-        LOG_ERROR(fileBoundary);
-        LOG_ERROR(_body.substr(_body.find_last_of("\n") + 1));
-        LOG_ERROR(boundary);
-        if (_body.find(boundary) != std::string::npos) {
-            _body.erase(_body.find_last_of(boundary));
-        }
-    }*/
-
+	_body = request;
     return this;
 }
 

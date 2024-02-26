@@ -31,18 +31,20 @@ PollManager &PollManager::operator=(const PollManager &src) {
 
 void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig) {
     for (unsigned long i = 0; i < serversConfig.size(); ++i) {
-        int j = socket(AF_INET, SOCK_STREAM, 0);
-        if (j < 0) {
-            LOG_SYS_ERROR("Socket creation failed");
-            kill(getpid(), SIGINT);
-        }
-        int reuse = 1;
-        setsockopt(j, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)); // Reuse the port
-        struct timeval timeout;
-        timeout.tv_sec = 0; // 5 seconds timeout
-        timeout.tv_usec = 30000; // Make it only for POST requests as it affects the benchmark
-        setsockopt(j, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(timeout)); // timeout for recv
-        serverSockets.push_back(std::make_pair(j, &serversConfig[i]));
+		for (unsigned long j = 0; j < serversConfig[i].getListen().size(); j++) {
+			int s = socket(AF_INET, SOCK_STREAM, 0);
+			if (s < 0) {
+				LOG_SYS_ERROR("Socket creation failed");
+				kill(getpid(), SIGINT);
+			}
+			int reuse = 1;
+			setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const char *) &reuse, sizeof(reuse)); // Reuse the port
+			struct timeval timeout;
+			timeout.tv_sec = 0; // 5 seconds timeout
+			timeout.tv_usec = 30000; // Make it only for POST requests as it affects the benchmark
+			setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (const char *) &timeout, sizeof(timeout)); // timeout for recv
+			serverSockets.push_back(std::make_pair(s, &serversConfig[i]));
+		}
     }
     for (unsigned long i = 0; i < serversConfig.size(); ++i) {
         struct sockaddr_in server;
@@ -56,15 +58,11 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig) {
                 server.sin_addr.s_addr = inet_addr(serversConfig[i].getListen()[j].first.c_str());
             server.sin_port = htons(serversConfig[i].getListen()[j].second);
 			_servers.push_back(server);
-        }
+		}
     }
 }
 
 void PollManager::binder(const std::vector<ServerConfig> &servers) {
-    if (_servers.size() != serverSockets.size()) {
-        LOG_SYS_ERROR("Servers and sockets size mismatch");
-        kill(getpid(), SIGINT);
-    }
     LOG_DEBUG("Binding " << _servers.size() << " servers");
     for (unsigned long i = 0; i < _servers.size(); i++) {
         if (bind(serverSockets[i].first, (struct sockaddr *) &_servers[i], sizeof(struct sockaddr_in)) == -1) {
@@ -72,9 +70,11 @@ void PollManager::binder(const std::vector<ServerConfig> &servers) {
             kill(getpid(), SIGINT);
         }
     }
-    for (unsigned long i = 0; i < serverSockets.size(); i++)
-        LOG_INFO("Socket " << serverSockets[i].first << " is bound to " << servers[i].getListen()[0].first << ":"
-                           << servers[i].getListen()[0].second);
+    for (unsigned long i = 0; i < servers.size(); i++)
+		for (unsigned long j = 0; j < servers[i].getListen().size(); j++)
+
+        	LOG_INFO("Socket " << serverSockets[i].first << " is bound to " << servers[i].getListen()[j].first << ":"
+                           	<< servers[i].getListen()[j].second);
     for (unsigned long i = 0; i < serverSockets.size(); i++) {
         if (listen(serverSockets[i].first, 25) < 0) {
             LOG_SYS_ERROR("Listen failed");

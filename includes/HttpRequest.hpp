@@ -70,9 +70,7 @@ public:
 
     std::string getQueryString() const;
 
-    void parseGetParams(const std::string &path_string);
-
-    void parsePostParams(std::istringstream &stream);
+    void parseParams(const std::string &path_string);
 
     void printHttpRequest() const;
 

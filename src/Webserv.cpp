@@ -133,35 +133,22 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 			return getFile(request, config, response);
 		}
 
-        if (request->getMethod() == "POST") {
-            LOG_DEBUG("POST request");
-            std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("file-name")).c_str(), std::ios::binary);
-            LOG_DEBUG("Upload path: " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("file-name")));
-            if (file.is_open())
-            {
-                response->setHeader("Connection", "keep-alive");
-
-                file.write(request->getBody().c_str(), request->getBody().size());
-                file.close();
-                response->setStatus(HttpStatus::OK);
-            }
-            else
-            {
-                LOG_SYS_ERROR("Error opening file while POST " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("File-Name")));
-                response->setStatus(409);
-            }
-            return response;
-        }
-
 		if (request->getMethod() == "DELETE") {
 			LOG_DEBUG("DELETE request");
 			std::string path = getDirPath(request, config);
+			if (!fileExists(path)) {
+				LOG_DEBUG("File not found");
+				setErrorResponse(response, HttpStatus::NOT_FOUND, const_cast<LocationConfig *>(config));
+				return response;
+			}
 			if (remove(path.c_str()) != 0) {
 				LOG_SYS_ERROR("Error deleting file " << path);
 				setErrorResponse(response, HttpStatus::INTERNAL_SERVER_ERROR, const_cast<LocationConfig *>(config));
 				return response;
 			}
-			return response->setStatus(HttpStatus::NO_CONTENT);
+			response->setStatus(HttpStatus::OK);
+			response->setBody("<html><body><h1>Deleted</h1></body></html>");
+			return response;
 		}
 		LOG_WARNING("Using default response");
         setDefaultResponse(response, const_cast<LocationConfig *>(config));
