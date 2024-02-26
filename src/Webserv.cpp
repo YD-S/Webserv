@@ -133,6 +133,26 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 			return getFile(request, config, response);
 		}
 
+        if (request->getMethod() == "POST") {
+            LOG_DEBUG("POST request");
+            std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("file-name")).c_str(), std::ios::binary);
+            LOG_DEBUG("Upload path: " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("file-name")));
+            if (file.is_open())
+            {
+                response->setHeader("Connection", "keep-alive");
+
+                file.write(request->getBody().c_str(), request->getBody().size());
+                file.close();
+                response->setStatus(HttpStatus::OK);
+            }
+            else
+            {
+                LOG_SYS_ERROR("Error opening file while POST " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("File-Name")));
+                response->setStatus(409);
+            }
+            return response;
+        }
+
 		if (request->getMethod() == "DELETE") {
 			LOG_DEBUG("DELETE request");
 			std::string path = getDirPath(request, config);
