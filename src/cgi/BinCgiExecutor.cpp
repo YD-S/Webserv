@@ -135,6 +135,7 @@ char **BinCgiExecutor::buildEnvp(HttpRequest *request) {
 	envp_vector.push_back("SCRIPT_NAME=" + request->getPath());
 	envp_vector.push_back("PATH_TRANSLATED=" + Webserv::getDirPath(request, _config));
 	envp_vector.push_back("BODY=" + request->getBody());
+	LOG_DEBUG("BODY: " << request->getBody());
 
 	// Other environment variables
 	if (request->getMethod() == "GET") {
