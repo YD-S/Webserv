@@ -183,12 +183,10 @@ void HttpRequest::printHttpRequest() const {
         std::cout << it->first << ": " << it->second << std::endl;
     }
 
+    // Print body
+    //std::cout << "\nBody:\n\n" << _body << std::endl;
+
 }
-
-
-#include "Webserv.hpp"
-#include "MimeTypes.hpp"
-#include "cgi/BinCgiExecutor.hpp"
 
 int HttpRequest::isInvalid(const LocationConfig *location) const{
     if (_method != "GET" && _method != "POST" && _method != "DELETE")
@@ -203,8 +201,8 @@ int HttpRequest::isInvalid(const LocationConfig *location) const{
 }
 
 
-HttpRequest *HttpRequest::parseHeader(std::string &request)
-{
+HttpRequest *HttpRequest::parse(std::string &request) {
+    std::cout << request << std::endl;
     std::istringstream stream(request, std::ios::binary);
     std::string line;
 
@@ -215,28 +213,49 @@ HttpRequest *HttpRequest::parseHeader(std::string &request)
 
     requestLineStream >> _method >> _path >> _version;
 
-	parseParams(_path);
+    parseParams(_path);
+
+    bool headersComplete = false; // Flag to indicate if headers are complete
+    bool isFile = false;
 
     while (std::getline(stream, line, '\n')) {
+        if (!headersComplete) {
             // Find the position of the colon in the line
             std::size_t colonPos = line.find(':');
 
             if (colonPos != std::string::npos) {
                 // Extract header and value
                 std::string header = stringToLower(trim(line.substr(0, colonPos)));
-                std::string value = trim(line.substr(colonPos + 1));
+                std::string value = stringToLower(trim(line.substr(colonPos + 1)));
 
                 this->setHeader(header, value);
+            } else if (line == "\r") {
+                // Empty line indicates end of headers
+                headersComplete = true;
             }
+        } else {
+            // After headers, the remaining data is the body
+            if (line == "\r" && !isFile) // Is its a multi-part, each part will have a \r\n line to determine the end of the part headers. This only works for one file upload :)Z
+            {
+                if (_body.find("Content-Disposition: form-data;") != std::string::npos &&
+                    _body.find("filename=\"") != std::string::npos) {
+                    // Extract the filename from the Content-Disposition header
+                    size_t filenameStart = _body.find("filename=\"") + 10; // Length of "filename=\""
+                    size_t filenameEnd = _body.find("\"", filenameStart);
+                    std::string myValue = _body.substr(filenameStart, filenameEnd - filenameStart);
+                    std::string myKey = "File-Name";
+                    this->setHeader(myKey, myValue);
+                    _body.clear();
+                }
+                continue;
+            }
+            _body.append(line);
+            _body.append("\n"); // Append newline as it's removed by std::getline
+        }
     }
+    printHttpRequest();
     return this;
 }
-
-HttpRequest *HttpRequest::parseBody(std::string &request) {
-	_body = request;
-    return this;
-}
-
 
 int HttpRequest::getFd() const {
     return _serverFd;

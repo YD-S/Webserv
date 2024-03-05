@@ -82,9 +82,7 @@ public:
 
     int isInvalid(const LocationConfig *location) const;
 
-    HttpRequest *parseHeader(std::string &request);
-
-    HttpRequest *parseBody(std::string &request);
+    HttpRequest *parse(std::string &request);
 };
 
 

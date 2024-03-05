@@ -117,59 +117,25 @@ void PollManager::poller() {
 
             std::string requestString;
             char buffer[BUFFER_SIZE] = {0};
-            ssize_t readValue = 0;
-            int timesreadValue = 0;
-            //long byteRead = 0;
-            long totalBytesReceived = 0;
-            long bytesLeftToReceive = 0;
-            std::string temp;
-            std::string header;
-            char *headerHasEnded = 0;
-            HttpRequest *request = new HttpRequest();
+            int readValue = 0;
             do {
-                for (int j = 0; j < BUFFER_SIZE; ++j)
+                for (int j = 0; j < BUFFER_SIZE; j++)
                     buffer[j] = 0;
-                std::cout << "Reading from socket " << clientSocket << ". Iteration number " << timesreadValue++ << ". ";
-                std::cout << "Bytes left to read: " << bytesLeftToReceive << std::endl;
-                while (!headerHasEnded) {
-                    for (int j = 0; j < BUFFER_SIZE; ++j)
-                        buffer[j] = 0;
-                    readValue = read(clientSocket, buffer, BUFFER_SIZE);
-                    temp.append(buffer);
-                    headerHasEnded = std::strstr(buffer, "\r\n\r\n");
-                    if (headerHasEnded)
-                    {
-                        headerHasEnded += 4;
-                        header = temp.substr(0, headerHasEnded - buffer);
-                        request->parseHeader(header);
-                        requestString = temp.substr(headerHasEnded - buffer);
-                        totalBytesReceived += requestString.size();
-                        if (!bytesLeftToReceive)
-                        {
-                            std::string temp2 = request->getHeader("content-length");
-                            if (!temp2.empty())
-                                bytesLeftToReceive = ft_stoul(request->getHeader("content-length")) - requestString.size();
-                        }
-                    }
-
-                }
-                readValue = recv(clientSocket, buffer, BUFFER_SIZE, MSG_WAITALL);
-                //byteRead += readValue;
+                readValue = read(clientSocket, buffer, BUFFER_SIZE);
                 if (readValue < 0) {
                     LOG_SYS_ERROR("Read failed");
                     continue;
                 }
                 requestString.append(buffer, readValue);
-                totalBytesReceived += readValue;
-                bytesLeftToReceive -= readValue;
-            } while (readValue > 0);
+            } while (readValue == BUFFER_SIZE);
+            std::ofstream file("tmae.jpg", std::ios::binary);
 
-
+            file.write(requestString.c_str(), requestString.size());
             Client client = Client(clientSocket, clientData);
             clients.push_back(client);
+            HttpRequest *request = new HttpRequest();
             request->setFd(serverSockets[i].first);
-            LOG_WARNING(requestString.size());
-            request->parseBody(requestString);
+            request->parse(requestString);
             _requests.push_back(std::make_pair(request, client));
 
             LOG_DEBUG("Request received from socket " << clientSocket);
