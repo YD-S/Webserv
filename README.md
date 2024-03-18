@@ -1,14 +1,28 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/YD-S/42_project-readmes/master/banners/cursus/projects/webserv-dark.png"/>
+</div>
+<a href='https://profile.intra.42.fr/users/ysingh' target="_blank">
+        <img alt='42 (oscuro)' src='https://img.shields.io/badge/Málaga-black?style=flat&logo=42&logoColor=white'/>
+</a>
+
 # Webserv
 
 A simple web server written in C++.
 
+## Features
+- Support for HTTP/1.1 protocol
+- Handling of GET, POST and DELETE requests
+- Static file serving
+- Dynamic content generation
+- Configuration via `.conf` files
+- Multi-threaded and/or event-driven architecture
+- Support for CGI scripts
+- Support for file uploads
+- Support for directory listing
+
 ## Development
 
 ### Diagrams
-
-#### Class diagram
-
-![Class diagram](./docs/class_diagram.svg)
 
 #### Sequence diagram
 
@@ -134,6 +148,6 @@ make
 ### Run
 
 ```bash
-./webserv [config_file]
+./webserv [config_file Optional - default: configs/default.conf]
 ```
 
