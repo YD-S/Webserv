@@ -1,44 +1,38 @@
-import os
-import urllib.parse
+#!/usr/bin/env python3
+import cgi
 
-class Request:
-    def __init__(self, environ):
-        self.environ = environ
-        self.method = environ['REQUEST_METHOD']
-        self.query = urllib.parse.parse_qs(environ.get('QUERY_STRING', ''))
-        self.body = environ['BODY']
+# Encabezado para indicar que el contenido es HTML
+print("Content-type:text/html\r\n\r\n")
 
-    def __str__(self):
-        s = f'Method: {self.method}\r\nQuery: {self.query}\r\nBody: {self.body}'
-        return s
+# Obtener datos del formulario
+form = cgi.FieldStorage()
 
-class Response:
-    def __init__(self, status_code, headers, body):
-        self.status_code = status_code
-        self.headers = headers
-        self.body = body
+# Función para calcular el resultado
+def calcular(num1, num2, operacion):
+    if operacion == "add":
+        return num1 + num2
+    elif operacion == "subtract":
+        return num1 - num2
+    elif operacion == "multiply":
+        return num1 * num2
+    elif operacion == "division":
+        if num2 != 0:
+            return num1 / num2
+        else:
+            return "Error: División por cero"
 
-    def __str__(self):
-        headers = ''
-        for key, value in self.headers.items():
-            headers += f'{key}: {value}\r\n'
-        s = f'Status: {self.status_code}\r\n{headers}\r\n{self.body}'
-        return s
-
-    def send(self):
-        print(str(self), end='')
-
-
-request = Request(os.environ)
-
-body = str(request)
-
-response = Response(
-    200,
-    {
-        'Content-Type': 'text/plain',
-        'Content-Length': len(body)
-    },
-    body
-)
-response.send()
+# Verificar si se enviaron los parámetros
+if "num1" in form and "num2" in form and "operacion" in form:
+    try:
+        num1 = float(form.getvalue("num1"))
+        num2 = float(form.getvalue("num2"))
+        operacion = form.getvalue("operacion")
+        print("num1:", num1)  # Imprimir num1 para depurar
+        print("num2:", num2)  # Imprimir num2 para depurar
+        print("operacion:", operacion)  # Imprimir operacion para depurar
+        resultado = calcular(num1, num2, operacion)
+        print("<h2>El resultado es: {}</h2>".format(resultado))
+    except ValueError:
+        print("<h2>Por favor, introduce números válidos.</h2>")
+else:
+    print("<h2>Por favor, introduce todos los valores requeridos.</h2>")
