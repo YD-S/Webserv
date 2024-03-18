@@ -226,7 +226,7 @@ HttpRequest *HttpRequest::parse(std::string &request) {
             if (colonPos != std::string::npos) {
                 // Extract header and value
                 std::string header = stringToLower(trim(line.substr(0, colonPos)));
-                std::string value = stringToLower(trim(line.substr(colonPos + 1)));
+                std::string value = trim(line.substr(colonPos + 1));
 
                 this->setHeader(header, value);
             } else if (line == "\r") {
@@ -253,6 +253,8 @@ HttpRequest *HttpRequest::parse(std::string &request) {
             _body.append("\n"); // Append newline as it's removed by std::getline
         }
     }
+    if (_method == "POST" && _headers.find("content-disposition") == _headers.end())
+        parseParams(_body);
     printHttpRequest();
     return this;
 }
