@@ -53,7 +53,7 @@ size_t ft_stoul(const std::string &str) {
 }
 
 
-void ft_error(const std::string &msg, int errorCode) {
+void ft_error(unused const std::string &msg, int errorCode) {
 	LOG_SYS_ERROR(msg);
 	exit_handler(errorCode);
 }

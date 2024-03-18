@@ -108,7 +108,8 @@ void PollManager::poller() {
     for (unsigned long i = 0; i < serverSockets.size(); i++) {
         if (FD_ISSET(serverSockets[i].first, &read_fd)) {
             socklen_t sizeClient = sizeof(clientData);
-            clientSocket = accept(serverSockets[i].first, (struct sockaddr *) &clientData, &sizeClient);
+			if(_requests.size() < 256)
+            	clientSocket = accept(serverSockets[i].first, (struct sockaddr *) &clientData, &sizeClient);
             if (clientSocket < 0) {
                 LOG_SYS_ERROR("Accept failed");
                 continue;

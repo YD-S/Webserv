@@ -135,8 +135,8 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 
         if (request->getMethod() == "POST") {
             LOG_DEBUG("POST request");
-            std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("file-name")).c_str(), std::ios::binary);
-            LOG_DEBUG("Upload path: " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("file-name")));
+			std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append(request->getHeader("file-name")).c_str(), std::ios::out | std::ios::binary);
+            LOG_DEBUG("Upload path: " << getDirPath(request, config).append(config->getUploadPath()).append(request->getHeader("file-name")));
             if (file.is_open())
             {
                 response->setHeader("Connection", "keep-alive");
@@ -147,7 +147,7 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
             }
             else
             {
-                LOG_SYS_ERROR("Error opening file while POST " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("File-Name")));
+                LOG_SYS_ERROR("Error opening file while POST " << getDirPath(request, config).append(config->getUploadPath()).append(request->getHeader("File-Name")));
                 response->setStatus(409);
             }
             return response;
