@@ -166,7 +166,7 @@ void PollManager::poller() {
         for (unsigned long j = 0; j < _responses.size(); j++) {
             if (_responses[j].first == responsesSent[i]) {
                 _responses.erase(_responses.begin() + j);
-                LOG_INFO("Deleting response ");
+                LOG_DEBUG("Deleting response");
                 delete responsesSent[i];
                 break;
             }
