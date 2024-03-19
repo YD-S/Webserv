@@ -29,23 +29,27 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	}
 	// Child process
 	if (pid == 0) {
+        close(request_pipe[1]);
 		// Duplicate the write end of the response_pipe to stdout
 		if (dup2(response_pipe[1], STDOUT_FILENO) == -1) {
 			LOG_ERROR("Failed to duplicate STDOUT_FILENO pipe");
+            exit(1);
 		}
 
 		// Duplicate the read end of the request_pipe to stdin
 		if (dup2(request_pipe[0], STDIN_FILENO) == -1) {
 			LOG_ERROR("Failed to duplicate STDIN_FILENO pipe");
+            exit(1);
 		}
+
 
 		// Execute the CGI
 		execve(this->getCgiPath().c_str(), args, envp_);
-		return false;
 		// If we get here, execve failed
 	}
 		// Parent process
 	else {
+        close(request_pipe[0]);
 		// Write the request body to the pipe
 		LOG_DEBUG("Writing to pipe: " << request->getBody());
 		if (write(request_pipe[1], request->getBody().c_str(), request->getBody().size()) == -1) {

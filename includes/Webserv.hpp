@@ -56,5 +56,6 @@ public:
 	static std::string getDirPath(const HttpRequest *request, const LocationConfig *config);
 };
 
+extern Webserv *webserv;
 
 #endif //WEBSERV_WEBSERV_HPP

@@ -6,6 +6,8 @@
 #include "MimeTypes.hpp"
 #include "cgi/BinCgiExecutor.hpp"
 
+Webserv *webserv;
+
 Webserv::Webserv() {
 	LOG_INFO("Webserv created");
 }
@@ -233,6 +235,7 @@ Webserv &Webserv::operator=(const Webserv &other) {
 
 Webserv::~Webserv() {
 	for (std::map<std::string, ICgiExecutor *>::iterator it = cgiExecutors.begin(); it != cgiExecutors.end(); ++it) {
+        LOG_DEBUG("Deleting cgi " << it->second->getCgiName());
 		delete it->second;
 	}
 	LOG_DEBUG("Webserv destroyed");

@@ -2,6 +2,7 @@
 #include <vector>
 #include "utils.hpp"
 #include "PollManager/PollManager.hpp"
+#include "Webserv.hpp"
 
 
 bool is_dir(const std::string &path) {
@@ -127,5 +128,6 @@ void exit_handler(int status) {
 		close(serverSockets[i].first);
 		LOG_DEBUG("Socket " << serverSockets[i].first << " closed");
 	}
+    delete webserv;
 	exit(status);
 }
