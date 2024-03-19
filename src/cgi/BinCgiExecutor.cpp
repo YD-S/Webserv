@@ -13,6 +13,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	int pipe_fd[2];
 	if (pipe(pipe_fd) == -1) {
 		LOG_ERROR("Failed to create pipe");
+        return false;
 	}
 
 	// Build the environment variables
@@ -25,6 +26,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	pid_t pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("Failed to fork");
+        return false;
 	}
 	// Child process
 	if (pid == 0) {
@@ -54,6 +56,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		LOG_DEBUG("Writing to pipe: " << request->getBody());
 		if (write(pipe_fd[1], request->getBody().c_str(), request->getBody().size()) == -1) {
 			LOG_ERROR("Failed to write to pipe");
+            return false;
 		}
 		// Close the write end of the pipe
         close(pipe_fd[1]);
@@ -67,6 +70,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		int kq = kqueue();
 		if (kq == -1) {
 			LOG_ERROR("Failed to create kqueue");
+            return false;
 		}
 		int num_events = kevent(kq, &ev, 1, &ev, 1, &timeout_s);
 
@@ -75,12 +79,14 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		int epoll_fd = epoll_create(1);
 		if (epoll_fd == -1) {
 			LOG_ERROR("Failed to create epoll");
+			return false;
 		}
 		struct epoll_event event = {};
 		event.events = EPOLLIN;
 		event.data.fd = pipe_fd[0];
 		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, pipe_fd[0], &event) == -1) {
 			LOG_ERROR("Failed to add pipe to epoll");
+			return false;
 		}
 		struct epoll_event events[1];
 
@@ -89,6 +95,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 
 		if (num_events == -1) {
 			LOG_ERROR("Failed to wait for pipe");
+            return false;
 		}
 		if (num_events == 0) {
 			LOG_ERROR("Timeout waiting for CGI response");
@@ -113,8 +120,8 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 			_cgiResult += std::string(buffer, bytes_read);
 		}
 
-		// Close the read end of the pipe
 		close(pipe_fd[0]);
+        close(pipe_fd[1]);
 
 		destroyCstrp(envp_);
 		destroyCstrp(args);
