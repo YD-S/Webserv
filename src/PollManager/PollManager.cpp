@@ -129,9 +129,6 @@ void PollManager::poller() {
                 }
                 requestString.append(buffer, readValue);
             } while (readValue == BUFFER_SIZE);
-            std::ofstream file("tmae.jpg", std::ios::binary);
-
-            file.write(requestString.c_str(), requestString.size());
             Client client = Client(clientSocket, clientData);
             clients.push_back(client);
             HttpRequest *request = new HttpRequest();
@@ -169,6 +166,7 @@ void PollManager::poller() {
         for (unsigned long j = 0; j < _responses.size(); j++) {
             if (_responses[j].first == responsesSent[i]) {
                 _responses.erase(_responses.begin() + j);
+                LOG_INFO("Deleting response ");
                 delete responsesSent[i];
                 break;
             }
