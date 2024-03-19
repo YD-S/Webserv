@@ -10,9 +10,8 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	// Create a pipe to communicate with the CGI
 	// We need to write the request body to the pipe and read the response from the pipe,
 	// so we need two file descriptors
-	int request_pipe[2];
-	int response_pipe[2];
-	if (pipe(request_pipe) == -1 || pipe(response_pipe) == -1) {
+	int pipe_fd[2];
+	if (pipe(pipe_fd) == -1) {
 		LOG_ERROR("Failed to create pipe");
 	}
 
@@ -29,18 +28,20 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	}
 	// Child process
 	if (pid == 0) {
-        close(request_pipe[1]);
 		// Duplicate the write end of the response_pipe to stdout
-		if (dup2(response_pipe[1], STDOUT_FILENO) == -1) {
+		if (dup2(pipe_fd[1], STDOUT_FILENO) == -1) {
 			LOG_ERROR("Failed to duplicate STDOUT_FILENO pipe");
             exit(1);
 		}
 
-		// Duplicate the read end of the request_pipe to stdin
-		if (dup2(request_pipe[0], STDIN_FILENO) == -1) {
+		// Duplicate the read end of the pipe_fd to stdin
+		if (dup2(pipe_fd[0], STDIN_FILENO) == -1) {
 			LOG_ERROR("Failed to duplicate STDIN_FILENO pipe");
             exit(1);
 		}
+
+        close(pipe_fd[0]);
+        close(pipe_fd[1]);
 
 
 		// Execute the CGI
@@ -49,20 +50,19 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	}
 		// Parent process
 	else {
-        close(request_pipe[0]);
 		// Write the request body to the pipe
 		LOG_DEBUG("Writing to pipe: " << request->getBody());
-		if (write(request_pipe[1], request->getBody().c_str(), request->getBody().size()) == -1) {
+		if (write(pipe_fd[1], request->getBody().c_str(), request->getBody().size()) == -1) {
 			LOG_ERROR("Failed to write to pipe");
 		}
 		// Close the write end of the pipe
-		close(response_pipe[1]);
+        close(pipe_fd[1]);
 
 		bool timeout = false;
 #if __APPLE__
 
 		struct kevent ev = {};
-		EV_SET(&ev, response_pipe[0], EVFILT_READ, EV_ADD, 0, 0, NULL);
+		EV_SET(&ev, pipe_fd[0], EVFILT_READ, EV_ADD, 0, 0, NULL);
 		struct timespec timeout_s = {TIMEOUT_SEC, 0};
 		int kq = kqueue();
 		if (kq == -1) {
@@ -78,8 +78,8 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		}
 		struct epoll_event event = {};
 		event.events = EPOLLIN;
-		event.data.fd = response_pipe[0];
-		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, response_pipe[0], &event) == -1) {
+		event.data.fd = pipe_fd[0];
+		if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, pipe_fd[0], &event) == -1) {
 			LOG_ERROR("Failed to add pipe to epoll");
 		}
 		struct epoll_event events[1];
@@ -109,12 +109,12 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		char buffer[1024];
 		_cgiResult = "";
 		ssize_t bytes_read;
-		while ((bytes_read = read(response_pipe[0], buffer, 1024)) > 0) {
+		while ((bytes_read = read(pipe_fd[0], buffer, 1024)) > 0) {
 			_cgiResult += std::string(buffer, bytes_read);
 		}
 
 		// Close the read end of the pipe
-		close(response_pipe[0]);
+		close(pipe_fd[0]);
 
 		destroyCstrp(envp_);
 		destroyCstrp(args);
