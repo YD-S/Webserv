@@ -232,6 +232,9 @@ Webserv &Webserv::operator=(const Webserv &other) {
 }
 
 Webserv::~Webserv() {
+	for (std::map<std::string, ICgiExecutor *>::iterator it = cgiExecutors.begin(); it != cgiExecutors.end(); ++it) {
+		delete it->second;
+	}
 	LOG_DEBUG("Webserv destroyed");
 }
 
@@ -353,6 +356,8 @@ HttpResponse *Webserv::generateDirectoryListing(const HttpRequest *request, cons
 	body += "</tbody></table></body></html>";
 
 	response->setBody(body);
+
+	closedir(dir);
 
 	return response;
 }
