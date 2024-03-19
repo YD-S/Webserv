@@ -190,8 +190,8 @@ void PollManager::setResponses(std::vector<std::pair<HttpResponse *, Client> > r
 void PollManager::setRequestHandled(HttpRequest *request) {
     for (std::vector<std::pair<HttpRequest *, Client> >::iterator it = _requests.begin(); it != _requests.end(); ++it) {
         if (it->first == request) {
-            _requests.erase(it);
             delete it->first;
+            _requests.erase(it);
             return;
         } else
             LOG_SYS_ERROR("Request not found");
