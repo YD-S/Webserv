@@ -17,7 +17,9 @@ void Webserv::parseConfig(const std::string &path) {
 	parse.parseConfig();
 	if (parse.getServers().empty())
 		LOG_SYS_ERROR("NO SERVER :(\t");
+#if DEBUG == 0
     parse.printAll();
+#endif
 }
 
 void Webserv::run(char **envp) {

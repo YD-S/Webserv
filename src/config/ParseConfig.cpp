@@ -643,8 +643,8 @@ void ParseConfig::printAll() {
         // Print Default Location
         const LocationConfig *defaultLocation = server.getDefaultLocation();
         std::cout << "Default Location:" << std::endl;
-        printLocation(*defaultLocation);
 
+        printLocation(*defaultLocation);
         // Print Locations
         const std::vector<LocationConfig> &locations = server.getLocations();
         for (std::vector<LocationConfig>::const_iterator locationIt = locations.begin();
@@ -653,7 +653,6 @@ void ParseConfig::printAll() {
             printLocation(*locationIt);
             // Add more details if needed
         }
-
         std::cout << std::endl;  // Add a separator between servers
     }
 }

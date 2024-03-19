@@ -255,7 +255,6 @@ HttpRequest *HttpRequest::parse(std::string &request) {
     }
     if (_method == "POST" && _headers.find("content-disposition") == _headers.end())
         parseParams(_body);
-    printHttpRequest();
     return this;
 }
 

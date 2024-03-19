@@ -15,7 +15,6 @@ A simple web server written in C++.
 - Static file serving
 - Dynamic content generation
 - Configuration via `.conf` files
-- Multi-threaded and/or event-driven architecture
 - Support for CGI scripts
 - Support for file uploads
 - Support for directory listing
@@ -30,7 +29,7 @@ A simple web server written in C++.
 
 ### Macros
 
-- `DEBUG`: Set the debug level. The higher the level, the higher the severity of the log messages. The default level is
+- `DEBUG`: Set the minimum debug level. The higher the level, the higher the severity of the log messages. The default level is
   3, for only error messages. Minimum level is 0, for all debug messages.
     - `0`: Debug messages
     - `1`: Info messages
