@@ -39,7 +39,13 @@ void Webserv::run(char **envp) {
 					 it3 != cgis.end(); ++it3) {
 					std::string extension = it3->first;
 					std::string path = it3->second;
-					cgiExecutors[extension] = new BinCgiExecutor(path, extension, envp, &(*it2));
+                    if (cgiExecutors.find(extension) == cgiExecutors.end())
+                        cgiExecutors[extension] = new BinCgiExecutor(path, extension, envp, &(*it2));
+                    else
+                    {
+                        delete cgiExecutors[extension];
+                        cgiExecutors[extension] = new BinCgiExecutor(path, extension, envp, &(*it2));
+                    }
 				}
 			}
 		}
