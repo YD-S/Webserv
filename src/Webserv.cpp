@@ -119,7 +119,7 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 			LOG_DEBUG("Redirect enabled");
 			return response->setStatus(HttpStatus::MOVED_PERMANENTLY)->setHeader("Location", config->getRedirect());
 		}
-		if ((request->getMethod() == "GET" || request->getMethod() == "POST") &&
+		if ((request->getMethod() == "GET" || (request->getMethod() == "POST" && request->getHeaders().find("file-name") == request->getHeaders().end())) &&
 			config->isCgiEnabled() &&
 			!is_dir(getDirPath(request, config))
 				) {
@@ -144,8 +144,8 @@ HttpResponse *Webserv::handleWithLocation(unused const HttpRequest *request, unu
 
         if (request->getMethod() == "POST") {
             LOG_DEBUG("POST request");
-			std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append(request->getHeader("file-name")).c_str(), std::ios::out | std::ios::binary);
-            LOG_DEBUG("Upload path: " << getDirPath(request, config).append(config->getUploadPath()).append(request->getHeader("file-name")));
+			std::ofstream file(getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("file-name")).c_str(), std::ios::out | std::ios::binary);
+            LOG_DEBUG("Upload path: " << getDirPath(request, config).append(config->getUploadPath()).append("/").append(request->getHeader("file-name")));
             if (file.is_open())
             {
                 response->setHeader("Connection", "keep-alive");

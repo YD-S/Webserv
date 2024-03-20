@@ -235,7 +235,7 @@ HttpRequest *HttpRequest::parse(std::string &request) {
             }
         } else {
             // After headers, the remaining data is the body
-            if (line == "\r" && !isFile) // Is its a multi-part, each part will have a \r\n line to determine the end of the part headers. This only works for one file upload :)Z
+            if (line == "\r" && !isFile) // If its a multi-part, each part will have a \r\n line to determine the end of the part headers. This only works for one file upload :)
             {
                 if (_body.find("Content-Disposition: form-data;") != std::string::npos &&
                     _body.find("filename=\"") != std::string::npos) {

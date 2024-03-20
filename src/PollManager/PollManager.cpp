@@ -39,10 +39,6 @@ void PollManager::socketConfig(const std::vector<ServerConfig> &serversConfig) {
 			}
 			int reuse = 1;
 			setsockopt(s, SOL_SOCKET, SO_REUSEADDR, (const char *) &reuse, sizeof(reuse)); // Reuse the port
-			struct timeval timeout;
-			timeout.tv_sec = 0; // 5 seconds timeout
-			timeout.tv_usec = 30000; // Make it only for POST requests as it affects the benchmark
-			setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (const char *) &timeout, sizeof(timeout)); // timeout for recv
 			serverSockets.push_back(std::make_pair(s, &serversConfig[i]));
 		}
     }
