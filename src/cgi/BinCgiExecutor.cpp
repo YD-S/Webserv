@@ -13,9 +13,8 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	int pipe_fd[2];
 	if (pipe(pipe_fd) == -1) {
 		LOG_ERROR("Failed to create pipe");
-        return false;
+		return false;
 	}
-
 	// Build the environment variables
 	char **envp_ = buildEnvp(request);
 
@@ -26,7 +25,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 	pid_t pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("Failed to fork");
-        return false;
+		return false;
 	}
 	// Child process
 	if (pid == 0) {
@@ -56,7 +55,7 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 		LOG_DEBUG("Writing to pipe: " << request->getBody());
 		if (write(pipe_fd[1], request->getBody().c_str(), request->getBody().size()) == -1) {
 			LOG_ERROR("Failed to write to pipe");
-            return false;
+			return false;
 		}
 		// Close the write end of the pipe
         close(pipe_fd[1]);
@@ -95,12 +94,13 @@ bool BinCgiExecutor::executeCgi(HttpRequest *request, std::string *response, std
 
 		if (num_events == -1) {
 			LOG_ERROR("Failed to wait for pipe");
-            return false;
+			return false;
 		}
 		if (num_events == 0) {
 			LOG_ERROR("Timeout waiting for CGI response");
 			timeout = true;
 			kill(pid, SIGKILL);
+			return false;
 		}
 		// Wait for the child process to finish
 		int status;
